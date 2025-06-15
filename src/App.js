@@ -1,10 +1,33 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar'; 
+import Home from './pages/Home';
+import Cadastro from './pages/Cadastro';
+import FAQ from './pages/FAQ';
+import Eventos from './pages/Eventos';
+import Login from './pages/Login';
+import Perfil from './pages/Perfil';
+import Pesquisa from './pages/Pesquisa';
+import Rankings from './pages/Rankings';
+
 function App() {
   return (
-    <div className="h-screen flex items-center justify-center bg-indigo-600 text-white text-4xl">
-      Tailwind funcionando 🎉
-    </div>
+    <Router>
+      <div className="min-h-screen bg-gray-900">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/cadastro" element={<Cadastro />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/eventos" element={<Eventos />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/pesquisa" element={<Pesquisa />} />
+          <Route path="/rankings" element={<Rankings />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
-export default App;
 
+export default App;
