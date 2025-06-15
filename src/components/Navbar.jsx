@@ -1,16 +1,40 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Sidebar from './Sidebar';
+import { Menu, User } from 'lucide-react';
 
 export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
-    <nav className="bg-indigo-700 text-white px-4 py-3 flex gap-6">
-      <Link to="/" className="hover:underline">Home</Link>
-      <Link to="/pesquisa" className="hover:underline">Pesquisa</Link>
-      <Link to="/faq" className="hover:underline">FAQ</Link>
-      <Link to="/cadastro" className="hover:underline">Cadastro</Link>
-      <Link to="/eventos" className="hover:underline">Eventos</Link>
-      <Link to="/login" className="hover:underline">Login</Link>
-      <Link to="/perfil" className="hover:underline">Perfil</Link>
-      <Link to="/rankings" className="hover:underline">Rankings</Link>
-    </nav>
+    <>
+      {/* Navbar superior */}
+      <header className="bg-black text-white flex items-center justify-between px-6 py-3 shadow-md">
+        {/* Ícone Hamburguer */}
+        <button onClick={() => setMenuOpen(true)} className="text-pink-500 hover:text-pink-400 ml-10">
+          <Menu size={30} />
+        </button>
+
+        {/* Logo centralizada */}
+        <Link to="/">
+            <div className="flex justify-center flex-grow">
+                <img
+                    src="/logo-connect-gamers-escuro.png"
+                    alt="Logo Connect Gamers"
+                    className="h-32 max-w-none"
+                />
+            </div>
+        </Link>
+        
+
+        {/* Ícone Perfil */}
+        <Link to="/login" className="text-pink-500 hover:text-pink-400 mr-10">
+          <User size={30} />
+        </Link>
+      </header>
+
+      {/* Sidebar lateral */}
+      <Sidebar isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+    </>
   );
 }
