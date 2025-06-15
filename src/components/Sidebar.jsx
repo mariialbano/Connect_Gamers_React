@@ -9,10 +9,10 @@ export default function Sidebar({ isOpen, onClose }) {
         <div className="p-5 text-xl font-bold border-b border-gray-700">Connect Gamers</div>
         <nav className="flex flex-col gap-4 p-5">
           <Link to="/" onClick={onClose}>Home</Link>
-          <Link to="/eventos" onClick={onClose}>Jogos e Eventos</Link>
+          <Link to="/eventos" onClick={onClose}>Eventos</Link>
           <Link to="/cadastro" onClick={onClose}>Inscreva-se</Link>
           <Link to="/rankings" onClick={onClose}>Rankings</Link>
-          <Link to="/pesquisa" onClick={onClose}>Pesquisa</Link>
+          <Link to="/pesquisa" onClick={onClose}>Saiba mais</Link>
           <Link to="/faq" onClick={onClose}>FAQ</Link>
           <Link to="/perfil" onClick={onClose}>Perfil</Link>
         </nav>

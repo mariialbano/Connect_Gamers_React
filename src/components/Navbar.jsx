@@ -19,7 +19,7 @@ export default function Navbar() {
         <Link to="/">
             <div className="flex justify-center flex-grow">
                 <img
-                    src="/logo-connect-gamers-escuro.png"
+                    src="/assets/logo-connect-gamers-escuro.png"
                     alt="Logo Connect Gamers"
                     className="h-32 max-w-none"
                 />
