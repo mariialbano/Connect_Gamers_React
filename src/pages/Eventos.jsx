@@ -1,110 +1,101 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 
-const jogos = [
-  {
-    id: "cs2",
-    nome: "Counter Strike 2",
-    imagem: "/assets/cs2.png",
-    eventos: [
-      { dia: "Sábado", horario: "13:00 às 15:00", modo: "5v5" },
-      { dia: "Sábado", horario: "16:00 às 18:00", modo: "5v5" },
-      { dia: "Domingo", horario: "10:00 às 12:00", modo: "2v2" },
-      { dia: "Quarta-feira", horario: "18:00 às 20:00", modo: "1v1" },
-    ],
-  },
-  {
-    id: "fortnite",
-    nome: "Fortnite",
-    imagem: "/assets/fortnite.png",
-    eventos: [
-      { dia: "Sexta-feira", horario: "14:00 às 16:00", modo: "Solo" },
-      { dia: "Sábado", horario: "16:00 às 18:00", modo: "Dupla" },
-      { dia: "Sábado", horario: "13:00 às 15:00", modo: "Squad" },
-      { dia: "Domingo", horario: "11:00 às 13:00", modo: "Squad" },
-    ],
-  },
-  {
-    id: "lol",
-    nome: "League of Legends",
-    imagem: "/assets/League of Legends.png",
-    eventos: [
-      { dia: "Segunda-feira", horario: "19:00 às 21:00", modo: "5v5" },
-      { dia: "Sábado", horario: "17:00 às 19:00", modo: "5v5" },
-      { dia: "Quarta-feira", horario: "20:00 às 22:00", modo: "ARAM" },
-      { dia: "Sábado", horario: "15:00 às 17:00", modo: "TFT" },
-    ],
-  },
-  {
-    id: "rocketleague",
-    nome: "Rocket League",
-    imagem: "/assets/rocket league.jpg",
-    eventos: [
-      { dia: "Terça-feira", horario: "13:00 às 15:00", modo: "2v2" },
-      { dia: "Quinta-feira", horario: "18:00 às 20:00", modo: "3v3" },
-      { dia: "Sábado", horario: "11:00 às 13:00", modo: "5v5" },
-      { dia: "Domingo", horario: "10:00 às 12:00", modo: "1v1" },
-    ],
-  },
-  {
-    id: "valorant",
-    nome: "Valorant",
-    imagem: "/assets/valorant.jpg",
-    eventos: [
-      { dia: "Quarta-feira", horario: "17:00 às 19:00", modo: "5v5" },
-      { dia: "Sábado", horario: "13:00 às 15:00", modo: "Spike Rush" },
-      { dia: "Sábado", horario: "16:00 às 18:00", modo: "Dupla" },
-      { dia: "Domingo", horario: "14:00 às 16:00", modo: "Deathmatch" },
-    ],
-  },
-];
+const eventosPorJogo = {
+  "Counter Strike 2": [
+    { id: 1, modo: "5v5", dia: "Sábado", horario: "13:00 às 15:00" },
+    { id: 2, modo: "5v5", dia: "Sábado", horario: "16:00 às 18:00" },
+    { id: 3, modo: "2v2", dia: "Domingo", horario: "10:00 às 12:00" },
+    { id: 4, modo: "1v1", dia: "Quarta-feira", horario: "18:00 às 20:00" },
+  ],
+  Fortnite: [
+    { id: 1, modo: "Solo", dia: "Sexta-feira", horario: "14:00 às 16:00" },
+    { id: 2, modo: "Dupla", dia: "Sábado", horario: "16:00 às 18:00" },
+    { id: 3, modo: "Squad", dia: "Sábado", horario: "13:00 às 15:00" },
+    { id: 4, modo: "Squad", dia: "Domingo", horario: "11:00 às 13:00" },
+  ],
+  "League of Legends": [
+    { id: 1, modo: "5v5", dia: "Segunda-feira", horario: "19:00 às 21:00" },
+    { id: 2, modo: "5v5", dia: "Sábado", horario: "17:00 às 19:00" },
+    { id: 3, modo: "ARAM", dia: "Quarta-feira", horario: "20:00 às 22:00" },
+    { id: 4, modo: "TFT", dia: "Sábado", horario: "15:00 às 17:00" },
+  ],
+  "Rocket League": [
+    { id: 1, modo: "2v2", dia: "Terça-feira", horario: "13:00 às 15:00" },
+    { id: 2, modo: "3v3", dia: "Quinta-feira", horario: "18:00 às 20:00" },
+    { id: 3, modo: "5v5", dia: "Sábado", horario: "11:00 às 13:00" },
+    { id: 4, modo: "1v1", dia: "Domingo", horario: "10:00 às 12:00" },
+  ],
+  Valorant: [
+    { id: 1, modo: "5v5", dia: "Quarta-feira", horario: "17:00 às 19:00" },
+    { id: 2, modo: "Spike Rush", dia: "Sábado", horario: "13:00 às 15:00" },
+    { id: 3, modo: "Dupla", dia: "Sábado", horario: "16:00 às 18:00" },
+    { id: 4, modo: "Deathmatch", dia: "Domingo", horario: "14:00 às 16:00" },
+  ],
+};
 
 export default function Eventos() {
-  const [jogoSelecionado, setJogoSelecionado] = useState(null);
+  const games = [
+    { id: "cs2", name: "Counter Strike 2", image: "/assets/cs2.png" },
+    { id: "fortnite", name: "Fortnite", image: "/assets/fortnite.png" },
+    { id: "lol", name: "League of Legends", image: "/assets/League of Legends.png" },
+    { id: "rocketleague", name: "Rocket League", image: "/assets/rocket league.jpg" },
+    { id: "valorant", name: "Valorant", image: "/assets/valorant.jpg" },
+  ];
 
-  const handleClick = (id) => {
-    const jogo = jogos.find((j) => j.id === id);
-    setJogoSelecionado(jogo);
+  const [activeGameId, setActiveGameId] = useState(null);
+
+  const toggleGame = (gameId) => {
+    setActiveGameId(prev => (prev === gameId ? null : gameId));
   };
 
   return (
-    <section className="w-full min-h-screen pt-28 text-white px-4">
-      <div className="max-w-5xl mx-auto">
-        {/* Lista de jogos */}
-        <div className="flex flex-wrap justify-center gap-6 p-4 rounded-xl bg-[#1a1a1d] shadow-xl border border-pink-500">
-          {jogos.map((jogo) => (
-            <img
-              key={jogo.id}
-              src={jogo.imagem}
-              alt={jogo.nome}
-              className="w-40 h-40 object-cover rounded-md cursor-pointer transition-transform hover:scale-105 border-2 border-transparent hover:border-pink-500"
-              onClick={() => handleClick(jogo.id)}
-            />
-          ))}
-        </div>
+    <section className="flex items-center justify-center px-2 pt-[80px] pb-[200px] text-white">
+      <div className="flex flex-wrap gap-6 justify-center max-w-[1600px]">
+        {games.map((game) => {
+          const isActive = activeGameId === game.id;
+          const eventos = eventosPorJogo[game.name] || [];
 
-        {/* Eventos */}
-        {jogoSelecionado && (
-          <div className="mt-10 p-6 bg-[#1a1a1d] border border-pink-500 rounded-xl shadow-xl max-w-xl mx-auto text-center">
-            <h2 className="text-2xl font-bold text-pink-400 mb-4">
-              {jogoSelecionado.nome}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-white mb-6">
-              {jogoSelecionado.eventos.map((evento, index) => (
-                <div key={index}>
-                  <p className="font-semibold">Modo de Jogo {evento.modo}</p>
-                  <p>{evento.dia}</p>
-                  <p>{evento.horario}</p>
+          return (
+            <div
+              key={game.id}
+              className="flex flex-col items-center w-[300px]"
+            >
+              <div
+                className="flex relative w-[300px] h-auto rounded-xl overflow-hidden border-2 border-pink-500/15 shadow-[0_0_10px_2px] shadow-pink-500/15 transition-all duration-500 ease-in-out hover:scale-105 cursor-pointer"
+                onClick={() => toggleGame(game.id)}
+              >
+                <img
+                  src={game.image}
+                  alt={game.name}
+                  className="w-full h-full object-cover transform transition-transform duration-300 ease-in-out"
+                  draggable={false}
+                />
+              </div>
+
+              <div
+                className={`w-full mt-9 bg-gray-800/65 rounded-lg px-4 overflow-hidden transition-all duration-500 ${isActive ? "max-h-[500px] opacity-100 py-4" : "max-h-0 opacity-0 py-0"
+                  }`}
+              >
+                <ul className="text-base space-y-2">
+                  {eventos.map(({ id, modo, dia, horario }) => (
+                    <li key={id}>
+                      <span className="font-medium">{modo}</span> — {dia}, {horario}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-4 text-center">
+                  <a
+                    href="/cadastro"
+                    className="bg-pink-500 hover:bg-pink-600 text-white text-base py-[6px] px-4 rounded-md transition"
+                  >
+                    Inscreva-se
+                  </a>
                 </div>
-              ))}
+              </div>
             </div>
-            <Link to="/cadastro">
-              <button className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded">
-                Cadastrar-se
-              </button>
-            </Link>
-          </div>
-        )}
+          );
+        })}
       </div>
     </section>
   );
