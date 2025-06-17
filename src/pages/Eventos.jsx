@@ -73,7 +73,7 @@ export default function Eventos() {
               </div>
 
               <div
-                className={`w-full mt-9 bg-gray-800/65 rounded-lg px-4 overflow-hidden transition-all duration-500 ${isActive ? "max-h-[500px] opacity-100 py-4" : "max-h-0 opacity-0 py-0"
+                className={`w-full mt-9 bg-gray-800/90 rounded-lg px-4 overflow-hidden transition-all duration-500 ${isActive ? "max-h-[500px] opacity-100 py-4" : "max-h-0 opacity-0 py-0"
                   }`}
               >
                 <ul className="text-base space-y-2">
