@@ -39,7 +39,7 @@ npx json-server --watch db.json --port 3001
 ```
 
 Isso iniciará a API simulada no endereço: [http://localhost:3001/squads](http://localhost:3001/squads)<br/>
-Você também pode visualizar os usuários e squads cadastrados no site no arquivo db.json
+Você também pode visualizar os usuários e squads cadastrados no arquivo db.json
 
 ---
 
