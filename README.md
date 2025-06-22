@@ -1,70 +1,79 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# 🎮 Connect Gamers
 
-## Available Scripts
+Um projeto React criado com **Create React App**, voltado para gamers que desejam criar squads, participar de eventos e se conectar com outros jogadores!
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 🚀 Como rodar o projeto localmente
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Siga os passos abaixo para rodar o projeto completo (front-end + API local):
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 1. Clone o repositório
 
-### `npm test`
+```bash
+git clone https://github.com/mariialbano/Connect_Gamers_React.git
+cd Connect_Gamers_React
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 2. Instale as dependências
 
-### `npm run build`
+```bash
+npm install
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 3. Inicie o projeto React
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+npm start
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Abra [http://localhost:3000/](http://localhost:3000/) no navegador para visualizar o app.
 
-### `npm run eject`
+### 4. Inicie a API local com json-server
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Em um novo terminal (por exemplo, Git Bash), execute:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npx json-server --watch db.json --port 3001
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Isso iniciará a API simulada no endereço: [http://localhost:3001/squads](http://localhost:3001/squads)
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+## 🛠 Tecnologias utilizadas
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- React
+- Tailwind CSS
+- React Router DOM
+- Lucide React (ícones)
+- JSON Server (API local fake)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## 👥 Funcionalidades
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- Cadastro e login de usuários  
+- Verificação de login antes de acessar rotas privadas  
+- Cadastro de squads (apenas para usuários logados)  
+- Sistema de navegação lateral (sidebar) e ícone de perfil  
+- API local com persistência de dados em `db.json`
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 📁 Estrutura do projeto
 
-### Making a Progressive Web App
+```bash
+📦 src
+├── components         # Navbar, Sidebar, Footer, etc.
+├── pages              # Login.jsx, Perfil.jsx, Cadastro.jsx...
+├── services           # api.js (funções de conexão com json-server)
+└── App.jsx            # Componente principal com as rotas
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## ❓ Dúvidas ou sugestões?
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Fique à vontade para abrir uma issue ou contribuir com melhorias!
