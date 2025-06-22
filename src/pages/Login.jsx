@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getItem, postItem } from "../services/api"; // ajuste o caminho conforme seu projeto
+import { useTheme } from "../theme/ThemeContext";
 
 export default function Login() {
   const [modo, setModo] = useState("login");
@@ -11,6 +12,7 @@ export default function Login() {
   const [usuariosExistentes, setUsuariosExistentes] = useState([]);
 
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   useEffect(() => {
     const fetchUsuarios = async () => {
@@ -74,7 +76,11 @@ export default function Login() {
 
   return (
     <div className="flex justify-center py-10 px-4">
-      <div className="bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md text-white">
+      <div className={
+        theme === "dark"
+          ? "bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md text-white"
+          : "bg-[#d9dbe2] p-8 rounded-xl shadow-lg w-full max-w-md text-black"
+      }>
         <div className="flex justify-around mb-6">
           <button
             onClick={() => setModo("login")}
@@ -92,7 +98,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="usuario" className="block mb-1">E-mail</label>
+            <label htmlFor="usuario" className={theme === "dark" ? "block mb-1" : "block mb-1 text-black"}>E-mail</label>
             <input
               type="text"
               id="usuario"
@@ -100,12 +106,16 @@ export default function Login() {
               value={usuario}
               onChange={(e) => setUsuario(e.target.value)}
               required
-              className="w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className={
+                theme === "dark"
+                  ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
+              }
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block mb-1">Senha</label>
+            <label htmlFor="password" className={theme === "dark" ? "block mb-1" : "block mb-1 text-black"}>Senha</label>
             <input
               type="password"
               id="password"
@@ -115,9 +125,13 @@ export default function Login() {
               pattern="(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}"
               title="A senha deve ter pelo menos 8 caracteres, incluindo letras, números e um símbolo"
               required
-              className="w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className={
+                theme === "dark"
+                  ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
+              }
             />
-            <small className="text-gray-400">
+            <small className={theme === "dark" ? "text-gray-400" : "text-gray-600"}>
               A senha deve ter pelo menos 8 caracteres, incluindo letras, números e um símbolo
             </small>
           </div>
@@ -129,8 +143,13 @@ export default function Login() {
               checked={seguranca}
               onChange={(e) => setSeguranca(e.target.checked)}
               required
+              className={
+                theme === "dark"
+                  ? ""
+                  : "accent-pink-500 bg-white border-gray-300"
+              }
             />
-            <label htmlFor="securityAwareness" className="text-sm text-gray-300">
+            <label htmlFor="securityAwareness" className={theme === "dark" ? "text-sm text-gray-300" : "text-sm text-black"}>
               Estou ciente das práticas de segurança do site
             </label>
           </div>
@@ -142,8 +161,13 @@ export default function Login() {
               checked={compartilharDados}
               onChange={(e) => setCompartilharDados(e.target.checked)}
               required
+              className={
+                theme === "dark"
+                  ? ""
+                  : "accent-pink-500 bg-white border-gray-300"
+              }
             />
-            <label htmlFor="dataSharing" className="text-sm text-gray-300">
+            <label htmlFor="dataSharing" className={theme === "dark" ? "text-sm text-gray-300" : "text-sm text-black"}>
               Concordo em compartilhar meus dados
             </label>
           </div>

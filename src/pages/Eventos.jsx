@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTheme } from "../theme/ThemeContext";
 
 const eventosPorJogo = {
   "Counter Strike 2": [
@@ -29,6 +30,7 @@ const eventosPorJogo = {
 };
 
 export default function Eventos() {
+  const { theme } = useTheme();
   const games = [
     { id: "cs2", name: "Counter Strike 2", image: "/assets/cs2.png" },
     { id: "fortnite", name: "Fortnite", image: "/assets/fortnite.png" },
@@ -44,7 +46,7 @@ export default function Eventos() {
   };
 
   return (
-    <section className="flex items-center justify-center px-2 pt-[80px] pb-[200px] text-white">
+    <section className="flex items-center justify-center px-2 pt-[80px] pb-[200px]">
       <div className="flex flex-wrap gap-6 justify-center max-w-[1600px]">
         {games.map((game) => {
           const isActive = activeGameId === game.id;
@@ -68,13 +70,15 @@ export default function Eventos() {
               </div>
 
               <div
-                className={`w-full mt-9 bg-gray-800/90 rounded-lg px-4 overflow-hidden transition-all duration-500 ${isActive ? "max-h-[500px] opacity-100 py-4" : "max-h-0 opacity-0 py-0"
-                  }`}
+                className={`w-full mt-9 rounded-lg px-4 overflow-hidden transition-all duration-500 ${theme === "dark"
+                    ? "bg-gray-800/90 text-white"
+                    : "bg-[#d9dbe2] text-black"
+                  } ${isActive ? "max-h-[500px] opacity-100 py-4" : "max-h-0 opacity-0 py-0"}`}
               >
                 <ul className="text-base space-y-2">
-                  {eventos.map(({ id, modo, dia, horario }) => (
+                  {eventos.map(({ id, nome, dia, horario }) => (
                     <li key={id}>
-                      <span className="font-medium">{modo}</span> — {dia}, {horario}
+                      <span className="font-medium">{nome}</span> — {dia}, {horario}
                     </li>
                   ))}
                 </ul>

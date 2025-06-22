@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { postItem } from "../services/api";
+import { useTheme } from "../theme/ThemeContext";
 
 export default function Cadastro() {
   const [jogoSelecionado, setJogoSelecionado] = useState("");
@@ -10,6 +11,7 @@ export default function Cadastro() {
   const [nivel, setNivel] = useState("");
 
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   // Verificação de usuários logados
   useEffect(() => {
@@ -108,7 +110,11 @@ export default function Cadastro() {
 
   return (
     <div className="flex justify-center py-10">
-      <div className="bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-xl">
+      <div className={
+        theme === "dark"
+          ? "bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-xl text-white"
+          : "bg-[#d9dbe2] p-8 rounded-xl shadow-lg w-full max-w-xl text-black"
+      }>
         <h1 className="text-3xl font-bold text-center text-pink-500 mb-8">
           Cadastre seu Squad!
         </h1>
@@ -119,13 +125,21 @@ export default function Cadastro() {
             placeholder="Nome do Squad"
             value={nomeSquad}
             onChange={(e) => setNomeSquad(e.target.value)}
-            className="w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+            className={
+              theme === "dark"
+                ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
+            }
           />
 
           <select
             value={nivel}
             onChange={(e) => setNivel(e.target.value)}
-            className="w-full px-4 py-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+            className={
+              theme === "dark"
+                ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+                : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black focus:outline-none focus:ring-2 focus:ring-pink-500"
+            }
           >
             <option value="">Selecione o nível do squad</option>
             <option>Iniciante</option>
@@ -140,7 +154,11 @@ export default function Cadastro() {
               setJogoSelecionado(e.target.value);
               setEventoSelecionado("");
             }}
-            className="w-full px-4 py-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+            className={
+              theme === "dark"
+                ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+                : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black focus:outline-none focus:ring-2 focus:ring-pink-500"
+            }
           >
             <option value="">Selecione o jogo</option>
             {jogos.map((jogo) => (
@@ -152,7 +170,11 @@ export default function Cadastro() {
             <select
               value={eventoSelecionado}
               onChange={(e) => setEventoSelecionado(e.target.value)}
-              className="w-full px-4 py-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className={
+                theme === "dark"
+                  ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black focus:outline-none focus:ring-2 focus:ring-pink-500"
+              }
             >
               <option value="">Selecione o evento</option>
               {eventosFiltrados.map((evento) => (
@@ -171,7 +193,11 @@ export default function Cadastro() {
                   placeholder={`Integrante ${index + 1}`}
                   value={nome}
                   onChange={(e) => handleIntegranteChange(index, e.target.value)}
-                  className="flex-1 px-4 py-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  className={
+                    theme === "dark"
+                      ? "flex-1 px-4 py-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      : "flex-1 px-4 py-2 rounded-md bg-[#f3f4f6] text-black focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  }
                 />
                 {index > 0 && (
                   <button type="button" onClick={() => removerIntegrante(index)} className="text-red-400 hover:text-red-600">
@@ -193,7 +219,7 @@ export default function Cadastro() {
 
           <button
             type="submit"
-            className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+              className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
           >
             Cadastrar Squad
           </button>

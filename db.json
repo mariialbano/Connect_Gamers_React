@@ -14,6 +14,21 @@
       "eventoId": 1,
       "nivel": "Intermediário",
       "dataCadastro": "2025-06-22T14:57:23.260Z"
+    },
+    {
+      "id": "1a6a",
+      "nomeSquad": "squad2 ",
+      "integrantes": [
+        "integrante 1",
+        "integrante 2",
+        "integrante 3",
+        "integrante 4",
+        "integrante 5"
+      ],
+      "jogo": "Valorant",
+      "eventoId": 2,
+      "nivel": "Avançado",
+      "dataCadastro": "2025-06-22T18:23:44.855Z"
     }
   ],
   "usuarios": [
@@ -26,6 +41,11 @@
       "id": "60df",
       "email": "mari@exemplo.com",
       "senha": "Mari21!!"
+    },
+    {
+      "id": "6528",
+      "email": "neemias123@gmail.com",
+      "senha": "Neemias123*"
     }
   ]
 }

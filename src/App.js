@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-
 import Home from './pages/Home';
 import Cadastro from './pages/Cadastro';
 import FAQ from './pages/FAQ';
@@ -10,11 +9,18 @@ import Login from './pages/Login';
 import Perfil from './pages/Perfil';
 import Pesquisa from './pages/Pesquisa';
 import Rankings from './pages/Rankings';
+import { useTheme } from './theme/ThemeContext';
 
 function App() {
+  const { theme } = useTheme();
+
   return (
     <Router>
-      <div className="min-h-screen bg-gray-700 text-white flex flex-col">
+      <div className={
+        theme === "dark"
+          ? "min-h-screen bg-gray-700 text-white flex flex-col"
+          : "min-h-screen bg-white text-black flex flex-col" // <-- alterado para bg-white
+      }>
         <Navbar />
         <main className="flex-1 p-6">
           <Routes>

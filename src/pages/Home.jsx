@@ -1,9 +1,15 @@
 import { Link } from "react-router-dom";
+import { useTheme } from "../theme/ThemeContext";
 
 export default function Home() {
+  const { theme } = useTheme();
   return (
     <div className="flex justify-center py-10 px-4">
-      <div className="bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-4xl text-white relative">
+      <div className={
+        theme === "dark"
+          ? "bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-4xl text-white relative"
+          : "bg-[#d9dbe2] p-8 rounded-xl shadow-lg w-full max-w-4xl text-black relative"
+      }>
         {/* Círculo decorativo */}
         <div className="absolute top-0 right-0 w-20 h-20 bg-pink-500 rounded-full opacity-20 -mt-10 -mr-10"></div>
 
