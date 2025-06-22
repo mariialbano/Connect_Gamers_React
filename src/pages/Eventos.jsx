@@ -2,34 +2,29 @@ import { useState } from "react";
 
 const eventosPorJogo = {
   "Counter Strike 2": [
-    { id: 1, modo: "5v5", dia: "Sábado", horario: "13:00 às 15:00" },
-    { id: 2, modo: "5v5", dia: "Sábado", horario: "16:00 às 18:00" },
-    { id: 3, modo: "2v2", dia: "Domingo", horario: "10:00 às 12:00" },
-    { id: 4, modo: "1v1", dia: "Quarta-feira", horario: "18:00 às 20:00" },
+    { id: 13, nome: "5v5 Competitivo", dia: "Sábado", horario: "13:00 às 15:00" },
+    { id: 14, nome: "2v2 Wingman", dia: "Domingo", horario: "16:00 às 18:00" },
+    { id: 15, nome: "Modo Casual", dia: "Sexta", horario: "19:00 às 21:00" },
   ],
   Fortnite: [
-    { id: 1, modo: "Solo", dia: "Sexta-feira", horario: "14:00 às 16:00" },
-    { id: 2, modo: "Dupla", dia: "Sábado", horario: "16:00 às 18:00" },
-    { id: 3, modo: "Squad", dia: "Sábado", horario: "13:00 às 15:00" },
-    { id: 4, modo: "Squad", dia: "Domingo", horario: "11:00 às 13:00" },
+    { id: 10, nome: "Solo", dia: "Sábado", horario: "12:00 às 14:00" },
+    { id: 11, nome: "Duplas", dia: "Sábado", horario: "15:00 às 17:00" },
+    { id: 12, nome: "Squad", dia: "Domingo", horario: "18:00 às 20:00" },
   ],
   "League of Legends": [
-    { id: 1, modo: "5v5", dia: "Segunda-feira", horario: "19:00 às 21:00" },
-    { id: 2, modo: "5v5", dia: "Sábado", horario: "17:00 às 19:00" },
-    { id: 3, modo: "ARAM", dia: "Quarta-feira", horario: "20:00 às 22:00" },
-    { id: 4, modo: "TFT", dia: "Sábado", horario: "15:00 às 17:00" },
+    { id: 7, nome: "5v5 Tradicional", dia: "Sábado", horario: "14:00 às 16:00" },
+    { id: 8, nome: "ARAM", dia: "Domingo", horario: "17:00 às 19:00" },
+    { id: 9, nome: "TFT", dia: "Segunda", horario: "20:00 às 22:00" },
   ],
   "Rocket League": [
-    { id: 1, modo: "2v2", dia: "Terça-feira", horario: "13:00 às 15:00" },
-    { id: 2, modo: "3v3", dia: "Quinta-feira", horario: "18:00 às 20:00" },
-    { id: 3, modo: "5v5", dia: "Sábado", horario: "11:00 às 13:00" },
-    { id: 4, modo: "1v1", dia: "Domingo", horario: "10:00 às 12:00" },
+    { id: 4, nome: "Duplas", dia: "Quarta", horario: "10:00 às 12:00" },
+    { id: 5, nome: "Trio", dia: "Sábado", horario: "15:00 às 17:00" },
+    { id: 6, nome: "1x1", dia: "Domingo", horario: "09:00 às 11:00" },
   ],
   Valorant: [
-    { id: 1, modo: "5v5", dia: "Quarta-feira", horario: "17:00 às 19:00" },
-    { id: 2, modo: "Spike Rush", dia: "Sábado", horario: "13:00 às 15:00" },
-    { id: 3, modo: "Dupla", dia: "Sábado", horario: "16:00 às 18:00" },
-    { id: 4, modo: "Deathmatch", dia: "Domingo", horario: "14:00 às 16:00" },
+    { id: 1, nome: "Spike Rush", dia: "Sábado", horario: "13:00 às 15:00" },
+    { id: 2, nome: "Competitivo", dia: "Domingo", horario: "16:00 às 18:00" },
+    { id: 3, nome: "Deathmatch", dia: "Sexta", horario: "20:00 às 22:00" },
   ],
 };
 
