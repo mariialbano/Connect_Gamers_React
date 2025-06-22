@@ -38,7 +38,8 @@ Em um novo terminal (por exemplo, Git Bash), execute:
 npx json-server --watch db.json --port 3001
 ```
 
-Isso iniciará a API simulada no endereço: [http://localhost:3001/squads](http://localhost:3001/squads)
+Isso iniciará a API simulada no endereço: [http://localhost:3001/squads](http://localhost:3001/squads)<br/>
+Você também pode visualizar os usuários e squads cadastrados no site no arquivo db.json
 
 ---
 
@@ -77,3 +78,13 @@ Isso iniciará a API simulada no endereço: [http://localhost:3001/squads](http:
 ## ❓ Dúvidas ou sugestões?
 
 Fique à vontade para abrir uma issue ou contribuir com melhorias!
+
+---
+
+## 👨‍💻 Projeto desenvolvido por
+
+- [Ana Julia Gonçalves](https://github.com/dsgana)
+- [Jéssica Brito](https://github.com/jessbrt19)
+- [Mariana Albano](https://github.com/mariialbano)
+- [Neemias Silva](https://github.com/neemiasv)
+- [Vinícius Gonzales](https://github.com/vngon)
