@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { postItem } from "../services/api";
 
 export default function Cadastro() {
@@ -7,6 +8,17 @@ export default function Cadastro() {
   const [integrantes, setIntegrantes] = useState([""]);
   const [nomeSquad, setNomeSquad] = useState("");
   const [nivel, setNivel] = useState("");
+
+  const navigate = useNavigate();
+
+  // Verificação de usuários logados
+  useEffect(() => {
+    const usuario = localStorage.getItem("usuarioLogado");
+    if (!usuario) {
+      alert("Você precisa estar logado para participar dos eventos.");
+      navigate("/login");
+    }
+  }, []);
 
   const jogos = [
     "Valorant",
@@ -177,7 +189,6 @@ export default function Cadastro() {
             >
               + Adicionar Integrante
             </button>
-
           </div>
 
           <button

@@ -1,10 +1,20 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { Menu, User } from 'lucide-react';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handlePerfilClick = () => {
+    const usuarioLogado = localStorage.getItem("usuarioLogado");
+    if (usuarioLogado) {
+      navigate("/perfil");
+    } else {
+      navigate("/login");
+    }
+  };
 
   return (
     <>
@@ -17,20 +27,19 @@ export default function Navbar() {
 
         {/* Logo centralizada */}
         <Link to="/">
-            <div className="flex justify-center flex-grow">
-                <img
-                    src="/assets/logo-connect-gamers-escuro.png"
-                    alt="Logo Connect Gamers"
-                    className="h-32 max-w-none"
-                />
-            </div>
+          <div className="flex justify-center flex-grow">
+            <img
+              src="/assets/logo-connect-gamers-escuro.png"
+              alt="Logo Connect Gamers"
+              className="h-32 max-w-none"
+            />
+          </div>
         </Link>
-        
 
         {/* Ícone Perfil */}
-        <Link to="/login" className="text-pink-500 hover:text-pink-400 mr-10">
+        <button onClick={handlePerfilClick} className="text-pink-500 hover:text-pink-400 mr-10">
           <User size={30} />
-        </Link>
+        </button>
       </header>
 
       {/* Sidebar lateral */}

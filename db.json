@@ -1,34 +1,31 @@
 {
   "squads": [
     {
-      "id": "da3f",
-      "nomeSquad": "Loud",
+      "id": "81a7",
+      "nomeSquad": "Girls Power",
       "integrantes": [
-        "Vinicius Camargo",
-        "Julia Rodrigues",
-        "Michael Santos",
-        "Igor Clementino",
-        "Beatriz Souza"
+        "Julia",
+        "Fernanda",
+        "Amanda",
+        "Nicole",
+        "Isis"
       ],
       "jogo": "Valorant",
       "eventoId": 1,
-      "nivel": "Competitivo",
-      "dataCadastro": "2025-06-17T22:23:38.252Z"
+      "nivel": "Intermediário",
+      "dataCadastro": "2025-06-22T14:57:23.260Z"
+    }
+  ],
+  "usuarios": [
+    {
+      "id": "6a91",
+      "email": "julia@exemplo.com",
+      "senha": "julia21!"
     },
     {
-      "id": "8185",
-      "nomeSquad": "Legendários",
-      "integrantes": [
-        "Igor",
-        "Mariana",
-        "Nicolas",
-        "Giovanna",
-        "Ana"
-      ],
-      "jogo": "League of Legends",
-      "eventoId": 7,
-      "nivel": "Intermediário",
-      "dataCadastro": "2025-06-17T22:41:15.575Z"
+      "id": "60df",
+      "email": "mari@exemplo.com",
+      "senha": "Mari21!!"
     }
   ]
 }
