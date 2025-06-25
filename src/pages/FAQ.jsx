@@ -28,7 +28,6 @@ const FAQ = () => {
 
   return (
     <div className="my-24 flex items-center justify-center p-8">
-      {/* Container do Feedback - Centralizado e com tamanho médio */}
       <div className={
         theme === "dark"
           ? "w-full max-w-xl h-auto min-h-[420px] bg-gray-800/80 p-6 rounded-lg shadow-lg flex flex-col justify-between"

@@ -11,11 +11,12 @@ const Profile = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showAvatarList, setShowAvatarList] = useState(false);
+  const [avatarListVisible, setAvatarListVisible] = useState(false);
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [nomeUsuario, setNomeUsuario] = useState("Nome do Usuário");
   const [editandoNome, setEditandoNome] = useState(false);
   const [novoNome, setNovoNome] = useState("");
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   const siteAvatars = [
     "/assets/avatars/avatar índia.jpg.png",
@@ -46,7 +47,7 @@ const Profile = () => {
 
         const usuarios = await getItem("usuarios");
         const usuario = usuarios.find((u) => u.email === email);
-        
+
         if (usuario) {
           setNomeUsuario(usuario.nome || "Nome do Usuário");
         }
@@ -83,7 +84,7 @@ const Profile = () => {
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (newPassword !== confirmPassword) {
       alert("As senhas não coincidem!");
       return;
@@ -150,33 +151,38 @@ const Profile = () => {
     }
   };
 
-  // Componente de Avatar corrigido
+  const handleAvatarClick = () => {
+    if (showAvatarList) {
+      setAvatarListVisible(false);
+    } else {
+      setShowAvatarList(true);
+    }
+  };
+
   const AvatarSection = () => (
     <div className="flex flex-col items-center mb-0 relative">
       <div
         className="relative inline-block cursor-pointer"
-        onClick={() => setShowAvatarList((prev) => !prev)}
+        onClick={handleAvatarClick}
       >
         <div
-          className="w-32 h-32 rounded-full border-4 border-[rgb(253,77,121)] shadow-lg mx-auto flex items-center justify-center overflow-hidden"
+          className="w-32 h-auto rounded-full border-4 border-[rgb(253,77,121)] shadow-lg mx-auto flex items-center justify-center overflow-hidden"
           style={{ backgroundColor: 'rgba(58, 58, 74, 0.7)' }}
         >
           <img
             src={profileImage}
             alt="Foto do perfil"
-            className="w-full h-full object-cover rounded-full"
+            className="w-full h-full object-cover rounded-xl"
           />
         </div>
         {showAvatarList && (
-          <div className="absolute left-1/2 -translate-x-1/2 top-full mt-4 bg-gray-900/95 p-4 rounded-xl shadow-xl flex gap-4 z-50 border border-pink-400">
+          <div className="mt-4 p-4 flex gap-4">
             {siteAvatars.map((avatar, idx) => (
               <img
                 key={idx}
                 src={avatar}
                 alt={`Avatar ${idx + 1}`}
-                className={`w-16 h-16 rounded-full border-2 cursor-pointer transition hover:border-pink-500 ${
-                  profileImage === avatar ? "border-pink-500" : "border-gray-300"
-                }`}
+                className={`w-16 h-auto rounded-full border-2 cursor-pointer transition hover:border-pink-500 ${profileImage === avatar ? "border-pink-500" : "border-gray-300"}`}
                 onClick={() => handleSiteAvatarSelect(avatar)}
                 draggable={false}
               />
@@ -188,7 +194,6 @@ const Profile = () => {
     </div>
   );
 
-  // Componente de Edição de Nome
   const NameEditSection = () => (
     <div className="text-center mb-12">
       <div className="mt-6">
@@ -247,11 +252,10 @@ const Profile = () => {
     </div>
   );
 
-  // Componente de Eventos
   const EventsSection = () => (
     <section className="mb-12">
       <h2 className="text-2xl font-bold mb-6 pb-2 border-b-2 border-[rgb(253,77,121)] flex justify-center items-center text-gray-100">
-        <i className="fas fa-calendar-alt mr-3 text-[rgb(253,77,121)]"></i> Meus Eventos
+        <i className="fas fa-calendar-alt mr-3 text-[rgb(253,77,121]"></i> Meus Eventos
       </h2>
       <div className="space-y-4">
         {[1, 2].map((event) => (
@@ -276,7 +280,6 @@ const Profile = () => {
     </section>
   );
 
-  // Componente de Alteração de Senha
   const PasswordSection = () => (
     <section className="mb-8">
       <button
@@ -353,9 +356,8 @@ const Profile = () => {
 
   return (
     <div
-      className={`min-h-screen flex flex-col ${
-        darkTheme ? 'text-gray-200' : 'text-gray-800'
-      }`}
+      className={`min-h-screen flex flex-col ${darkTheme ? 'text-gray-200' : 'text-gray-800'
+        }`}
       style={{
         backgroundImage: darkTheme
           ? "url('/assets/IMAGENS/bg-dark.jpg')"
@@ -366,19 +368,11 @@ const Profile = () => {
         transition: 'background-image 0.5s'
       }}
     >
-      {/* Overlay da sidebar */}
-      <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-40 ${
-          sidebarOpen ? 'block' : 'hidden'
-        }`}
-        onClick={closeSidebar}
-      ></div>
-
       {/* Conteúdo principal */}
       <div className="container mx-auto px-4 pt-24 pb-16 max-w-4xl bg-gray-800 rounded-xl my-8 shadow-lg backdrop-blur-sm">
         <AvatarSection />
         <NameEditSection />
-        
+
         <div className="max-w-2xl mx-auto">
           <EventsSection />
           <PasswordSection />
