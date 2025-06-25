@@ -10,7 +10,7 @@
       <img
         src={profileImage}
         alt="Foto do perfil"
-        className="w-full h-full object-cover rounded-full" // Adicionei rounded-full aqui
+        className="w-full h-full object-cover rounded-full" 
       />
     </div>
     {showAvatarList && (
