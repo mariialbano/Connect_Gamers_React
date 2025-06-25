@@ -31,7 +31,7 @@ const FAQ = () => {
       {/* Container do Feedback - Centralizado e com tamanho médio */}
       <div className={
         theme === "dark"
-          ? "w-full max-w-xl h-auto min-h-[420px] bg-gray-800/70 p-6 rounded-lg shadow-lg flex flex-col justify-between"
+          ? "w-full max-w-xl h-auto min-h-[420px] bg-gray-800/80 p-6 rounded-lg shadow-lg flex flex-col justify-between"
           : "w-full max-w-xl h-auto min-h-[420px] bg-[#d9dbe2] p-6 rounded-lg shadow-lg flex flex-col justify-between"
       }>
         <h2 className="text-3xl font-bold mb-4 text-center text-pink-500">

@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../theme/ThemeContext';
 
 const Pesquisa = () => {
+  const { theme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkTheme, setDarkTheme] = useState(localStorage.getItem("siteTheme") === "dark" || false);
   const [vlibrasActive, setVlibrasActive] = useState(localStorage.getItem("vlibrasAtivo") === "true" || false);
   const [hoverTitle, setHoverTitle] = useState(false);
-
-  useEffect(() => {
-    document.body.classList.toggle("dark-theme", darkTheme);
-    document.body.classList.toggle("light-theme", !darkTheme);
-    localStorage.setItem("siteTheme", darkTheme ? "dark" : "light");
-  }, [darkTheme]);
 
   useEffect(() => {
     if (vlibrasActive && window.VLibras) {
@@ -19,40 +14,18 @@ const Pesquisa = () => {
     localStorage.setItem("vlibrasAtivo", vlibrasActive);
   }, [vlibrasActive]);
 
-  useEffect(() => {
-    console.log("Script da página de Pesquisa e Dados carregado com sucesso.");
-  }, []);
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  const closeSidebar = () => {
-    setSidebarOpen(false);
-  };
-
-  const handleThemeToggle = () => {
-    setDarkTheme(!darkTheme);
-  };
-
-  const handleVlibrasToggle = () => {
-    setVlibrasActive(!vlibrasActive);
-  };
-
   return (
-    <div className={`mb-32 flex flex-col ${darkTheme ? 'text-white bg-black' : 'text-black'}`}>
-      {/* Overlay */}
-      <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-40 ${sidebarOpen ? 'block' : 'hidden'}`}
-        onClick={closeSidebar}
-      ></div>
-
+    <div className={
+      theme === "dark"
+        ? "min-h-screen flex flex-col text-white"
+        : "min-h-screen flex flex-col text-black bg-white"
+    }>    
       {/* Conteúdo principal */}
-      <section className="pt-32 pb-16 flex justify-center items-start px-4">
+      <section className="pt-32 flex justify-center items-start px-4">
         <div
           className={
-            darkTheme
-              ? "bg-[#1a1a1a] text-white rounded-xl shadow-md p-8 w-full max-w-xl text-center"
+            theme === "dark"
+              ? "bg-gray-800 text-white rounded-xl shadow-md p-8 w-full max-w-xl text-center"
               : "bg-[#d9dbe2] text-black rounded-xl shadow-md p-8 w-full max-w-xl text-center"
           }
         >
@@ -64,16 +37,16 @@ const Pesquisa = () => {
           >
             Pesquisa e Dados
           </h2>
-          <p className={darkTheme ? "text-[#bbb] mb-2" : "text-gray-700 mb-2"}>Jogos e Cooperação Social</p>
-          <p className={darkTheme ? "text-[#bbb] mb-2" : "text-gray-700 mb-2"}>
+          <p className={theme === "dark" ? "text-[#bbb] mb-2" : "text-gray-700 mb-2"}>Jogos e Cooperação Social</p>
+          <p className={theme === "dark" ? "text-[#bbb] mb-2" : "text-gray-700 mb-2"}>
             Um estudo publicado na <em>PNAS</em> mostrou que jogos cooperativos aumentam a empatia e a cooperação entre os participantes.
           </p>
-          <p className={darkTheme ? "text-[#bbb] mt-4 mb-2" : "text-gray-700 mt-4 mb-2"}>Videogames e Conexões Sociais</p>
-          <p className={darkTheme ? "text-[#bbb] mb-2" : "text-gray-700 mb-2"}>
+          <p className={theme === "dark" ? "text-[#bbb] mt-4 mb-2" : "text-gray-700 mt-4 mb-2"}>Videogames e Conexões Sociais</p>
+          <p className={theme === "dark" ? "text-[#bbb] mb-2" : "text-gray-700 mb-2"}>
             Uma pesquisa da <em>APA</em> descobriu que jogos multiplayer ajudam a fortalecer laços sociais.
           </p>
-          <p className={darkTheme ? "text-[#bbb] mt-4 mb-2" : "text-gray-700 mt-4 mb-2"}>Jogos e Saúde Mental</p>
-          <p className={darkTheme ? "text-[#bbb]" : "text-gray-700"}>
+          <p className={theme === "dark" ? "text-[#bbb] mt-4 mb-2" : "text-gray-700 mt-4 mb-2"}>Jogos e Saúde Mental</p>
+          <p className={theme === "dark" ? "text-[#bbb]" : "text-gray-700"}>
             Segundo a Oxford Internet Institute, jogos online podem reduzir o estresse e aumentar o bem-estar emocional.
           </p>
         </div>
