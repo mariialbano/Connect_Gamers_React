@@ -152,11 +152,7 @@ const Profile = () => {
   };
 
   const handleAvatarClick = () => {
-    if (showAvatarList) {
-      setAvatarListVisible(false);
-    } else {
-      setShowAvatarList(true);
-    }
+    setShowAvatarList((prev) => !prev);
   };
 
   const AvatarSection = () => (
