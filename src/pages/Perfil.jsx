@@ -150,17 +150,20 @@ const Profile = () => {
     }
   };
 
-  const AvatarSection = () => (
+const AvatarSection = () => (
   <div className="flex flex-col items-center mb-6 relative">
     <div
       className="relative cursor-pointer group"
       onClick={() => setShowAvatarList((prev) => !prev)}
     >
-      <div className="w-36 h-36 rounded-full border-4 border-[rgb(253,77,121)] shadow-xl overflow-hidden flex items-center justify-center bg-gray-700">
+      <div
+        className="w-36 h-28 border-4 border-[rgb(253,77,121)] shadow-xl overflow-hidden flex items-center justify-center bg-gray-700"
+        style={{ borderRadius: "50% / 40%" }} // Oval horizontal
+      >
         <img
           src={profileImage}
           alt="Foto do perfil"
-          className="w-full h-full object-contain rounded-full"
+          className="w-full h-full object-cover"
         />
       </div>
 
@@ -184,6 +187,7 @@ const Profile = () => {
     <span className="mt-2 text-sm text-gray-400">Clique na foto para escolher um avatar</span>
   </div>
 );
+
 
 
 
