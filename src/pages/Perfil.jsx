@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { getItem } from "../services/api";
 
 const Profile = () => {
-
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkTheme, setDarkTheme] = useState(localStorage.getItem("siteTheme") === "dark");
   const [vlibrasActive, setVlibrasActive] = useState(localStorage.getItem("vlibrasAtivo") === "true");
@@ -18,7 +17,7 @@ const Profile = () => {
   const [novoNome, setNovoNome] = useState("");
   const navigate = useNavigate();
 
-    const siteAvatars = [
+  const siteAvatars = [
     "/assets/avatars/avatar índia.jpg.png",
     "/assets/avatars/dinossauro avatar.jpg.png",
     "/assets/avatars/menina avatar.jpg.png",
@@ -26,7 +25,7 @@ const Profile = () => {
     "/assets/avatars/menino avatar.jpg.png",
   ];
 
-    useEffect(() => {
+  useEffect(() => {
     document.body.classList.toggle("dark-theme", darkTheme);
     document.body.classList.toggle("light-theme", !darkTheme);
     localStorage.setItem("siteTheme", darkTheme ? "dark" : "light");
@@ -59,7 +58,6 @@ const Profile = () => {
     fetchUserData();
   }, []);
 
-  
   const handleSiteAvatarSelect = (avatarUrl) => {
     setProfileImage(avatarUrl);
     localStorage.setItem("profileImage", avatarUrl);
@@ -151,39 +149,44 @@ const Profile = () => {
       console.error("Erro ao atualizar nome:", error);
     }
   };
-//componente de avatar
- <div className="flex flex-col items-center mb-0 relative">
-  <div
-    className="relative inline-block cursor-pointer"
-    onClick={() => setShowAvatarList((prev) => !prev)}
-  >
-    <div
-      className="w-32 h-32 rounded-full border-4 border-[rgb(253,77,121)] shadow-lg mx-auto flex items-center justify-center overflow-hidden"
-      style={{ backgroundColor: 'rgba(58, 58, 74, 0.7)' }}
-    >
-      <img
-        src={profileImage}
-        alt="Foto do perfil"
-        className="w-full h-full object-cover rounded-full"
-      />
-    </div>
-    {showAvatarList && (
-      <div className="absolute left-1/2 -translate-x-1/2 top-full mt-4 bg-gray-900/95 p-4 rounded-xl shadow-xl flex gap-4 z-50 border border-pink-400">
-        {siteAvatars.map((avatar, idx) => (
+
+  // Componente de Avatar corrigido
+  const AvatarSection = () => (
+    <div className="flex flex-col items-center mb-0 relative">
+      <div
+        className="relative inline-block cursor-pointer"
+        onClick={() => setShowAvatarList((prev) => !prev)}
+      >
+        <div
+          className="w-32 h-32 rounded-full border-4 border-[rgb(253,77,121)] shadow-lg mx-auto flex items-center justify-center overflow-hidden"
+          style={{ backgroundColor: 'rgba(58, 58, 74, 0.7)' }}
+        >
           <img
-            key={idx}
-            src={avatar}
-            alt={`Avatar ${idx + 1}`}
-            className={`w-16 h-16 rounded-full border-2 cursor-pointer transition hover:border-pink-500 ${profileImage === avatar ? "border-pink-500" : "border-gray-300"}`}
-            onClick={() => handleSiteAvatarSelect(avatar)}
-            draggable={false}
+            src={profileImage}
+            alt="Foto do perfil"
+            className="w-full h-full object-cover rounded-full"
           />
-        ))}
+        </div>
+        {showAvatarList && (
+          <div className="absolute left-1/2 -translate-x-1/2 top-full mt-4 bg-gray-900/95 p-4 rounded-xl shadow-xl flex gap-4 z-50 border border-pink-400">
+            {siteAvatars.map((avatar, idx) => (
+              <img
+                key={idx}
+                src={avatar}
+                alt={`Avatar ${idx + 1}`}
+                className={`w-16 h-16 rounded-full border-2 cursor-pointer transition hover:border-pink-500 ${
+                  profileImage === avatar ? "border-pink-500" : "border-gray-300"
+                }`}
+                onClick={() => handleSiteAvatarSelect(avatar)}
+                draggable={false}
+              />
+            ))}
+          </div>
+        )}
       </div>
-    )}
-  </div>
-  <span className="mt-2 text-sm text-gray-400">Clique na foto para escolher um avatar</span>
-</div>
+      <span className="mt-2 text-sm text-gray-400">Clique na foto para escolher um avatar</span>
+    </div>
+  );
 
   // Componente de Edição de Nome
   const NameEditSection = () => (
