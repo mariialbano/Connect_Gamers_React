@@ -1,4 +1,4 @@
-{
+ww{
   "squads": [
     {
       "id": "81a7",
@@ -29,6 +29,21 @@
       "eventoId": 2,
       "nivel": "Avançado",
       "dataCadastro": "2025-06-22T18:23:44.855Z"
+    },
+    {
+      "id": "5812",
+      "nomeSquad": "Squad neemias",
+      "integrantes": [
+        "Neemias",
+        "Joaozinho",
+        "Robertinho",
+        "Miguelzinho",
+        "Enzinho"
+      ],
+      "jogo": "Valorant",
+      "eventoId": 2,
+      "nivel": "Competitivo",
+      "dataCadastro": "2025-06-25T02:57:28.935Z"
     }
   ],
   "usuarios": [
