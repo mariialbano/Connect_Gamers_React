@@ -19,10 +19,11 @@ const Profile = () => {
 
   // Lista de avatares do site
   const siteAvatars = [
-    "/assets/avatars/avatar1.webp",
-    "/assets/avatars/avatar2.jpg",
-    "/assets/avatars/avatar3.avif",
-    "/assets/avatars/avatar4.avif",
+    "/assets/avatars/avatar índia.jpg.png",
+    "/assets/avatars/dinossauro avatar.jpg.png",
+    "/assets/avatars/menina avatar.jpg.png",
+    "/assets/avatars/menina cacheada avatar.jpg.png",
+    "assets/avatars/menino avatar.jpg.png",
   ];
 
   const handleSiteAvatarSelect = (avatarUrl) => {
