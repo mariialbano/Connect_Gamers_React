@@ -156,14 +156,14 @@ const Profile = () => {
       className="relative cursor-pointer group"
       onClick={() => setShowAvatarList((prev) => !prev)}
     >
-      <div className="w-32 h-32 rounded-full border-4 border-[rgb(253,77,121)] shadow-xl overflow-hidden flex items-center justify-center bg-gray-700">
+      <div className="w-36 h-36 rounded-full border-4 border-[rgb(253,77,121)] shadow-xl overflow-hidden flex items-center justify-center bg-gray-700">
         <img
           src={profileImage}
           alt="Foto do perfil"
-          className="w-full h-full object-cover rounded-full transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-full object-contain rounded-full"
         />
       </div>
-      {/* Lista de avatares */}
+
       {showAvatarList && (
         <div className="absolute left-1/2 -translate-x-1/2 top-full mt-4 bg-gray-900/95 p-4 rounded-xl shadow-xl flex gap-4 z-50 border border-pink-400">
           {siteAvatars.map((avatar, idx) => (
@@ -184,6 +184,7 @@ const Profile = () => {
     <span className="mt-2 text-sm text-gray-400">Clique na foto para escolher um avatar</span>
   </div>
 );
+
 
 
   // Componente de Edição de Nome
