@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getItem, postItem } from "../services/api"; // Adicione este import se já não existir
+import { getItem } from "../services/api"; // já está importado
 
 const Profile = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -12,6 +12,9 @@ const Profile = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showAvatarList, setShowAvatarList] = useState(false);
   const [showPasswordSection, setShowPasswordSection] = useState(false); // NOVO
+  const [nomeUsuario, setNomeUsuario] = useState("");
+  const [editandoNome, setEditandoNome] = useState(false);
+  const [novoNome, setNovoNome] = useState("");
   const navigate = useNavigate();
 
   // Lista de avatares do site
@@ -45,6 +48,21 @@ const Profile = () => {
     }
     localStorage.setItem("vlibrasAtivo", vlibrasActive);
   }, [vlibrasActive]);
+
+  // Buscar nome do usuário ao carregar a página
+  useEffect(() => {
+    const fetchNome = async () => {
+      const email = localStorage.getItem("usuarioLogado");
+      const usuarios = await getItem("usuarios");
+      const usuario = usuarios.find((u) => u.email === email);
+      if (usuario && usuario.nome) {
+        setNomeUsuario(usuario.nome);
+      } else {
+        setNomeUsuario("Nome do Usuário");
+      }
+    };
+    fetchNome();
+  }, []);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -117,6 +135,22 @@ const Profile = () => {
     }
   };
 
+  // Função para salvar o novo nome
+  const handleSalvarNome = async () => {
+    const email = localStorage.getItem("usuarioLogado");
+    const usuarios = await getItem("usuarios");
+    const usuario = usuarios.find((u) => u.email === email);
+    if (!usuario) return;
+    // Atualiza no JSON Server
+    await fetch(`http://localhost:3001/usuarios/${usuario.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome: novoNome }),
+    });
+    setNomeUsuario(novoNome);
+    setEditandoNome(false);
+  };
+
   return (
     <div
       className={`min-h-screen flex flex-col ${darkTheme ? 'text-gray-200' : 'text-gray-800'}`}
@@ -134,19 +168,19 @@ const Profile = () => {
         className={`fixed inset-0 bg-black bg-opacity-50 z-40 ${sidebarOpen ? 'block' : 'hidden'}`}
         onClick={closeSidebar}
       ></div>
-      
-      <div 
+
+      <div
         className="container mx-auto px-4 pt-24 pb-16 max-w-4xl 
         bg-gray-800
-        rounded-xl my-8 shadow-lg
+        rounded-xl my-8  shadow-lg
         backdrop-blur-sm"
-      > 
-        <div className="flex flex-col items-center mb-8 relative">
-          <div 
+      >
+        <div className="flex flex-col items-center mb-0 relative">
+          <div
             className="relative inline-block cursor-pointer"
             onClick={() => setShowAvatarList((prev) => !prev)}
           >
-            <div 
+            <div
               className="w-44 h-44 rounded-full border-4 border-[rgb(253,77,121)] shadow-lg mx-auto flex items-center justify-center overflow-hidden"
               style={{ backgroundColor: 'rgba(58, 58, 74, 0.7)' }}
             >
@@ -176,10 +210,52 @@ const Profile = () => {
 
         <div className="text-center mb-12">
           <div className="mt-6">
-            <h1 className="text-3xl font-bold text-gray-100">
-              Nome do Usuário
-            </h1>
-            <p className="mt-2 text-lg text-gray-300">
+            {editandoNome ? (
+              <div className="flex flex-col items-center gap-2">
+                <input
+                  type="text"
+                  className="text-2xl font-bold text-gray-500 rounded-lg px-3 py-1"
+                  value={novoNome}
+                  onChange={e => setNovoNome(e.target.value)}
+                  maxLength={20} // Limite de 20 caracteres
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <button
+                    className="bg-[rgb(253,77,121)] text-white px-4 py-1 rounded font-bold"
+                    onClick={handleSalvarNome}
+                    disabled={!novoNome.trim()}
+                  >
+                    Salvar
+                  </button>
+                  <button
+                    className="bg-gray-500 text-white px-4 py-1 rounded font-bold"
+                    onClick={() => setEditandoNome(false)}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex justify-center w-full relative">
+                <div className="flex items-center justify-center mx-auto">
+                  <h1 className="text-3xl font-bold text-gray-100">{nomeUsuario}</h1>
+                  <button
+                    className="ml-2 mt-2       text-gray-400 hover:text-pink-400 p-2 z-20 text-2xl"
+                    title="Editar nome"
+                    onClick={() => {
+                      setNovoNome(nomeUsuario === "Nome do Usuário" ? "" : nomeUsuario);
+                      setEditandoNome(true);
+                    }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
+            <p className="mt-1 text-lg text-gray-300">
               {localStorage.getItem("usuarioLogado") || "user@conectgamers.com"}
             </p>
             <div className="inline-block bg-[rgb(253,77,121)] text-white px-6 py-2 rounded-full text-sm mt-3 shadow-lg">
@@ -220,8 +296,7 @@ const Profile = () => {
               </div>
             </div>
           </section>
-
-          {/* Seção de Senha como aba */}
+          Q
           <section className="mb-8">
             <button
               type="button"

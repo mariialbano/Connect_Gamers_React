@@ -49,16 +49,19 @@
   "usuarios": [
     {
       "id": "6a91",
+      "nome": "Jogador1",
       "email": "julia@exemplo.com",
       "senha": "julia21!"
     },
     {
       "id": "60df",
+      "nome": "Jogador2",
       "email": "mari@exemplo.com",
       "senha": "Mari21!!"
     },
     {
       "id": "6528",
+      "nome": "Neemias",
       "email": "neemias123@gmail.com",
       "senha": "Neemias123*"
     }
