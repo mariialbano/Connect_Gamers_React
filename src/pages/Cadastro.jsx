@@ -109,7 +109,7 @@ export default function Cadastro() {
   };
 
   return (
-    <div className="flex justify-center py-10">
+    <div className="flex justify-center py-20">
       <div className={
         theme === "dark"
           ? "bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-xl text-white"

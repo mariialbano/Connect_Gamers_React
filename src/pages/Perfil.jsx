@@ -85,21 +85,21 @@ const Profile = () => {
       {/* Container principal - Cinza escuro transparente */}
       <div 
         className="container mx-auto px-4 pt-24 pb-16 max-w-4xl 
-        bg-gray-800/70
-        rounded-xl shadow-2xl my-8 border border-gray-600
+        bg-gray-800
+        rounded-xl my-8 shadow-lg
         backdrop-blur-sm"
-      >
+      > 
         {/* Cabeçalho do Perfil */}
         <div className="text-center mb-12">
           <div className="relative inline-block">
             <div 
-              className="w-44 h-44 rounded-full border-4 border-[rgb(253,77,121)] shadow-lg mx-auto flex items-center justify-center overflow-hidden"
+              className="w-44 h-44 rounded-full border-4 border-[)rgb(253,77,121] shadow-lg mx-auto flex items-center justify-center overflow-hidden"
               style={{ backgroundColor: 'rgba(58, 58, 74, 0.7)' }}
             >
               <img
                 src={profileImage}
                 alt="Foto do perfil"
-                className="w-full h-full object-cover"
+                className="w-full h-fu      ll object-cover"
               />
             </div>
             <label

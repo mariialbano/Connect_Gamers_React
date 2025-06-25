@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className={
       theme === "dark"
-        ? "bg-black text-gray-400 py-4 text-center mt-10 border-t border-pink-500"
+        ? "bg-black text-gray-400 py-4 text-center mt-28 border-t border-pink-500"
         : "bg-[#d1d2d6] text-gray-600 py-4 text-center mt-10 border-t border-pink-500"
     }>
       <p className="text-sm">© {new Date().getFullYear()} Connect Gamers. Todos os direitos reservados.</p>
