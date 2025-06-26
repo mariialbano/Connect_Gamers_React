@@ -21,3 +21,19 @@ export const getItem = async (endpoint) => {
   }
   return response.json();
 };
+
+export const patchItem = async (endpoint, id, data) => {
+  const response = await fetch(`http://localhost:3001/${endpoint}/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Erro ao atualizar dados em " + endpoint);
+  }
+
+  return response.json();
+};

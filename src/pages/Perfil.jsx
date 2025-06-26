@@ -210,7 +210,10 @@ const Profile = () => {
         ) : (
           <div className="flex justify-center w-full relative">
             <div className="flex items-center justify-center mx-auto">
-              <h1 className={`text-3xl font-bold ${theme === "dark" ? "text-gray-100" : "text-black"}`}>{nomeUsuario}</h1>
+              <h1 className={`text-3xl font-bold ${theme === "dark" ? "text-gray-100" : "text-black"}`}>
+                  Olá, {nomeUsuario}!
+              </h1>
+
               <button
                 className={`ml-2 mt-2 ${theme === "dark" ? "text-gray-400 hover:text-pink-400" : "text-gray-600 hover:text-pink-600"} p-2 z-20 text-2xl`}
                 title="Editar nome"
@@ -226,8 +229,8 @@ const Profile = () => {
             </div>
           </div>
         )}
-        <p className={`mt-1 text-lg ${theme === "dark" ? "text-gray-300" : "text-black"}`}>
-          {localStorage.getItem("usuarioLogado") || "user@conectgamers.com"}
+        <p className={`mt-1 text-md ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>
+          {localStorage.getItem("usuarioLogado")}
         </p>
         <div className="inline-block bg-[rgb(253,77,121)] text-white px-6 py-2 rounded-full text-sm mt-3 shadow-lg">
           Ranking: Ouro
@@ -303,15 +306,17 @@ const Profile = () => {
               <label className={`block mb-3 font-semibold ${theme === "dark" ? "text-gray-200" : "text-black"}`}>Senha Atual</label>
               <input
                 type="password"
+                name="currentPassword"
+                id="currentPassword"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Digite sua senha atual"
+                autoComplete="current-password"
                 className={`w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgb(253,77,121)]
                   ${theme === "dark"
                     ? "bg-gray-600 border border-gray-500 text-white"
                     : "bg-[#f3f4f6] border border-pink-300 text-black"}
                 `}
-                placeholder="Digite sua senha atual"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                required
               />
             </div>
             <div className="mb-5">

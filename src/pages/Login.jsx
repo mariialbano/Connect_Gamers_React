@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getItem, postItem } from "../services/api"; // ajuste o caminho conforme seu projeto
+import { getItem, postItem } from "../services/api";
 import { useTheme } from "../theme/ThemeContext";
 
 export default function Login() {
   const [modo, setModo] = useState("login");
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
+  const [nome, setNome] = useState(""); // Novo campo
   const [seguranca, setSeguranca] = useState(false);
   const [compartilharDados, setCompartilharDados] = useState(false);
   const [usuariosExistentes, setUsuariosExistentes] = useState([]);
@@ -30,8 +31,8 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!usuario || !senha || !seguranca || !compartilharDados) {
-      alert("Por favor, preencha todos os campos e aceite os termos.");
+    if (!usuario || !senha || !seguranca || !compartilharDados || (modo === "cadastro" && !nome)) {
+      alert("Preencha todos os campos e aceite os termos.");
       return;
     }
 
@@ -43,9 +44,9 @@ export default function Login() {
         return;
       }
 
-      // Cadastra o novo usuário
       try {
         await postItem("usuarios", {
+          nome,
           email: usuario,
           senha: senha,
         });
@@ -74,6 +75,17 @@ export default function Login() {
     }
   };
 
+  const handleEsqueciSenha = () => {
+    const usuarioEncontrado = usuariosExistentes.find((u) => u.email === usuario);
+    if (!usuario) {
+      alert("Digite seu e-mail para recuperar a senha.");
+    } else if (!usuarioEncontrado) {
+      alert("Usuário não encontrado.");
+    } else {
+      alert(`Sua senha é: ${usuarioEncontrado.senha}`);
+    }
+  };
+
   return (
     <div className="flex justify-center py-10 px-4">
       <div className={
@@ -92,11 +104,31 @@ export default function Login() {
             onClick={() => setModo("cadastro")}
             className={`px-4 py-2 font-bold ${modo === "cadastro" ? "text-pink-500 border-b-2 border-pink-500" : "text-gray-400"}`}
           >
-            Cadastrar
+            Cadastre-se
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+
+          {modo === "cadastro" && (
+            <div>
+              <label htmlFor="nome" className={theme === "dark" ? "block mb-1" : "block mb-1 text-black"}>Nome</label>
+              <input
+                type="text"
+                id="nome"
+                placeholder="Digite seu nome"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                required
+                className={
+                  theme === "dark"
+                    ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400"
+                    : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black placeholder-gray-500"
+                }
+              />
+            </div>
+          )}
+
           <div>
             <label htmlFor="usuario" className={theme === "dark" ? "block mb-1" : "block mb-1 text-black"}>E-mail</label>
             <input
@@ -108,8 +140,8 @@ export default function Login() {
               required
               className={
                 theme === "dark"
-                  ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400"
+                  : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black placeholder-gray-500"
               }
             />
           </div>
@@ -127,8 +159,8 @@ export default function Login() {
               required
               className={
                 theme === "dark"
-                  ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400"
+                  : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black placeholder-gray-500"
               }
             />
             <small className={theme === "dark" ? "text-gray-400" : "text-gray-600"}>
@@ -143,11 +175,7 @@ export default function Login() {
               checked={seguranca}
               onChange={(e) => setSeguranca(e.target.checked)}
               required
-              className={
-                theme === "dark"
-                  ? ""
-                  : "accent-pink-500 bg-white border-gray-300"
-              }
+              className={theme === "dark" ? "" : "accent-pink-500 bg-white border-gray-300"}
             />
             <label htmlFor="securityAwareness" className={theme === "dark" ? "text-sm text-gray-300" : "text-sm text-black"}>
               Estou ciente das práticas de segurança do site
@@ -161,11 +189,7 @@ export default function Login() {
               checked={compartilharDados}
               onChange={(e) => setCompartilharDados(e.target.checked)}
               required
-              className={
-                theme === "dark"
-                  ? ""
-                  : "accent-pink-500 bg-white border-gray-300"
-              }
+              className={theme === "dark" ? "" : "accent-pink-500 bg-white border-gray-300"}
             />
             <label htmlFor="dataSharing" className={theme === "dark" ? "text-sm text-gray-300" : "text-sm text-black"}>
               Concordo em compartilhar meus dados
@@ -178,6 +202,14 @@ export default function Login() {
           >
             {modo === "login" ? "Entrar" : "Cadastrar"}
           </button>
+          {modo === "login" && (
+              <p
+                onClick={handleEsqueciSenha}
+                className="text-pink-500 mt-2 cursor-pointer text-sm hover:underline text-center"
+              >
+                Esqueci minha senha
+              </p>
+            )}
         </form>
       </div>
     </div>
