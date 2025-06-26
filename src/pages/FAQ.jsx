@@ -7,17 +7,9 @@ const FAQ = () => {
   const [feedback, setFeedback] = useState("");
   const { theme } = useTheme();
 
-  const handleRatingChange = (value) => {
-    setRating(value);
-  };
-
-  const handleMouseOver = (value) => {
-    setHoverRating(value);
-  };
-
-  const handleMouseLeave = () => {
-    setHoverRating(0);
-  };
+  const handleRatingChange = setRating;
+  const handleMouseOver = setHoverRating;
+  const handleMouseLeave = () => setHoverRating(0);
 
   const handleFeedbackSubmit = (e) => {
     e.preventDefault();
@@ -52,7 +44,7 @@ const FAQ = () => {
                       ? 'text-yellow-400'
                       : theme === "dark"
                         ? 'text-gray-300'
-                        : 'text-gray-600' // cinza escuro no tema claro
+                        : 'text-gray-600'
                   }`}
                   onClick={() => handleRatingChange(value)}
                   onMouseOver={() => handleMouseOver(value)}
@@ -65,7 +57,7 @@ const FAQ = () => {
           </div>
 
           <textarea 
-              className={`w-full p-2 border border-gray-300 rounded focus:border-gray-500/80 focus:ring-1 focus:ring-gray-500/80 outline-none ${
+            className={`w-full p-2 border border-gray-300 rounded focus:border-gray-500/80 focus:ring-1 focus:ring-gray-500/80 outline-none ${
               theme === "dark"
                 ? "bg-gray-200 text-black"
                 : "bg-gray-200 text-black"

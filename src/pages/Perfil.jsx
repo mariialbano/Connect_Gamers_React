@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { getItem } from "../services/api";
 import { useTheme } from "../theme/ThemeContext";
 
 const Profile = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [vlibrasActive, setVlibrasActive] = useState(localStorage.getItem("vlibrasAtivo") === "true");
   const [profileImage, setProfileImage] = useState(localStorage.getItem("profileImage") || "https://via.placeholder.com/150");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showAvatarList, setShowAvatarList] = useState(false);
-  const [avatarListVisible, setAvatarListVisible] = useState(false);
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [nomeUsuario, setNomeUsuario] = useState("Nome do Usuário");
   const [editandoNome, setEditandoNome] = useState(false);
   const [novoNome, setNovoNome] = useState("");
-  const navigate = useNavigate(); 
   const { theme } = useTheme();
 
   const siteAvatars = [
@@ -60,8 +56,6 @@ const Profile = () => {
     setShowAvatarList(false);
   };
 
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-  const closeSidebar = () => setSidebarOpen(false);
   const handleVlibrasToggle = () => setVlibrasActive(!vlibrasActive);
 
   const handleImageChange = (e) => {
@@ -245,7 +239,7 @@ const Profile = () => {
   const EventsSection = () => (
     <section className="mb-12">
       <h2 className={`text-2xl font-bold mb-6 pb-2 border-b-2 border-[rgb(253,77,121)] flex justify-center items-center ${theme === "dark" ? "text-gray-100" : "text-black"}`}>
-        <i className="fas fa-calendar-alt mr-3 text-[rgb(253,77,121)]"></i> Meus Eventos
+        <i className="fas fa-calendar-alt mr-3 text-[rgb(253,77,121]"></i> Meus Eventos
       </h2>
       <div className="space-y-4">
         {[1, 2].map((event) => (
