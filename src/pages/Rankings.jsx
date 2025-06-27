@@ -61,7 +61,7 @@ const Rankings = () => {
           {jogadoresExibidos.map((jogador, index) => (
             <li
               key={index}
-              className={`border border-gray-300 rounded-lg px-4 py-3 transition-all duration-500
+              className={`border border-gray-300 rounded-lg px-4 py-3 hover:scale-105 transition-all duration-500
                 ${theme === "dark"
                   ? "bg-gray-300 hover:bg-gray-300/85"
                   : "bg-gray-100 hover:bg-gray-400/85"

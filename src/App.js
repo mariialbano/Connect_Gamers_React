@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -24,7 +24,8 @@ function App() {
         <Navbar />
         <main className="flex-1 p-6">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Navigate to="/home" />} />
+            <Route path="/home" element={<Home />} />            
             <Route path="/cadastro" element={<Cadastro />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/eventos" element={<Eventos />} />
