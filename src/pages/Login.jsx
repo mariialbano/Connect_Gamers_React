@@ -31,6 +31,12 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(usuario)) {
+      alert("Por favor, insira um e-mail válido.");
+      return;
+    }                     
+
     if (!usuario || !senha || !seguranca || !compartilharDados || (modo === "cadastro" && !nome)) {
       alert("Preencha todos os campos e aceite os termos.");
       return;
@@ -132,7 +138,7 @@ export default function Login() {
           <div>
             <label htmlFor="usuario" className={theme === "dark" ? "block mb-1" : "block mb-1 text-black"}>E-mail</label>
             <input
-              type="text"
+              type="email"
               id="usuario"
               placeholder="Digite seu e-mail"
               value={usuario}
@@ -203,13 +209,13 @@ export default function Login() {
             {modo === "login" ? "Entrar" : "Cadastrar"}
           </button>
           {modo === "login" && (
-              <p
-                onClick={handleEsqueciSenha}
-                className="text-pink-500 mt-2 cursor-pointer text-sm hover:underline text-center"
-              >
-                Esqueci minha senha
-              </p>
-            )}
+            <p
+              onClick={handleEsqueciSenha}
+              className="text-pink-500 mt-2 cursor-pointer text-sm hover:underline text-center"
+            >
+              Esqueci minha senha
+            </p>
+          )}
         </form>
       </div>
     </div>
