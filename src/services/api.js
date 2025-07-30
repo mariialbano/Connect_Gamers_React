@@ -1,5 +1,5 @@
 export const postItem = async (endpoint, data) => {
-  const response = await fetch(`http://localhost:3001/${endpoint}`, {
+  const response = await fetch(`http://localhost:5000/api/${endpoint}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -15,7 +15,7 @@ export const postItem = async (endpoint, data) => {
 };
 
 export const getItem = async (endpoint) => {
-  const response = await fetch(`http://localhost:3001/${endpoint}`);
+  const response = await fetch(`http://localhost:5000/api/${endpoint}`);
   if (!response.ok) {
     throw new Error("Erro ao buscar dados de " + endpoint);
   }
@@ -23,7 +23,7 @@ export const getItem = async (endpoint) => {
 };
 
 export const patchItem = async (endpoint, id, data) => {
-  const response = await fetch(`http://localhost:3001/${endpoint}/${id}`, {
+  const response = await fetch(`http://localhost:5000/api/${endpoint}/${id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

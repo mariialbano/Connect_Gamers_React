@@ -16,29 +16,28 @@ git clone https://github.com/mariialbano/Connect_Gamers_React.git
 cd Connect_Gamers_React
 ```
 
-### 2. Instale as dependências
+### 2. Instale as dependências do frontend
 
 ```bash
 npm install
 ```
 
-### 3. Inicie o projeto React
+#### Em seguida, instale as dependências do backend:
+
+cd backend        <!-- acessa o diretório do backend --> 
+npm install       <!-- instala dependências do backend -->
+cd ..             <!-- retorna um diretório (diretório raiz) -->
+
+
+### 3. Inicie o projeto
 
 ```bash
-npm start
+npm run dev        
 ```
 
-Abra [http://localhost:3000/](http://localhost:3000/) no navegador para visualizar o app.
+Abra [http://localhost:3000/] no navegador para visualizar o app.
 
-### 4. Inicie a API local com json-server
-
-Em um novo terminal (por exemplo, Git Bash), execute:
-
-```bash
-npx json-server --watch db.json --port 3001
-```
-
-Isso iniciará a API simulada no endereço: [http://localhost:3001/squads](http://localhost:3001/squads)<br/>
+A API estará no endereço: [http://localhost:5000/api/squads] & [http://localhost:5000/api/usuarios]
 Você também pode visualizar os usuários e squads cadastrados no arquivo db.json
 
 ---
@@ -49,7 +48,7 @@ Você também pode visualizar os usuários e squads cadastrados no arquivo db.js
 - Tailwind CSS
 - React Router DOM
 - Lucide React (ícones)
-- JSON Server (API local fake)
+- JSON Server (API)
 
 ---
 
@@ -87,4 +86,4 @@ Fique à vontade para abrir uma issue ou contribuir com melhorias!
 - [Jéssica Brito](https://github.com/jessbrt19)
 - [Mariana Albano](https://github.com/mariialbano)
 - [Neemias Silva](https://github.com/neemiasv)
-- [Vinícius Gonzales](https://github.com/vngon)
+- [Danilo Senna](https://github.com/)

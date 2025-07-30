@@ -138,7 +138,7 @@ export default function Login() {
           <div>
             <label htmlFor="usuario" className={theme === "dark" ? "block mb-1" : "block mb-1 text-black"}>E-mail</label>
             <input
-              type="email"
+              type="email" 
               id="usuario"
               placeholder="Digite seu e-mail"
               value={usuario}

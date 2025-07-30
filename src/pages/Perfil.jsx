@@ -98,7 +98,7 @@ const Profile = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:3001/usuarios/${usuario.id}`, {
+      const response = await fetch(`http://localhost:5000/api/usuarios/${usuario.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ senha: newPassword }),
@@ -126,7 +126,7 @@ const Profile = () => {
       const usuario = usuarios.find((u) => u.email === email);
       if (!usuario) return;
 
-      await fetch(`http://localhost:3001/usuarios/${usuario.id}`, {
+      await fetch(`http://localhost:5000/api/usuarios/${usuario.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nome: novoNome }),
