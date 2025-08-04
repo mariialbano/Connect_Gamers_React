@@ -44,6 +44,21 @@
       "eventoId": 2,
       "nivel": "Competitivo",
       "dataCadastro": "2025-06-25T02:57:28.935Z"
+    },
+    {
+      "nomeSquad": "Squad 35",
+      "integrantes": [
+        "Joao",
+        "José ",
+        "Jean",
+        "Julia",
+        "Joana"
+      ],
+      "jogo": "Valorant",
+      "eventoId": 2,
+      "nivel": "Competitivo",
+      "dataCadastro": "2025-08-03T20:49:39.945Z",
+      "id": "1754254179953"
     }
   ],
   "usuarios": [
@@ -70,6 +85,12 @@
       "nome": "Mariana",
       "email": "mariii@hotmail.com",
       "senha": "Mari1234!"
+    },
+    {
+      "nome": "neemias teste 1",
+      "email": "neemias123@gGGGmail.com",
+      "senha": "Nkdsamduaw0428*",
+      "id": "1754253671912"
     }
   ]
 }
