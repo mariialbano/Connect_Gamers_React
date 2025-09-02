@@ -5,9 +5,9 @@ import { useTheme } from "../theme/ThemeContext";
 
 export default function Login() {
   const [modo, setModo] = useState("login");
-  const [usuario, setUsuario] = useState("");
+  const [usuario, setUsuario] = useState(""); // Agora é nome de usuário, não email
   const [senha, setSenha] = useState("");
-  const [nome, setNome] = useState(""); // Novo campo
+  const [nome, setNome] = useState(""); // Novo campo para cadastro
   const [seguranca, setSeguranca] = useState(false);
   const [compartilharDados, setCompartilharDados] = useState(false);
   const [usuariosExistentes, setUsuariosExistentes] = useState([]);
@@ -31,30 +31,24 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(usuario)) {
-      alert("Por favor, insira um e-mail válido.");
-      return;
-    }                     
-
     if (!usuario || !senha || !seguranca || !compartilharDados || (modo === "cadastro" && !nome)) {
       alert("Preencha todos os campos e aceite os termos.");
       return;
     }
 
-    const emailExiste = usuariosExistentes.find((u) => u.email === usuario);
+    const usuarioExiste = usuariosExistentes.find((u) => u.usuario === usuario);
 
     if (modo === "cadastro") {
-      if (emailExiste) {
-        alert("Este e-mail já está cadastrado!");
+      if (usuarioExiste) {
+        alert("Este nome de usuário já está cadastrado!");
         return;
       }
 
       try {
         await postItem("usuarios", {
           nome,
-          email: usuario,
-          senha: senha,
+          usuario,
+          senha,
         });
         localStorage.setItem("usuarioLogado", usuario);
         alert("Cadastro realizado com sucesso!");
@@ -65,12 +59,12 @@ export default function Login() {
     }
 
     if (modo === "login") {
-      if (!emailExiste) {
-        alert("E-mail não encontrado. Verifique ou cadastre-se primeiro.");
+      if (!usuarioExiste) {
+        alert("Usuário não encontrado. Verifique ou cadastre-se primeiro.");
         return;
       }
 
-      if (emailExiste.senha !== senha) {
+      if (usuarioExiste.senha !== senha) {
         alert("Senha incorreta!");
         return;
       }
@@ -82,9 +76,9 @@ export default function Login() {
   };
 
   const handleEsqueciSenha = () => {
-    const usuarioEncontrado = usuariosExistentes.find((u) => u.email === usuario);
+    const usuarioEncontrado = usuariosExistentes.find((u) => u.usuario === usuario);
     if (!usuario) {
-      alert("Digite seu e-mail para recuperar a senha.");
+      alert("Digite seu nome de usuário para recuperar a senha.");
     } else if (!usuarioEncontrado) {
       alert("Usuário não encontrado.");
     } else {
@@ -136,11 +130,11 @@ export default function Login() {
           )}
 
           <div>
-            <label htmlFor="usuario" className={theme === "dark" ? "block mb-1" : "block mb-1 text-black"}>E-mail</label>
+            <label htmlFor="usuario" className={theme === "dark" ? "block mb-1" : "block mb-1 text-black"}>Nome de usuário</label>
             <input
-              type="email" 
+              type="text"
               id="usuario"
-              placeholder="Digite seu e-mail"
+              placeholder="Digite seu nome de usuário"
               value={usuario}
               onChange={(e) => setUsuario(e.target.value)}
               required
