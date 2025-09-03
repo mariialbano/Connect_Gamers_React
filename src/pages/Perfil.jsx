@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getItem } from "../services/api";
 
-/* ---------- Componentes filhos (estáveis) ---------- */
-
 function AvatarSection({
   profileImage,
   siteAvatars,
@@ -98,7 +96,6 @@ function NameEditSection({
                 className="ml-2 mt-2 text-gray-600 hover:text-pink-600 dark:text-gray-400 dark:hover:text-pink-400 p-2 z-20 text-2xl"
                 title="Editar nome"
                 onClick={() => {
-                  // inicializa com o nome atual para edição
                   setNovoNome(nomeUsuario === "Nome do Usuário" ? "" : nomeUsuario);
                   setEditandoNome(true);
                 }}
@@ -162,7 +159,6 @@ function PasswordSection({
   setConfirmPassword,
   onSubmitPassword
 }) {
-  // mesma regex do login.jsx
   const passwordPattern = "(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}";
   const passwordTitle = "A senha deve ter pelo menos 8 caracteres, incluindo letras, números e um símbolo";
 
@@ -251,8 +247,6 @@ function PasswordSection({
   );
 }
 
-/* ---------- Componente principal Profile (export default) ---------- */
-
 const Profile = () => {
   const [profileImage, setProfileImage] = useState(localStorage.getItem("profileImage") || "/assets/avatars/india-avatar.png");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -260,7 +254,7 @@ const Profile = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showAvatarList, setShowAvatarList] = useState(false);
   const [showPasswordSection, setShowPasswordSection] = useState(false);
-  const [nomeUsuario, setNomeUsuario] = useState("Nome do Usuário"); // Nome alterável
+  const [nomeUsuario, setNomeUsuario] = useState("Nome do Usuário");
   const [editandoNome, setEditandoNome] = useState(false);
   const [novoNome, setNovoNome] = useState("");
 
@@ -275,13 +269,13 @@ const Profile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const usuarioLogado = localStorage.getItem("usuarioLogado"); // login permanente
+        const usuarioLogado = localStorage.getItem("usuarioLogado"); 
         if (!usuarioLogado) return;
 
         const usuarios = await getItem("usuarios");
-        const usuario = usuarios.find((u) => u.usuario === usuarioLogado); // busca pelo login
+        const usuario = usuarios.find((u) => u.usuario === usuarioLogado); 
         if (usuario) {
-          setNomeUsuario(usuario.nome || "Nome do Usuário"); // carrega o nome
+          setNomeUsuario(usuario.nome || "Nome do Usuário"); 
         }
       } catch (error) {
         console.error("Erro ao buscar dados do usuário:", error);
@@ -297,13 +291,11 @@ const Profile = () => {
     setShowAvatarList(false);
   };
 
-  // mesma regex do login.jsx (em JS)
   const passwordRegex = /(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}/;
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
 
-    // valida formato da senha (mesma regra do cadastro)
     if (!passwordRegex.test(newPassword)) {
       alert("A nova senha deve ter pelo menos 8 caracteres, incluindo letras, números e um símbolo.");
       return;
@@ -365,12 +357,12 @@ const Profile = () => {
       const response = await fetch(`http://localhost:5000/api/usuarios/${usuario.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome: novoNome }), // salva o nome
+        body: JSON.stringify({ nome: novoNome }),
       });
 
       if (!response.ok) throw new Error("Erro ao atualizar nome.");
 
-      setNomeUsuario(novoNome); // atualiza na tela
+      setNomeUsuario(novoNome);
       setEditandoNome(false);
     } catch (error) {
       console.error("Erro ao atualizar nome:", error);
