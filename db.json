@@ -91,6 +91,75 @@
       "email": "neemias123@gGGGmail.com",
       "senha": "Nkdsamduaw0428*",
       "id": "1754253671912"
+    },
+    {
+      "nome": "Neemias Silva",
+      "usuario": "neemias12345",
+      "senha": "Neemias123*",
+      "id": "1756859484293"
+    },
+    {
+      "nome": "neemias",
+      "usuario": "neemiasteste1",
+      "senha": "Neemias12345*",
+      "id": "1756860887995"
+    }
+  ],
+  "jogos": [
+    {
+      "id": "cs2",
+      "name": "Counter Strike 2",
+      "desc": "FPS tático — torneios e partidas ranqueadas.",
+      "image": "/assets/cs2.png",
+      "video": "/assets/cs2.mp4",
+      "categories": [
+        "FPS",
+        "Tático"
+      ]
+    },
+    {
+      "id": "fortnite",
+      "name": "Fortnite",
+      "desc": "Battle Royale — torneios criativos e campeonatos.",
+      "image": "/assets/fortnite.png",
+      "video": "/assets/fortnite.mp4",
+      "categories": [
+        "Battle Royale",
+        "Criativo"
+      ]
+    },
+    {
+      "id": "lol",
+      "name": "League of Legends",
+      "desc": "MOBA — ligas, scrims e campeonatos.",
+      "image": "/assets/lol.png",
+      "video": "/assets/lol.mp4",
+      "categories": [
+        "MOBA",
+        "Competitivo"
+      ]
+    },
+    {
+      "id": "rocketleague",
+      "name": "Rocket League",
+      "desc": "Futebol com carros — eventos e partidas rápidas.",
+      "image": "/assets/rocketleague.jpg",
+      "video": "/assets/rocketleague.mp4",
+      "categories": [
+        "Esporte",
+        "Competitivo"
+      ]
+    },
+    {
+      "id": "valorant",
+      "name": "Valorant",
+      "desc": "FPS tático com habilidades — ligas e scrims.",
+      "image": "/assets/valorant.png",
+      "video": "/assets/valorant.mp4",
+      "categories": [
+        "FPS",
+        "Competitivo"
+      ]
     }
   ]
 }
