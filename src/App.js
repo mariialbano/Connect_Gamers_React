@@ -8,8 +8,6 @@ import Eventos from './pages/Eventos';
 import Jogos from './pages/Jogos'; 
 import Login from './pages/Login';
 import Perfil from './pages/Perfil';
-import Pesquisa from './pages/Pesquisa';
-import Rankings from './pages/Rankings';
 import { useTheme } from './theme/ThemeContext';
 
 function App() {
@@ -35,8 +33,8 @@ function App() {
             <Route path="/jogos/:gameId" element={<Jogos />} />
             <Route path="/login" element={<Login />} />
             <Route path="/perfil" element={<Perfil />} />
-            <Route path="/pesquisa" element={<Pesquisa />} />
-            <Route path="/rankings" element={<Rankings />} />
+            {/* <Route path="/pesquisa" element={<Pesquisa />} /> */}
+            {/* <Route path="/rankings" element={<Rankings />} /> */}
           </Routes>
         </main>
         <Footer />

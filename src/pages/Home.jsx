@@ -28,7 +28,7 @@ export default function Home() {
             to="/pesquisa"
             className="text-pink-500 hover:underline font-semibold"
           >
-            Saiba mais &rarr;
+            Comunidade &rarr;
           </Link>
         </div>
       </div>
