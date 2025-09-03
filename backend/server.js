@@ -2,6 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const usersRouter = require('./routes/users');
 const squadsRouter = require('./routes/squads');
+const gamesRouter = require('./routes/games');
+const eventosRouter = require('./routes/eventos');
+const rankingsRouter = require('./routes/rankings');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
@@ -24,6 +27,9 @@ app.use(limiter);
 
 app.use('/api/usuarios', usersRouter);
 app.use('/api/squads', squadsRouter);
+app.use('/api/games', gamesRouter);
+app.use('/api/eventos', eventosRouter);
+app.use('/api/rankings', rankingsRouter);
 
 app.get('/', (req, res) => {
     res.send('Você está no backend!');
