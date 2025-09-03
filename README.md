@@ -38,8 +38,8 @@ npm run dev
 
 Abra [http://localhost:3000/] no navegador para visualizar o app.
 
-A API estará no endereço: [http://localhost:5000/api/squads] & [http://localhost:5000/api/usuarios]
-Você também pode visualizar os usuários e squads cadastrados no arquivo db.json
+A API estaram nos endereços: [http://localhost:5000/api/squads], [http://localhost:5000/api/usuarios], [http://localhost:5000/api/games], [http://localhost:5000/api/games] & [http://localhost:5000/api/rankings]
+Você também pode visualizar através do arquivo db.json
 
 ---
 
