@@ -24,10 +24,11 @@ npm install
 
 #### Em seguida, instale as dependências do backend:
 
-cd backend        <!-- acessa o diretório do backend --> 
-npm install       <!-- instala dependências do backend -->
-cd ..             <!-- retorna um diretório (diretório raiz) -->
-
+```bash
+cd backend        # acessa o diretório do backend
+npm install       # instala dependências do backend
+cd ..             # retorna um diretório (diretório raiz)
+```
 
 ### 3. Inicie o projeto
 
@@ -49,6 +50,8 @@ Você também pode visualizar os usuários e squads cadastrados no arquivo db.js
 - React Router DOM
 - Lucide React (ícones)
 - JSON Server (API)
+- Node.js
+- Express (API)
 
 ---
 
