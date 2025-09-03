@@ -143,7 +143,7 @@
       "id": "rocketleague",
       "name": "Rocket League",
       "desc": "Futebol com carros — eventos e partidas rápidas.",
-      "image": "/assets/rocketleague.jpg",
+      "image": "/assets/rocketleague.png",
       "video": "/assets/rocketleague.mp4",
       "categories": [
         "Esporte",
