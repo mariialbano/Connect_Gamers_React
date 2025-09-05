@@ -6,13 +6,12 @@ import { useTheme } from "../theme/ThemeContext";
 export default function Cadastro() {
   const [jogoSelecionado, setJogoSelecionado] = useState("");
   const [eventoSelecionado, setEventoSelecionado] = useState("");
-  // Primeiro integrante será sempre o usuário logado
   const [integrantes, setIntegrantes] = useState([""]);
   const [nomeSquad, setNomeSquad] = useState("");
   const [nivel, setNivel] = useState("");
 
   // Eventos carregados do backend
-  const [eventos, setEventos] = useState({}); // { NomeDoJogo: [events] }
+  const [eventos, setEventos] = useState({}); 
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -117,7 +116,6 @@ export default function Cadastro() {
           ? "bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-xl text-white"
           : "bg-[#d9dbe2] p-8 rounded-xl shadow-lg w-full max-w-xl text-black"
       }>
-  {/* Título com contraste reforçado no tema claro (pink-800) mantendo leveza no escuro */}
   <h1 className="text-3xl font-bold text-center text-black dark:text-white mb-8">
           Cadastre seu Squad!
         </h1>
@@ -187,7 +185,7 @@ export default function Cadastro() {
             </select>
           </div>
 
-          {/* Evento (condicional) */}
+          {/* Evento */}
           {jogoSelecionado && (
             <div className="flex flex-col gap-1">
               <label htmlFor="eventoSelect" className="text-sm font-medium">Evento</label>
@@ -238,7 +236,6 @@ export default function Cadastro() {
                     type="button"
                     onClick={() => removerIntegrante(index)}
                     aria-label={`Remover integrante ${index+1}`}
-                    /* Botão com alto contraste (bg red-600 / texto branco) e tamanho mínimo acessível */
                     className="bg-red-600 hover:bg-red-700 active:bg-red-800 text-white px-3 py-1.5 rounded-md text-sm font-semibold transition"
                   >
                     Remover

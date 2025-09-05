@@ -1,9 +1,5 @@
 import React, { useRef, useEffect } from 'react';
 
-// Componente de janela de chat com melhorias de acessibilidade:
-// - role="log" + aria-live para anunciar novas mensagens
-// - lista semântica <ul>/<li>
-// - cada mensagem com aria-label sintetizando remetente e horário
 export default function ChatWindow({ channel, messages }) {
   const chatRef = useRef(null);
   useEffect(() => {

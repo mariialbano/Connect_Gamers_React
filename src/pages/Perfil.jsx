@@ -8,12 +8,14 @@ function AvatarSection({ profileImage, siteAvatars, showAvatarList, onToggleList
       <button
         type="button"
         onClick={onToggleList}
-  className="relative w-32 h-44 md:w-36 md:h-52 rounded-full ring-4 ring-pink-800 overflow-hidden shadow-xl group transition-all"
+        className="focus-avatar group relative rounded-full ring-4 ring-pink-800 shadow-xl transition-all"
         aria-label="Alterar avatar"
         title="Clique para escolher um avatar"
       >
-        <img src={profileImage} alt="Avatar do usuário" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
-        <span className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm font-semibold transition-opacity">Trocar Avatar</span>
+        <span className="block w-32 h-44 md:w-36 md:h-52 rounded-full overflow-hidden relative">
+          <img src={profileImage} alt="Avatar do usuário" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+          <span className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm font-semibold transition-opacity">Trocar Avatar</span>
+        </span>
       </button>
       {showAvatarList && (
         <div className="grid grid-cols-5 gap-3 mt-4 p-2">
@@ -24,10 +26,12 @@ function AvatarSection({ profileImage, siteAvatars, showAvatarList, onToggleList
                 key={av}
                 type="button"
                 onClick={() => onSelectAvatar(av)}
-                className={`w-14 h-20 rounded-full overflow-hidden transition-all hover:scale-105 ${selected ? 'ring-2 ring-pink-500' : ''}`}
+                className={`focus-avatar relative w-14 h-20 rounded-full transition-all hover:scale-105 ${selected ? 'border-2 border-pink-500 dark:border-pink-400' : ''}`}
                 aria-label="Selecionar avatar"
               >
-                <img src={av} alt="Opção de avatar" className="w-full h-full object-cover" />
+                <span className="absolute inset-0 rounded-full overflow-hidden">
+                  <img src={av} alt="Opção de avatar" className="w-full h-full object-cover" />
+                </span>
               </button>
             );
           })}
@@ -79,7 +83,6 @@ function NameEditSection({ nomeUsuario, editandoNome, novoNome, setNovoNome, set
         </div>
       )}
       <p className="mt-1 text-md text-gray-700 dark:text-gray-400">{localStorage.getItem('usuarioLogado')}</p>
-  {/* Contraste: intensifica cor no tema claro (bg pink-600/15 + texto pink-800) mantendo legibilidade dark */}
   <div className="inline-block text-sm md:text-base bg-pink-600/15 text-pink-800 dark:text-pink-300 px-4 py-2 rounded-full font-semibold mt-4 tracking-wide">Ranking: Ouro</div>
     </div>
   );
@@ -88,17 +91,16 @@ function NameEditSection({ nomeUsuario, editandoNome, novoNome, setNovoNome, set
 // Meus Eventos
 function EventsSection({ usuarioLogado }) {
   const [meusSquads, setMeusSquads] = useState([]);
-  const [eventos, setEventos] = useState({}); // { NomeDoJogo: events[] }
+  const [eventos, setEventos] = useState({});
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
-  const [origemEventos,setOrigemEventos] = useState('eventos'); // 'eventos' | 'games-fallback'
+  const [origemEventos,setOrigemEventos] = useState('eventos');
 
   useEffect(() => {
     async function fetchData() {
       if(!usuarioLogado){ return; }
       setLoading(true); setErro(null);
       try {
-        // Buscar squads primeiro (se falhar já aborta)
         const squads = await getItem('squads');
         let eventosData = {};
         try {
@@ -108,7 +110,6 @@ function EventsSection({ usuarioLogado }) {
           console.warn('Falha ao obter /api/eventos, tentando /api/games fallback', evErr);
           try {
             const games = await getItem('games');
-            // Reconstrói estrutura { NomeDoJogo: [events] }
             const rebuilt = {};
             (games||[]).forEach(g=>{ if(Array.isArray(g.events)) rebuilt[g.name] = g.events; });
             eventosData = rebuilt;
@@ -156,7 +157,6 @@ function EventsSection({ usuarioLogado }) {
               </div>
               {evento && <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{evento.dia} • {evento.horario}</p>}
               <p className="text-sm font-semibold mb-1 text-gray-800 dark:text-gray-200">Squad: {squad.nomeSquad}</p>
-              {/* Ajuste de contraste: dark:text-gray-400 -> dark:text-gray-300 para atender WCAG 2.1 AA */}
               <p className="text-xs text-gray-500 dark:text-gray-300 mb-2">Nível: {squad.nivel}</p>
               <div className="flex flex-wrap gap-2 mt-2">
                 {squad.integrantes.slice(0, 8).map((nome, idx) => (
@@ -184,7 +184,7 @@ function PasswordSection({ showPasswordSection, setShowPasswordSection, currentP
         aria-controls="password-section"
         aria-expanded={showPasswordSection}
       >
-  <span><i className="fas fa-lock mr-3 text-pink-800 dark:text-pink-400" /> Alterar Senha</span>
+        <span className="justify-center"><i className="fas fa-lock mr-3 text-pink-800 dark:text-pink-400" /> Alterar Senha</span>
         <span className="ml-2">{showPasswordSection ? <i className="fas fa-chevron-up" /> : <i className="fas fa-chevron-down" />}</span>
       </button>
       <div id="password-section" className={`overflow-hidden transition-all duration-300 p-0 rounded-xl shadow-lg mt-2 bg-white border border-pink-200 dark:bg-gray-700/60 dark:border-gray-600 ${showPasswordSection ? 'animate-slide-fade-in max-h-[1000px]' : 'animate-slide-fade-out max-h-0'}`} aria-hidden={!showPasswordSection}>
@@ -211,7 +211,6 @@ function PasswordSection({ showPasswordSection, setShowPasswordSection, currentP
   );
 }
 
-// ---- Profile Page ----
 const Profile = () => {
   const [profileImage, setProfileImage] = useState(localStorage.getItem('profileImage') || '/assets/avatars/india-avatar.png');
   const [currentPassword, setCurrentPassword] = useState('');

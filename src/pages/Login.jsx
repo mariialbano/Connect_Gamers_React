@@ -4,9 +4,9 @@ import { getItem, postItem } from "../services/api";
 
 export default function Login() {
   const [modo, setModo] = useState("login");
-  const [usuario, setUsuario] = useState(""); // Agora é nome de usuário, não email
+  const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
-  const [nome, setNome] = useState(""); // Novo campo para cadastro
+  const [nome, setNome] = useState("");
   const [seguranca, setSeguranca] = useState(false);
   const [compartilharDados, setCompartilharDados] = useState(false);
   const [usuariosExistentes, setUsuariosExistentes] = useState([]);
@@ -88,14 +88,12 @@ export default function Login() {
         <div className="flex justify-around mb-6">
           <button
             onClick={() => setModo("login")}
-            /* Contraste tabs: ativo pink-800, inativo gray-600 */
             className={`px-4 py-2 font-bold transition-colors ${modo === "login" ? "text-pink-800 dark:text-pink-400 border-b-2 border-pink-800 dark:border-pink-400" : "text-gray-600 dark:text-gray-400 hover:text-pink-700 dark:hover:text-pink-300"}`}
           >
             Login
           </button>
           <button
             onClick={() => setModo("cadastro")}
-            /* Contraste tabs: ativo pink-800, inativo gray-600 */
             className={`px-4 py-2 font-bold transition-colors ${modo === "cadastro" ? "text-pink-800 dark:text-pink-400 border-b-2 border-pink-800 dark:border-pink-400" : "text-gray-600 dark:text-gray-400 hover:text-pink-700 dark:hover:text-pink-300"}`}
           >
             Cadastre-se

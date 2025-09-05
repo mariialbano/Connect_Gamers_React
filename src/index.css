@@ -83,3 +83,24 @@ a.rounded-full:focus-visible::after {
 .focus-none:focus-visible::after {
 	display: none;
 }
+
+.game-card:focus-visible::after {
+	border-radius: 1rem
+}
+
+.focus-avatar:focus-visible::after {
+	border-radius: 9999px;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+	box-shadow: 0 0 0 3px var(--focus-ring-color, #000), 0 0 0 6px var(--focus-ring-halo, rgba(0,0,0,0.15));
+	outline: none;
+}
+
+input:disabled:focus-visible,
+select:disabled:focus-visible,
+textarea:disabled:focus-visible {
+	box-shadow: none;
+}

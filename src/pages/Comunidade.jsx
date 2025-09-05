@@ -3,7 +3,6 @@ import { useTheme } from '../theme/ThemeContext';
 import MessageInput from '../components/MessageInput';
 import ChatWindow from '../components/ChatWindow';
 
-// Paleta de cores para usuários (determinístico pelo userId)
 const gradients = [
     'from-green-400 to-blue-500',
     'from-purple-400 to-pink-500',
@@ -20,15 +19,14 @@ function colorFor(userId) {
 
 export default function Comunidade() {
     const { theme } = useTheme();
-    const [channels, setChannels] = useState([]); // {name,count}
+    const [channels, setChannels] = useState([]);
     const [channel, setChannel] = useState('Geral');
     const [messages, setMessages] = useState([]);
-    // Estados de digitação removidos (indicador não é mais exibido)
     const pollingRef = useRef(null);
     const usuarioLogado = localStorage.getItem('usuarioLogado');
     const [currentUser, setCurrentUser] = useState(null);
 
-    // Carrega usuário atual (procura em /api/usuarios)
+    // Carrega usuário atual
     useEffect(() => {
         let abort = false;
         const load = async () => {
@@ -71,7 +69,6 @@ export default function Comunidade() {
                     currentUser: currentUser && m.userId === currentUser.id
                 };
             });
-            // Atualiza mensagens (notificação sonora removida)
             setMessages(mapped);
         } catch (e) { /* noop */ }
     }, [currentUser]);
@@ -80,14 +77,11 @@ export default function Comunidade() {
     useEffect(() => { fetchChannels(); }, [fetchChannels]);
     useEffect(() => { fetchMessages(channel); }, [channel, fetchMessages]);
 
-    // Polling simples de mensagens a cada 4s
     useEffect(() => {
         if (pollingRef.current) clearInterval(pollingRef.current);
         pollingRef.current = setInterval(() => fetchMessages(channel), 4000);
         return () => clearInterval(pollingRef.current);
     }, [channel, fetchMessages]);
-
-    // handleTyping removido
 
     async function handleSend(msgText) {
         if (!currentUser) return alert('Faça login para enviar mensagens');
@@ -113,7 +107,7 @@ export default function Comunidade() {
                 color: colorFor(saved.userId),
                 currentUser: true
             }]);
-            fetchChannels(); // atualizar contagem
+            fetchChannels();
         } catch (e) {
             console.error(e);
         }

@@ -5,11 +5,10 @@ export default function Home() {
   return (
     <div className="flex justify-center py-10 px-4">
       <div className="bg-[#d9dbe2] dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-4xl text-black dark:text-white relative">
-  {/* Círculo decorativo (pink-600 unificado) */}
   <div className="absolute top-0 right-0 w-20 h-20 bg-pink-600 rounded-full opacity-20 -mt-10 -mr-10"></div>
 
         <h2 className="text-4xl font-bold mb-6 text-black dark:text-white">
-          NOSSO <br /> {/* Contraste (tema claro): pink-400 -> pink-800 */} <span className="text-pink-800 dark:text-pink-400">OBJETIVO</span>
+          NOSSO <br /> <span className="text-pink-800 dark:text-pink-400">OBJETIVO</span>
         </h2>
 
         <p className="text-justify leading-relaxed">
@@ -21,7 +20,7 @@ export default function Home() {
           de novas amizades e a construção de equipes sólidas para futuras competições. A plataforma busca promover a interação, o espírito de equipe e o aprendizado coletivo, essencial para quem deseja aprimorar suas habilidades
           no universo dos games de forma competitiva e divertida.
           <br /><br />
-          Ao unir tecnologia, comunidade e eSports, a {/* Contraste (tema claro): pink-600 -> pink-800 */} <span className="text-pink-800 dark:text-pink-400 font-semibold">Connect Gamers</span> se posiciona como um ponto de encontro para todos que vivem e respiram o universo gamer.
+          Ao unir tecnologia, comunidade e eSports, a<span className="text-pink-800 dark:text-pink-400 font-semibold">Connect Gamers</span> se posiciona como um ponto de encontro para todos que vivem e respiram o universo gamer.
         </p>
 
         <div className="mt-6 text-right">

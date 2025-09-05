@@ -1,4 +1,3 @@
-// Removido useEffect não utilizado
 export default function EmojiPicker({ addEmoji }) {
     const emojis = ['😀', '😂', '😍', '😎', '😭', '👍', '🎮', '🔥', '❤️', '😜'];
     return (

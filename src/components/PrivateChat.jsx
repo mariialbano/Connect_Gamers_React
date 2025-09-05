@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import EmojiPicker from './EmojiPicker';
 
-// Reutiliza paleta simples determinística
 const gradients = [
     'from-green-400 to-blue-500',
     'from-purple-400 to-pink-500',

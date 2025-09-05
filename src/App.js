@@ -4,7 +4,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Cadastro from './pages/Cadastro';
 import FAQ from './pages/FAQ';
-import Jogos from './pages/Eventos'; // Página de listagem de jogos
+import Jogos from './pages/Jogos';
 import JogoDetalhe from './pages/JogoDetalhe';
 import Login from './pages/Login';
 import Perfil from './pages/Perfil';

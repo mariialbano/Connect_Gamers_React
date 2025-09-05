@@ -80,13 +80,13 @@ export default function Navbar() {
           >
             <Users size={30} />
           </button>
-          {/* Lado direito: perfil/login */}
+          {/* Perfil/Login */}
           <div
             className="flex justify-end relative items-center min-w-[48px] cursor-pointer"
             onMouseEnter={() => usuarioLogado && setProfileDropdown(true)}
             onMouseLeave={() => usuarioLogado && setProfileDropdown(false)}
           >
-            {/* Ícone de perfil */}
+            {/* Perfil */}
             <button
               onClick={handlePerfilClick}
               className="flex items-center text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-600"
@@ -95,7 +95,7 @@ export default function Navbar() {
             >
               <User size={30} />
             </button>
-            {/* Botão de Entre ou Cadastre-se */}
+            {/* Entre ou Cadastre-se */}
             {!usuarioLogado && (
               <button
                 className="ml-2 text-sm cursor-pointer relative group transition-colors text-pink-800 hover:text-pink-900 dark:text-white dark:hover:text-pink-400"
@@ -105,7 +105,7 @@ export default function Navbar() {
                 <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-500 transition-all duration-300 group-hover:w-full"></span>
               </button>
             )}
-            {/* Seta e dropdown */}
+            {/* Seta e Dropdown */}
             {usuarioLogado && (
               <>
                 <button

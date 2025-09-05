@@ -13,7 +13,6 @@ function safeUsers(list = []) {
   return list.map(u => ({ ...u, senha: u.senha ? '***' : undefined }));
 }
 
-// GET /api/debug/db  -> snapshot completo (sanitizado)
 router.get('/db', (req, res) => {
   try {
     const db = readDB();
@@ -74,7 +73,6 @@ router.get('/statuses', (req, res) => {
   } catch { res.status(500).json({ error: 'Falha' }); }
 });
 
-// Ajuda rápida
 router.get('/', (req, res) => {
   res.json({
     message: 'Debug API - somente leitura',

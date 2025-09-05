@@ -181,7 +181,7 @@ export default function Amigos(){
                                     <span className="text-xs text-gray-500 dark:text-gray-400">{g.members.length}</span>
                                 </button>
                             ))}
-                            {!groupChats.length && <div className="text-[11px] text-gray-500">Sem grupos</div>}
+                            {!groupChats.length && <div className="text-[11px] text-gray-500 dark:text-gray-300">Sem grupos</div>}
                         </div>
                     </div>
                     <div>
@@ -195,7 +195,7 @@ export default function Amigos(){
                             <span className="truncate font-medium text-sm md:text-base">{f.username}</span>
                         </button>
                     ))}
-                    {!sorted.length && <div className="text-[11px] text-gray-500">Sem amigos</div>}
+                    {!sorted.length && <div className="text-[11px] text-gray-500 dark:text-gray-300">Sem amigos</div>}
                     </div>
                 </div>
             </aside>
@@ -230,7 +230,7 @@ export default function Amigos(){
                                             </div>
                                         </li>
                                     ))}
-                                    {!requests.incoming.length && <li className="text-xs text-gray-500">Nenhum</li>}
+                                    {!requests.incoming.length && <li className="text-xs text-gray-500 dark:text-gray-300">Nenhum</li>}
                                 </ul>
                             </div>
                             <div>
@@ -242,7 +242,7 @@ export default function Amigos(){
                                             <button onClick={()=>cancelRequest(fr.id)} className="text-[10px] px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white">Cancelar</button>
                                         </li>
                                     ))}
-                                    {!requests.outgoing.length && <li className="text-xs text-gray-500">Nenhum</li>}
+                                    {!requests.outgoing.length && <li className="text-xs text-gray-500 dark:text-gray-300">Nenhum</li>}
                                 </ul>
                             </div>
                             </div>
@@ -264,7 +264,7 @@ export default function Amigos(){
                                         <button onClick={()=>sendRequest(r.id)} disabled={requestSending} className="text-xs px-3 py-1 rounded bg-pink-800 hover:bg-pink-800 disabled:opacity-50 disabled:cursor-not-allowed text-white">{requestSending?'...':'Enviar'}</button>
                                     </li>
                                 ))}
-                                {search && !results.length && !searchLoading && !searchError && <li className="text-xs text-gray-500 px-1">Sem resultados</li>}
+                                {search && !results.length && !searchLoading && !searchError && <li className="text-xs text-gray-500 dark:text-gray-300 px-1">Sem resultados</li>}
                             </ul>
                         </div>
                     </div>
@@ -292,7 +292,7 @@ export default function Amigos(){
                                 </div>
                             </li>
                         ))}
-                        {!list.length && <li className="text-xs text-gray-500">Lista vazia</li>}
+                        {!list.length && <li className="text-xs text-gray-500 dark:text-gray-300">Lista vazia</li>}
                     </ul>
                 </div>
             </main>

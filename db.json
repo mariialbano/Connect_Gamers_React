@@ -642,14 +642,16 @@
           "fromUserId": "1756860887995",
           "username": "Neemias",
           "text": "aaaaaaaaaa",
-          "time": "2025-09-05T04:50:46.788Z"
+          "time": "2025-09-05T04:50:46.788Z",
+          "timestamp": 1757047846788
         },
         {
           "id": "1757049858112",
           "fromUserId": "1756860887995",
           "username": "Neemias",
           "text": "da",
-          "time": "2025-09-05T05:24:18.112Z"
+          "time": "2025-09-05T05:24:18.112Z",
+          "timestamp": 1757049858112
         }
       ]
     }

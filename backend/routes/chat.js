@@ -32,7 +32,6 @@ const DEFAULT_CHANNELS = [
     'CS2'
 ];
 
-// GET /api/chat/log?type=channel|private|group&limit=100&offset=0
 router.get('/log', (req,res)=>{
     const { type, limit='100', offset='0' } = req.query;
     let data=[];
@@ -44,11 +43,10 @@ router.get('/log', (req,res)=>{
     }catch(e){ return res.status(500).json({ error:'Falha ao ler log'}); }
     const off = Math.max(parseInt(offset)||0,0);
     const lim = Math.min(Math.max(parseInt(limit)||50,1),500);
-    const slice = data.slice(-1 * (off+lim), data.length - off || undefined); // pega do final
+    const slice = data.slice(-1 * (off+lim), data.length - off || undefined);
     res.json({ total:data.length, returned:slice.length, items:slice });
 });
 
-// GET /api/chat/raw-log  -> texto puro
 router.get('/raw-log', (req,res)=>{
     try{
         if(!fs.existsSync(logPath)) return res.status(404).send('Log vazio');
@@ -145,7 +143,6 @@ router.post('/private/:userA/:userB', (req, res) => {
 });
 
 module.exports = router;
-// ----- Grupos (chats de squads) -----
 
 // Lista grupos do usuário
 router.get('/groups', (req, res) => {
