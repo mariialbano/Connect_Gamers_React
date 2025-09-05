@@ -1,15 +1,22 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { postItem } from "../services/api";
+import { useNavigate, useLocation } from "react-router-dom";
+import { postItem, getItem } from "../services/api";
+import { useTheme } from "../theme/ThemeContext";
 
 export default function Cadastro() {
   const [jogoSelecionado, setJogoSelecionado] = useState("");
   const [eventoSelecionado, setEventoSelecionado] = useState("");
+  // Primeiro integrante será sempre o usuário logado
   const [integrantes, setIntegrantes] = useState([""]);
   const [nomeSquad, setNomeSquad] = useState("");
   const [nivel, setNivel] = useState("");
 
+  // Eventos carregados do backend
+  const [eventos, setEventos] = useState({});
+
   const navigate = useNavigate();
+  const location = useLocation();
+  const { theme } = useTheme();
 
   // Verificação de usuários logados
   useEffect(() => {
@@ -17,46 +24,42 @@ export default function Cadastro() {
     if (!usuario) {
       alert("Você precisa estar logado para participar dos eventos.");
       navigate("/login");
+    } else {
+      setIntegrantes([usuario]);
     }
   }, [navigate]);
 
-  const jogos = [
-    "Valorant",
-    "Rocket League",
-    "League of Legends",
-    "Fortnite",
-    "Counter Strike 2",
-  ];
 
-  const eventosTeste = {
-    "Valorant": [
-      { id: 1, nome: "Spike Rush", dia: "Sábado", horario: "13:00 às 15:00" },
-      { id: 2, nome: "Competitivo", dia: "Domingo", horario: "16:00 às 18:00" },
-      { id: 3, nome: "Deathmatch", dia: "Sexta", horario: "20:00 às 22:00" },
-    ],
-    "Rocket League": [
-      { id: 4, nome: "Duplas", dia: "Quarta", horario: "10:00 às 12:00" },
-      { id: 5, nome: "Trio", dia: "Sábado", horario: "15:00 às 17:00" },
-      { id: 6, nome: "1x1", dia: "Domingo", horario: "09:00 às 11:00" },
-    ],
-    "League of Legends": [
-      { id: 7, nome: "5v5 Tradicional", dia: "Sábado", horario: "14:00 às 16:00" },
-      { id: 8, nome: "ARAM", dia: "Domingo", horario: "17:00 às 19:00" },
-      { id: 9, nome: "TFT", dia: "Segunda", horario: "20:00 às 22:00" },
-    ],
-    "Fortnite": [
-      { id: 10, nome: "Solo", dia: "Sábado", horario: "12:00 às 14:00" },
-      { id: 11, nome: "Duplas", dia: "Sábado", horario: "15:00 às 17:00" },
-      { id: 12, nome: "Squad", dia: "Domingo", horario: "18:00 às 20:00" },
-    ],
-    "Counter Strike 2": [
-      { id: 13, nome: "5v5 Competitivo", dia: "Sábado", horario: "13:00 às 15:00" },
-      { id: 14, nome: "2v2 Wingman", dia: "Domingo", horario: "16:00 às 18:00" },
-      { id: 15, nome: "Modo Casual", dia: "Sexta", horario: "19:00 às 21:00" },
-    ],
-  };
+  const jogos = Object.keys(eventos);
+  const eventosFiltrados = jogoSelecionado ? eventos[jogoSelecionado] || [] : [];
 
-  const eventosFiltrados = jogoSelecionado ? eventosTeste[jogoSelecionado] : [];
+  useEffect(() => {
+    let ativo = true;
+    async function fetchEventos() {
+      try {
+        const data = await getItem("eventos");
+        if (!ativo) return;
+        setEventos(data);
+        // aplicar query params após carregar
+        const params = new URLSearchParams(location.search);
+        const jogoParam = params.get('jogo');
+        const eventoIdParam = params.get('eventoId');
+        if (jogoParam && data[jogoParam]) {
+          setJogoSelecionado(jogoParam);
+          if (eventoIdParam) {
+            const evInt = parseInt(eventoIdParam, 10);
+            const existe = (data[jogoParam] || []).some(ev => ev.id === evInt);
+            if (existe) setEventoSelecionado(String(evInt));
+          }
+        }
+      } catch (err) {
+        if (!ativo) return;
+        setEventos({});
+      }
+    }
+    fetchEventos();
+    return () => { ativo = false; };
+  }, [location.search]);
 
   const handleIntegranteChange = (index, value) => {
     const novaLista = [...integrantes];
@@ -65,6 +68,7 @@ export default function Cadastro() {
   };
 
   const adicionarIntegrante = () => {
+    if (integrantes.length >= 5) return;
     setIntegrantes([...integrantes, ""]);
   };
 
@@ -108,84 +112,146 @@ export default function Cadastro() {
 
   return (
     <div className="flex justify-center py-20">
-      <div className="bg-[#d9dbe2] dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-xl text-black dark:text-white">
-        <h1 className="text-3xl font-bold text-center text-pink-500 mb-8">
+      <div className={
+        theme === "dark"
+          ? "bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-xl text-white"
+          : "bg-[#d9dbe2] p-8 rounded-xl shadow-lg w-full max-w-xl text-black"
+      }>
+  {/* Título com contraste reforçado no tema claro (pink-800) mantendo leveza no escuro */}
+  <h1 className="text-3xl font-bold text-center text-black dark:text-white mb-8">
           Cadastre seu Squad!
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <input
-            type="text"
-            placeholder="Nome do Squad"
-            value={nomeSquad}
-            onChange={(e) => setNomeSquad(e.target.value)}
-            className="w-full px-4 py-2 rounded-md bg-[#f3f4f6] dark:bg-gray-700 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
-          />
+        <form onSubmit={handleSubmit} className="space-y-6" aria-labelledby="form-squad-title">
+          <h2 id="form-squad-title" className="sr-only">Formulário de cadastro de squad</h2>
 
-          <select
-            value={nivel}
-            onChange={(e) => setNivel(e.target.value)}
-            className="w-full px-4 py-2 rounded-md bg-[#f3f4f6] dark:bg-gray-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
-          >
-            <option value="">Selecione o nível do squad</option>
-            <option>Iniciante</option>
-            <option>Intermediário</option>
-            <option>Avançado</option>
-            <option>Competitivo</option>
-          </select>
+          {/* Nome do Squad */}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="nomeSquad" className="text-sm font-medium">Nome do Squad <span className="sr-only">(obrigatório)</span></label>
+            <input
+              id="nomeSquad"
+              type="text"
+              placeholder="Nome do Squad"
+              value={nomeSquad}
+              onChange={(e) => setNomeSquad(e.target.value)}
+              className={
+                theme === "dark"
+                  ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400"
+                  : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black placeholder-gray-500"
+              }
+              aria-required="true"
+            />
+          </div>
 
-          <select
-            value={jogoSelecionado}
-            onChange={(e) => {
-              setJogoSelecionado(e.target.value);
-              setEventoSelecionado("");
-            }}
-            className="w-full px-4 py-2 rounded-md bg-[#f3f4f6] dark:bg-gray-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
-          >
-            <option value="">Selecione o jogo</option>
-            {jogos.map((jogo) => (
-              <option key={jogo} value={jogo}>{jogo}</option>
-            ))}
-          </select>
-
-          {jogoSelecionado && (
+          {/* Nível */}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="nivelSquad" className="text-sm font-medium">Nível do Squad</label>
             <select
-              value={eventoSelecionado}
-              onChange={(e) => setEventoSelecionado(e.target.value)}
-              className="w-full px-4 py-2 rounded-md bg-[#f3f4f6] dark:bg-gray-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+              id="nivelSquad"
+              value={nivel}
+              onChange={(e) => setNivel(e.target.value)}
+              className={
+                theme === "dark"
+                  ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white"
+                  : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black"
+              }
             >
-              <option value="">Selecione o evento</option>
-              {eventosFiltrados.map((evento) => (
-                <option key={evento.id} value={evento.id}>
-                  {evento.nome} - {evento.dia} ({evento.horario})
-                </option>
+              <option value="">Selecione o nível do squad</option>
+              <option>Iniciante</option>
+              <option>Intermediário</option>
+              <option>Avançado</option>
+              <option>Competitivo</option>
+            </select>
+          </div>
+
+          {/* Jogo */}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="jogoSelect" className="text-sm font-medium">Jogo</label>
+            <select
+              id="jogoSelect"
+              value={jogoSelecionado}
+              onChange={(e) => {
+                setJogoSelecionado(e.target.value);
+                setEventoSelecionado("");
+              }}
+              className={
+                theme === "dark"
+                  ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white"
+                  : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black"
+              }
+            >
+              <option value="">Selecione o jogo</option>
+              {jogos.map((jogo) => (
+                <option key={jogo} value={jogo}>{jogo}</option>
               ))}
             </select>
+          </div>
+
+          {/* Evento (condicional) */}
+          {jogoSelecionado && (
+            <div className="flex flex-col gap-1">
+              <label htmlFor="eventoSelect" className="text-sm font-medium">Evento</label>
+              <select
+                id="eventoSelect"
+                value={eventoSelecionado}
+                onChange={(e) => setEventoSelecionado(e.target.value)}
+                className={
+                  theme === "dark"
+                    ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white"
+                    : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black"
+                }
+              >
+                <option value="">Selecione o evento</option>
+                {eventosFiltrados.map((evento) => (
+                  <option key={evento.id} value={evento.id}>
+                    {evento.nome} - {evento.dia} ({evento.horario})
+                  </option>
+                ))}
+              </select>
+            </div>
           )}
 
-          <div className="space-y-2">
+          {/* Integrantes */}
+          <div className="space-y-2" aria-labelledby="integrantes-label">
+            <p id="integrantes-label" className="text-sm font-medium mb-1">Integrantes (máx. 5)</p>
             {integrantes.map((nome, index) => (
               <div key={index} className="flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder={`Integrante ${index + 1}`}
-                  value={nome}
-                  onChange={(e) => handleIntegranteChange(index, e.target.value)}
-                  className="flex-1 px-4 py-2 rounded-md bg-[#f3f4f6] dark:bg-gray-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
-                />
+                <div className="flex-1 flex flex-col">
+                  <label htmlFor={`integrante-${index}`} className="sr-only">{index === 0 ? "Integrante 1 (você)" : `Integrante ${index + 1}`}</label>
+                  <input
+                    id={`integrante-${index}`}
+                    type="text"
+                    placeholder={index === 0 ? "Você" : `Integrante ${index + 1}`}
+                    value={nome}
+                    onChange={(e) => handleIntegranteChange(index, e.target.value)}
+                    disabled={index === 0}
+                    title={index === 0 ? "Este é o seu usuário" : "Nome do integrante"}
+                    className={
+                      theme === "dark"
+                        ? `px-4 py-2 rounded-md bg-gray-700 text-white ${index===0 ? 'opacity-80 cursor-not-allowed' : ''}`
+                        : `px-4 py-2 rounded-md bg-[#f3f4f6] text-black ${index===0 ? 'opacity-80 cursor-not-allowed' : ''}`
+                    }
+                  />
+                </div>
                 {index > 0 && (
-                  <button type="button" onClick={() => removerIntegrante(index)} className="text-red-400 hover:text-red-600">
+                  <button
+                    type="button"
+                    onClick={() => removerIntegrante(index)}
+                    aria-label={`Remover integrante ${index+1}`}
+                    /* Botão com alto contraste (bg red-600 / texto branco) e tamanho mínimo acessível */
+                    className="bg-red-600 hover:bg-red-700 active:bg-red-800 text-white px-3 py-1.5 rounded-md text-sm font-semibold transition"
+                  >
                     Remover
                   </button>
                 )}
               </div>
             ))}
-
             <button
               type="button"
               onClick={adicionarIntegrante}
-              className={`text-pink-500 hover:underline mt-2 ${integrantes.length >= 5 ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`text-pink-800 dark:text-pink-300 hover:underline mt-2 ${integrantes.length >= 5 ? "opacity-50 cursor-not-allowed" : ""}`}
               disabled={integrantes.length >= 5}
+              aria-label="Adicionar novo integrante"
             >
               + Adicionar Integrante
             </button>
@@ -193,7 +259,7 @@ export default function Cadastro() {
 
           <button
             type="submit"
-            className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+            className="w-full bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
           >
             Cadastrar Squad
           </button>

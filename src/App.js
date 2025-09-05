@@ -4,8 +4,8 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Cadastro from './pages/Cadastro';
 import FAQ from './pages/FAQ';
-import Eventos from './pages/Eventos';
-import Jogos from './pages/Jogos'; 
+import Jogos from './pages/Eventos'; // antigo Eventos renomeado semanticamente para Jogos
+import JogoDetalhe from './pages/JogoDetalhe';
 import Login from './pages/Login';
 import Perfil from './pages/Perfil';
 import { useTheme } from './theme/ThemeContext';
@@ -29,12 +29,11 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/cadastro" element={<Cadastro />} />
             <Route path="/faq" element={<FAQ />} />
-            <Route path="/eventos" element={<Eventos />} />
-            <Route path="/jogos/:gameId" element={<Jogos />} />
+            <Route path="/jogos" element={<Jogos />} />
+            <Route path="/jogos/:gameId" element={<JogoDetalhe />} />
             <Route path="/login" element={<Login />} />
             <Route path="/perfil" element={<Perfil />} />
-            {/* <Route path="/pesquisa" element={<Pesquisa />} /> */}
-            {/* <Route path="/rankings" element={<Rankings />} /> */}
+            
           </Routes>
         </main>
         <Footer />

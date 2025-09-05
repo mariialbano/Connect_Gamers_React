@@ -52,9 +52,9 @@ export default function Sidebar({ isOpen, onClose }) {
                 <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-500 transition-all duration-300 group-hover:w-full"></span>
               </span>
             </Link>
-            <Link to="/eventos" onClick={onClose} className="relative group transition-colors hover:text-pink-500 dark:hover:text-pink-400">
+      <Link to="/jogos" onClick={onClose} className="relative group transition-colors hover:text-pink-500 dark:hover:text-pink-400">
               <span className="relative">
-                Eventos
+        Jogos
                 <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-500 transition-all duration-300 group-hover:w-full"></span>
               </span>
             </Link>

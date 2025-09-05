@@ -86,8 +86,8 @@ export default function Jogos() {
         return (
             <div className="text-center mt-10">
                 <h2 className="text-3xl font-bold">Jogo não encontrado</h2>
-                <button className="mt-6 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition" onClick={() => navigate("/eventos")}>
-                    Voltar para eventos
+                <button className="mt-6 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition" onClick={() => navigate("/jogos")}> 
+                    Voltar para jogos
                 </button>
             </div>
         );
@@ -188,12 +188,12 @@ export default function Jogos() {
                         </aside>
                     </div>
 
-                    {/* Botão de retorno (não é footer) */}
+                    {/* Botão Voltar */}
                     <div className="flex justify-center mt-10">
                         <button
                             className="bg-gray-600 hover:bg-pink-600/30 text-white px-6 py-3 rounded-xl hover:rounded-xl shadow-lg transition"
-                            onClick={() => navigate("/eventos")}
-                            aria-label="Voltar para eventos"
+                            onClick={() => navigate("/jogos")}
+                            aria-label="Voltar para jogos"
                         >
                             ← Voltar
                         </button>
@@ -203,7 +203,7 @@ export default function Jogos() {
         );
     }
 
-    // Lista de jogos (index)
+    // Lista de jogos 
     return (
         <section className="min-h-screen px-8 py-12 flex flex-col items-center" aria-labelledby="games-list-title">
             <div className="w-full max-w-7xl text-black dark:text-white">
@@ -212,23 +212,32 @@ export default function Jogos() {
                     <input
                         type="text"
                         placeholder="Pesquisar por nome..."
+                        /* Foco acessível arredondado */
                         className="p-3 rounded-lg border border-gray-300 dark:border-gray-600 flex-1"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         aria-label="Pesquisar por nome"
                     />
                     <div className="flex flex-wrap gap-2">
-                        {allCategories.map((cat) => (
-                            <button
-                                key={cat}
-                                className={`px-4 py-2 rounded-full border ${selectedCategories.includes(cat) ? "bg-gray-700 text-white border-gray-700" : "bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white border-gray-400"}`}
-                                onClick={() => setSelectedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])}
-                                aria-pressed={selectedCategories.includes(cat)}
-                                aria-label={`Filtrar por categoria ${cat}`}
-                            >
-                                {cat}
-                            </button>
-                        ))}
+                                                {allCategories.map((cat) => {
+                                                        const ativo = selectedCategories.includes(cat);
+                                                        return (
+                                                                <button
+                                                                        key={cat}
+                                                                        /* Paleta rosa para filtros: estado ativo forte, inativo suave; contraste AA */
+                                                                        className={`px-4 py-2 rounded-full border text-sm font-semibold transition-colors
+                                                                            ${ativo
+                                                                                ? 'bg-pink-800 text-white border-pink-800 hover:bg-pink-900 active:bg-pink-950 dark:bg-pink-600 dark:border-pink-600 dark:hover:bg-pink-500'
+                                                                                : 'bg-pink-100 text-pink-800 border-pink-300 hover:bg-pink-200 dark:bg-pink-600/20 dark:text-pink-300 dark:border-pink-500 dark:hover:bg-pink-600/30'}
+                                                                            `}
+                                                                        onClick={() => setSelectedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])}
+                                                                        aria-pressed={ativo}
+                                                                        aria-label={`Filtrar por categoria ${cat}`}
+                                                                    >
+                                                                        {cat}
+                                                                </button>
+                                                        );
+                                                })}
                         <button
                             className="px-4 py-2 rounded-full border bg-red-200 dark:bg-red-600 text-red-800 dark:text-white border-red-400"
                             onClick={handleClearFilters}
@@ -256,6 +265,7 @@ export default function Jogos() {
                                         navigate(`/jogos/${game.id}`);
                                     }
                                 }}
+                                /* Foco arredondado: ring rosa */
                                 className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-lg transition cursor-pointer"
                             >
                                 <img src={game.image} alt={game.name} className="w-full h-56 object-cover rounded-xl mb-4" />

@@ -59,6 +59,29 @@
       "nivel": "Competitivo",
       "dataCadastro": "2025-08-03T20:49:39.945Z",
       "id": "1754254179953"
+    },
+    {
+      "nomeSquad": "squad neemias",
+      "integrantes": [
+        "neemiasteste1"
+      ],
+      "jogo": "Fortnite",
+      "eventoId": 10,
+      "nivel": "Competitivo",
+      "dataCadastro": "2025-09-04T00:23:26.745Z",
+      "id": "1756945406753"
+    },
+    {
+      "nomeSquad": "squad teste verificação de usuarios",
+      "integrantes": [
+        "neemiasteste1",
+        "neemias12345"
+      ],
+      "jogo": "Fortnite",
+      "eventoId": 11,
+      "nivel": "Competitivo",
+      "dataCadastro": "2025-09-04T00:31:00.236Z",
+      "id": "1756945860237"
     }
   ],
   "usuarios": [
@@ -99,7 +122,7 @@
       "id": "1756859484293"
     },
     {
-      "nome": "neemias",
+      "nome": "Neemias",
       "usuario": "neemiasteste1",
       "senha": "Neemias12345*",
       "id": "1756860887995"

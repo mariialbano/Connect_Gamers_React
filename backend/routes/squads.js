@@ -21,6 +21,33 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
   const db = readDB();
+  const { integrantes = [], jogo, eventoId } = req.body || {};
+
+  // Validação básica de campos obrigatórios
+  if (!jogo || !eventoId) {
+    return res.status(400).json({ error: 'Campos obrigatórios ausentes (jogo, eventoId).' });
+  }
+
+  // Garantir array
+  if (!Array.isArray(integrantes) || integrantes.length === 0) {
+    return res.status(400).json({ error: 'Informe ao menos um integrante.' });
+  }
+
+  // Carregar usuários existentes
+  const usuariosValidos = new Set((db.usuarios || []).map(u => (u.usuario || '').toLowerCase().trim()));
+
+  // Encontrar integrantes inexistentes
+  const integrantesNormalizados = integrantes.map(n => (n || '').toLowerCase().trim()).filter(Boolean);
+  const invalidos = integrantesNormalizados.filter(n => !usuariosValidos.has(n));
+
+  if (invalidos.length > 0) {
+    return res.status(400).json({
+      error: 'Usuário não foi encontrado.',
+      mensagem: 'Um ou mais usuários informados não existem no sistema.',
+      usuariosInvalidos: invalidos
+    });
+  }
+
   const novoSquad = { ...req.body, id: Date.now().toString() };
   db.squads.push(novoSquad);
   writeDB(db);

@@ -90,13 +90,15 @@ export default function Login() {
         <div className="flex justify-around mb-6">
           <button
             onClick={() => setModo("login")}
-            className={`px-4 py-2 font-bold ${modo === "login" ? "text-pink-500 border-b-2 border-pink-500" : "text-gray-400"}`}
+            /* Contraste tabs: ativo pink-800, inativo gray-600 */
+            className={`px-4 py-2 font-bold transition-colors ${modo === "login" ? "text-pink-800 dark:text-pink-400 border-b-2 border-pink-800 dark:border-pink-400" : "text-gray-600 dark:text-gray-400 hover:text-pink-700 dark:hover:text-pink-300"}`}
           >
             Login
           </button>
           <button
             onClick={() => setModo("cadastro")}
-            className={`px-4 py-2 font-bold ${modo === "cadastro" ? "text-pink-500 border-b-2 border-pink-500" : "text-gray-400"}`}
+            /* Contraste tabs: ativo pink-800, inativo gray-600 */
+            className={`px-4 py-2 font-bold transition-colors ${modo === "cadastro" ? "text-pink-800 dark:text-pink-400 border-b-2 border-pink-800 dark:border-pink-400" : "text-gray-600 dark:text-gray-400 hover:text-pink-700 dark:hover:text-pink-300"}`}
           >
             Cadastre-se
           </button>
@@ -180,14 +182,14 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+            className="w-full bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
           >
             {modo === "login" ? "Entrar" : "Cadastrar"}
           </button>
           {modo === "login" && (
             <p
               onClick={handleEsqueciSenha}
-              className="text-pink-500 mt-2 cursor-pointer text-sm hover:underline text-center"
+              className="text-pink-400 dark:text-pink-400 mt-2 cursor-pointer text-sm hover:underline text-center"
             >
               Esqueci minha senha
             </p>

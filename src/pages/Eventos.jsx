@@ -4,7 +4,7 @@ import { BsFilterRight } from "react-icons/bs";
 const normalize = str =>
   str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
-export default function Eventos() {
+export default function Jogos() {
   const navigate = useNavigate();
 
   const [games, setGames] = useState([]);
@@ -141,9 +141,8 @@ export default function Eventos() {
     <section className="min-h-screen pt-8 px-4">
       <header>
         {/* Carrossel */}
-        <div tabindex="-1" className="mb-24 flex justify-center mx-auto">
+  <div className="mb-24 flex justify-center mx-auto">
           <div
-            tabindex="-1"
             ref={containerRef}
             className="relative w-full max-w-[1400px] rounded-2xl overflow-hidden shadow-2xl"
             onPointerDown={onPointerDown}
@@ -154,8 +153,8 @@ export default function Eventos() {
             onMouseLeave={() => { isPausedRef.current = false; startAutoplay(); }}
           >
             {/* Efeitos de transição entre videos*/}
-            <div tabindex="-1" className="relative w-full h-[500px] md:h-[650px]">
-              <div tabindex="-1" className="flex transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${carouselIndex * 100}%)` }}>
+            <div className="relative w-full h-[500px] md:h-[650px]">
+              <div className="flex transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${carouselIndex * 100}%)` }}>
                 {destaques.map((d) => (
                   <div key={d.id} className="flex-shrink-0 w-full h-[500px] md:h-[650px] relative">
                     {d.video ? (
@@ -177,14 +176,14 @@ export default function Eventos() {
                         />
                       )
                     )}
-                    {/* pontos para mudanças de imagens */}
+                    {/* Pontos para mudanças de imagens */}
                     <div className="absolute left-1/2 -translate-x-1/2 bottom-6 flex items-center gap-2 z-50 ">
                       {destaques.map((_, i) => (
                         <button
+                          tabIndex={-1}
                           key={i}
-                          tabIndex={0} // garante que o Tab passe por aqui primeiro
                           onClick={() => { setCarouselIndex(i); pauseAutoplayTemporarily(); }}
-                          className={`w-3 h-3 md:w-3 md:h-3 rounded-full transition-all ${i === carouselIndex ? "scale-150 bg-pink-500" : "bg-white/60"}`}
+                          className={`w-3 h-3 md:w-3 md:h-3 rounded-full transition-all ${i === carouselIndex ? "scale-150 bg-pink-600" : "bg-white/60"}`}
                           aria-label={`Ir para destaque ${i + 1}`}
                         />
                       ))}
@@ -195,9 +194,9 @@ export default function Eventos() {
                         <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">{d.name}</h2>
                         <p className="text-gray-200 text-base md:text-lg mb-6 drop-shadow">{d.desc}</p>
                         <button
-                          tabIndex={0} // continua recebendo foco, mas depois dos pontos
-                          className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-8 py-3 rounded-full w-max transition pointer-events-auto"
+                          className="bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white font-semibold px-8 py-3 rounded-full w-max transition pointer-events-auto"
                           onClick={() => navigate(`/jogos/${d.id}`)}
+                          aria-label={`Ver jogo ${d.name}`}
                         >
                           Ver jogo
                         </button>
@@ -225,6 +224,9 @@ export default function Eventos() {
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="p-1 rounded-lg  hover:bg-pink-600/30 border border-gray-300 dark:border-gray-600 flex items-center gap-2 hover:scale-105 transition"
+              aria-label="Abrir filtro de categorias"
+              aria-haspopup="true"
+              aria-expanded={dropdownOpen}
             >
               <BsFilterRight size={41} />
             </button>
@@ -260,6 +262,8 @@ export default function Eventos() {
                             prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
                           )
                         }
+                        className="accent-pink-600 w-4 h-4 rounded-sm border border-pink-600 cursor-pointer"
+                        aria-checked={selectedCategories.includes(cat)}
                       />
                       <span className="text-gray-800 dark:text-white">{cat}</span>
                     </label>
@@ -276,8 +280,10 @@ export default function Eventos() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 justify-items-center gap-4">
             {filteredGames.map(g => (
               <div
-                tabIndex={0} // melhor usar camelCase no React
+                tabIndex={0}
                 key={g.id}
+                role="button"
+                aria-label={`Abrir página do jogo ${g.name}`}
                 onClick={() => navigate(`/jogos/${g.id}`)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {

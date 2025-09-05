@@ -19,7 +19,7 @@ const FAQ = () => {
   return (
     <div className="my-24 flex items-center justify-center p-8">
       <div className="w-full max-w-xl h-auto min-h-[420px] bg-[#d9dbe2] dark:bg-gray-800/80 p-6 rounded-lg shadow-lg flex flex-col justify-between">
-        <h2 className="text-3xl font-bold mb-4 text-center text-pink-500">
+  <h2 className="text-3xl font-bold mb-4 text-center text-black dark:text-white">
           Seu Feedback é importante para nós!
         </h2>
 
@@ -51,6 +51,7 @@ const FAQ = () => {
           <textarea 
             className="w-full p-2 border border-gray-300 rounded focus:border-gray-500/80 focus:ring-1 focus:ring-gray-500/80 outline-none bg-gray-200 text-black dark:bg-gray-700 dark:text-white"
             placeholder="Deixe seu comentário..."
+            aria-label="Campo para comentário ou feedback"
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
             rows={4}
@@ -58,7 +59,8 @@ const FAQ = () => {
 
           <button 
             type="submit" 
-            className="w-full bg-pink-500 hover:bg-pink-600 text-white py-2 px-4 rounded transition mt-0"
+            className="w-full bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white py-2 px-4 rounded transition mt-0"
+            aria-label="Enviar feedback"
           >
             Enviar Feedback
           </button>
