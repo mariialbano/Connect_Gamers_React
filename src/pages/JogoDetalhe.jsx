@@ -7,14 +7,13 @@ export default function JogoDetalhe() {
     const navigate = useNavigate();
     const [search, setSearch] = useState("");
     const [selectedCategories, setSelectedCategories] = useState([]);
-        const [games, setGames] = useState([]); // Initialize games state
+        const [games, setGames] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    // eventos agora vem embutido em cada jogo (game.events)
     const [rankings, setTopPlayers] = useState([]);
     const [chatMessages] = useState([
         { user: "Organizador", text: "Evento em 10 minutos!" },
-    ]); // Apenas leitura (avisos), sem input do usuário
+    ]);
 
     useEffect(() => {
         let cancelado = false;
@@ -69,8 +68,6 @@ export default function JogoDetalhe() {
 
     const game = games.find((g) => g.id === gameId);
 
-    // Envio de mensagens removido: seção agora somente de avisos.
-
     const handleClearFilters = () => {
         setSelectedCategories([]);
         setSearch("");
@@ -113,9 +110,22 @@ export default function JogoDetalhe() {
         return (
             <section className="min-h-screen px-8 py-12 flex justify-center" aria-labelledby="game-page-title">
                 <div className="w-full max-w-7xl text-black dark:text-white">
-                    {/* Imagem do jogo */}
+                    {/* Imagem do Jogo */}
                     <header className="flex flex-col md:flex-row gap-6 mb-10 items-center" aria-label="Informações do jogo">
-                        <img src={game.image} alt={game.name} className="w-full md:w-1/3 h-auto object-cover rounded-2xl " />
+                        {game.image ? (
+                            <div className="w-48 sm:w-56 md:w-64 lg:w-72 flex items-center justify-center p-2 rounded-xl border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900/40 shadow-sm">
+                                <img
+                                    src={game.image}
+                                    alt={game.name}
+                                    className="max-w-full h-auto object-contain"
+                                    loading="lazy"
+                                />
+                            </div>
+                        ) : (
+                            <div className="w-48 sm:w-56 md:w-64 lg:w-72 flex items-center justify-center text-gray-600 dark:text-gray-300 text-xs text-center px-2 min-h-28 p-2 rounded-xl border border-dashed border-gray-400 dark:border-gray-600 bg-white/40 dark:bg-gray-900/30">
+                                Sem imagem disponível
+                            </div>
+                        )}
                         <div className="md:w-2/3 flex flex-col justify-center">
                             <h1 id="game-page-title" className="text-4xl md:text-5xl font-extrabold mb-4">{game.name}</h1>
                             <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300">{game.desc}</p>
@@ -172,7 +182,7 @@ export default function JogoDetalhe() {
                         </main>
 
 
-                        {/* Avisos (antes Chat) */}
+                        {/* Avisos */}
                         <aside className="flex flex-col gap-6" aria-label="Painel lateral: chat e interações">
                             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 flex flex-col h-full">
                                 <h2 className="text-2xl font-bold mb-4">Avisos</h2>
@@ -186,7 +196,6 @@ export default function JogoDetalhe() {
                                         <p key={idx} className="text-sm"><strong>[{msg.user}]:</strong> {msg.text}</p>
                                     ))}
                                 </div>
-                                {/* Campo de entrada removido: somente leitura */}
                             </div>
                         </aside>
                     </div>

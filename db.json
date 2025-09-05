@@ -146,7 +146,7 @@
       "name": "Counter Strike 2",
       "desc": "FPS tático competitivo em que duas equipes (Terroristas e Contra-Terroristas) disputam objetivos de bomba ou resgate de reféns. Destaque para economia de rounds, precisão, granadas utilitárias e coordenação estratégica em campeonatos, scrims e ligas ranqueadas.",
       "image": "/assets/cs2.png",
-      "video": "/assets/cs2.mp4",
+      "video": "https://www.youtube.com/watch?v=c80dVYcL69E",
       "categories": [
         "FPS",
         "Tático"
@@ -177,7 +177,7 @@
       "name": "Fortnite",
       "desc": "Battle Royale com construção, modos criativos e eventos sazonais ao vivo. Jogadores caem em uma ilha dinânica, coletam recursos, constroem estruturas defensivas e disputam até restar apenas um esquadrão ou jogador. Inclui arenas competitivas e mapas personalizados da comunidade.",
       "image": "/assets/fortnite.png",
-      "video": "/assets/fortnite.mp4",
+      "video": "https://www.youtube.com/watch?v=CjxeUy-76Vc",
       "categories": [
         "Battle Royale",
         "Criativo"
@@ -208,7 +208,7 @@
       "name": "League of Legends",
       "desc": "MOBA 5x5 focado em controle de mapa, rotações, objetivos estratégicos (torres, dragões, arauto e barão) e composição de campeões. Amplamente jogado em filas ranqueadas, ligas regionais, treinos (scrims) e campeonatos internacionais.",
       "image": "/assets/lol.png",
-      "video": "/assets/lol.mp4",
+      "video": "https://www.youtube.com/watch?v=pNjWjwae-us",
       "categories": [
         "MOBA",
         "Competitivo"
@@ -239,7 +239,7 @@
       "name": "Rocket League",
       "desc": "Futebol veicular arcade em alta velocidade onde equipes usam impulsos aéreos e manobras acrobáticas para marcar gols. Combina física precisa, timing e posicionamento em modos casuais, competitivos e eventos especiais.",
       "image": "/assets/rocketleague.png",
-      "video": "/assets/rocketleague.mp4",
+      "video": "https://www.youtube.com/watch?v=SgSX3gOrj60",
       "categories": [
         "Esporte",
         "Competitivo"
@@ -270,7 +270,7 @@
       "name": "Valorant",
       "desc": "FPS tático 5x5 que mistura precisão de tiro com habilidades únicas de agentes (controle de área, visão e suporte). Partidas divididas em ataque/defesa com economia de créditos, execução de estratégias e comunicação essencial em ranqueadas, scrims e campeonatos.",
       "image": "/assets/valorant.png",
-      "video": "/assets/valorant.mp4",
+      "video": "https://www.youtube.com/watch?v=IhhjcB2ZjIM",
       "categories": [
         "FPS",
         "Competitivo"

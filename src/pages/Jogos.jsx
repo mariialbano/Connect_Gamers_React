@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
+import SilentYouTube from "../components/SilentYouTube";
 import { BsFilterRight } from "react-icons/bs";
 const normalize = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
@@ -11,6 +12,7 @@ function Jogos() {
     const next = () => setCarouselIndex(i => (i + 1) % destaques.length);
     const prev = () => setCarouselIndex(i => (i - 1 + destaques.length) % destaques.length);
     const srcSafe = (s) => (s ? encodeURI(s) : "");
+    const isYouTube = url => /youtube\.com|youtu\.be/.test(url || '');
     const AUTOPLAY_MS = 5000;
     const autoplayRef = useRef(null);
     const isPausedRef = useRef(false);
@@ -34,9 +36,9 @@ function Jogos() {
     const draggingRef = useRef(false);
     const startXRef = useRef(0);
     const threshold = 60;
-    const onPointerDown = (e) => { try { if (e.target.closest('button, input, a')) return; } catch {} if (e.pointerType === 'mouse' && e.button !== 0) return; draggingRef.current = true; startXRef.current = e.clientX ?? 0; try { e.currentTarget.setPointerCapture(e.pointerId); } catch {} pauseAutoplayTemporarily(); };
-    const onPointerMove = (e) => { if (!draggingRef.current) return; const delta = (e.clientX ?? 0) - startXRef.current; if (delta > threshold) { draggingRef.current = false; try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {} prev(); } else if (delta < -threshold) { draggingRef.current = false; try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {} next(); } };
-    const onPointerUp = (e) => { if (!draggingRef.current) { try { e.currentTarget.releasePointerCapture && e.currentTarget.releasePointerCapture(e.pointerId); } catch {} return; } draggingRef.current = false; try { e.currentTarget.releasePointerCapture && e.currentTarget.releasePointerCapture(e.pointerId); } catch {} pauseAutoplayTemporarily(); };
+    const onPointerDown = (e) => { try { if (e.target.closest('button, input, a')) return; } catch { } if (e.pointerType === 'mouse' && e.button !== 0) return; draggingRef.current = true; startXRef.current = e.clientX ?? 0; try { e.currentTarget.setPointerCapture(e.pointerId); } catch { } pauseAutoplayTemporarily(); };
+    const onPointerMove = (e) => { if (!draggingRef.current) return; const delta = (e.clientX ?? 0) - startXRef.current; if (delta > threshold) { draggingRef.current = false; try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { } prev(); } else if (delta < -threshold) { draggingRef.current = false; try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { } next(); } };
+    const onPointerUp = (e) => { if (!draggingRef.current) { try { e.currentTarget.releasePointerCapture && e.currentTarget.releasePointerCapture(e.pointerId); } catch { } return; } draggingRef.current = false; try { e.currentTarget.releasePointerCapture && e.currentTarget.releasePointerCapture(e.pointerId); } catch { } pauseAutoplayTemporarily(); };
     const [search, setSearch] = useState("");
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -54,7 +56,7 @@ function Jogos() {
                             <div className="flex transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${carouselIndex * 100}%)` }}>
                                 {destaques.map(d => (
                                     <div key={d.id} className="flex-shrink-0 w-full h-[500px] md:h-[650px] relative">
-                                        {d.video ? <video src={srcSafe(d.video)} autoPlay muted loop playsInline className="w-full h-full object-cover rounded-2xl" aria-label={`Vídeo mostrando o jogo ${d.name}`} /> : (d.image && <img src={srcSafe(d.image)} alt={d.name} className="w-full h-full object-cover rounded-2xl" />)}
+                                        {d.video ? (isYouTube(d.video) ? <SilentYouTube url={d.video} title={d.name} className="w-full h-full" poster={d.image} /> : <video src={srcSafe(d.video)} autoPlay muted loop playsInline className="w-full h-full object-cover rounded-2xl" aria-label={`Vídeo mostrando o jogo ${d.name}`} />) : (d.image && <img src={srcSafe(d.image)} alt={d.name} className="w-full h-full object-cover rounded-2xl" />)}
                                         <div className="absolute left-1/2 -translate-x-1/2 bottom-6 flex items-center gap-2 z-50 ">
                                             {destaques.map((_, i) => (
                                                 <button tabIndex={-1} key={i} onClick={() => { setCarouselIndex(i); pauseAutoplayTemporarily(); }} className={`w-3 h-3 md:w-3 md:h-3 rounded-full transition-all ${i === carouselIndex ? 'scale-150 bg-pink-600' : 'bg-white/60'}`} aria-label={`Ir para destaque ${i + 1}`} />
@@ -101,13 +103,13 @@ function Jogos() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 justify-items-center gap-4">
                         {filteredGames.map(g => (
                             <div
-                              tabIndex={0}
-                              key={g.id}
-                              role="button"
-                              aria-label={`Abrir página do jogo ${g.name}`}
-                              onClick={() => navigate(`/jogos/${g.id}`)}
-                              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/jogos/${g.id}`); } }}
-                              className="game-card bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl cursor-pointer transition transform hover:scale-105 duration-300"
+                                tabIndex={0}
+                                key={g.id}
+                                role="button"
+                                aria-label={`Abrir página do jogo ${g.name}`}
+                                onClick={() => navigate(`/jogos/${g.id}`)}
+                                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/jogos/${g.id}`); } }}
+                                className="game-card bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl cursor-pointer transition transform hover:scale-105 duration-300"
                             >
                                 <div className="overflow-hidden rounded-t-2xl">
                                     <img src={srcSafe(g.image)} alt={`Capa do Jogo ${g.name}`} className="w-full h-full object-cover" />
@@ -116,7 +118,7 @@ function Jogos() {
                                     <h3 className="text-md font-bold mb-2 text-gray-900 dark:text-white">{g.name}</h3>
                                     <div className="flex flex-wrap gap-1">
                                         {g.categories.map(cat => (
-                                          <span key={cat} className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white px-2 py-0.5 rounded-full text-xs">{cat}</span>
+                                            <span key={cat} className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white px-2 py-0.5 rounded-full text-xs">{cat}</span>
                                         ))}
                                     </div>
                                 </div>
