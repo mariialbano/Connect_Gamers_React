@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, LogOut, ChevronDown } from 'lucide-react';
+import { User, Users, LogOut, ChevronDown } from 'lucide-react';
 import { useTheme } from '../theme/ThemeContext';
 export default function Navbar() {
   const [profileDropdown, setProfileDropdown] = useState(false);
@@ -23,9 +23,9 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Navbar superior */}
+      {/* Navbar */}
       <header className="bg-[#d1d2d6] dark:bg-black text-black dark:text-white flex items-center justify-between px-6 py-1 shadow-md">
-        {/* Logo à esquerda */}
+        {/* Logo */}
         <Link to="/" className="flex-shrink-0 mr-8">
           <img
             src={theme === "dark"
@@ -35,36 +35,51 @@ export default function Navbar() {
             className="h-32 max-w-none"
           />
         </Link>
-        {/* Navlinks e perfil/login alinhados corretamente */}
+        {/* Navlinks e perfil/login */}
         <div className="flex flex-1 items-center justify-between">
           <div className="flex-1 flex justify-end">
-      <nav className="flex gap-6 items-center text-lg font-bold mr-16">
-  <Link to="/" className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md">
-              <span className="relative">
-                Home
-        <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
-              </span>
-            </Link>
-  <Link to="/jogos" className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md">
-              <span className="relative">
-        Jogos
-        <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
-              </span>
-            </Link>
-  <Link to="/cadastro" className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md">
-              <span className="relative">
-                Inscreva-se
-        <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
-              </span>
-            </Link>
-  <Link to="/faq" className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md">
-              <span className="relative">
-                FAQ
-        <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
-              </span>
-            </Link>
-          </nav>
+            <nav className="flex gap-6 items-center text-lg font-bold mr-16">
+              <Link to="/" className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md">
+                <span className="relative">
+                  Home
+                  <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
+                </span>
+              </Link>
+              <Link to="/jogos" className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md">
+                <span className="relative">
+                  Jogos
+                  <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
+                </span>
+              </Link>
+              <Link to="/cadastro" className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md">
+                <span className="relative">
+                  Inscreva-se
+                  <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
+                </span>
+              </Link>
+              <Link to="/faq" className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md">
+                <span className="relative">
+                  FAQ
+                  <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
+                </span>
+              </Link>
+              <Link to="/comunidade" className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md">
+                <span className="relative">
+                  Comunidade
+                  <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
+                </span>
+              </Link>
+            </nav>
           </div>
+          {/* Amigos */}
+          <button
+            onClick={() => navigate('/amigos')}
+            className="mr-3 flex items-center text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-600"
+            style={{ border: 'none', background: 'none' }}
+            aria-label="Ir para amigos"
+          >
+            <Users size={30} />
+          </button>
           {/* Lado direito: perfil/login */}
           <div
             className="flex justify-end relative items-center min-w-[48px] cursor-pointer"
@@ -113,14 +128,12 @@ export default function Navbar() {
                         navigate("/perfil");
                         setProfileDropdown(false);
                       }}
-                      /* Hover unificado claro/escuro */
                       className="flex items-center gap-2 w-full text-left px-4 py-2 hover:rounded-lg hover:bg-pink-600/30 dark:hover:bg-pink-600/30 text-gray-900 dark:text-white"
                     >
                       <User size={18} /> Conta
                     </button>
                     <button
                       onClick={toggleTheme}
-                      /* Hover unificado claro/escuro */
                       className="flex items-center gap-2 w-full text-left px-4 py-2 hover:rounded-lg hover:bg-pink-600/30 dark:hover:bg-pink-600/30 text-gray-900 dark:text-white"
                       aria-label="Alternar tema claro/escuro"
                     >
@@ -167,7 +180,6 @@ export default function Navbar() {
                         handleLogout();
                         setProfileDropdown(false);
                       }}
-                      /* Hover unificado claro/escuro */
                       className="flex items-center gap-2 w-full text-left px-4 py-2 hover:rounded-lg hover:bg-pink-600/30 dark:hover:bg-pink-600/30 text-gray-900 dark:text-white"
                     >
                       <LogOut size={18} /> Sair

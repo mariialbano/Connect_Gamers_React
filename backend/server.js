@@ -5,6 +5,8 @@ const squadsRouter = require('./routes/squads');
 const gamesRouter = require('./routes/games');
 const eventosRouter = require('./routes/eventos');
 const rankingsRouter = require('./routes/rankings');
+const chatRouter = require('./routes/chat');
+const socialRouter = require('./routes/social');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
@@ -12,7 +14,7 @@ const PORT = process.env.PORT || 5000;
 
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000,
-    max: 50,
+    max: 100,
     standardHeaders: true,
     legacyHeaders: false,
     message: 'Você excedeu o limite de requisições, tente novamente mais tarde.'
@@ -30,6 +32,8 @@ app.use('/api/squads', squadsRouter);
 app.use('/api/games', gamesRouter);
 app.use('/api/eventos', eventosRouter);
 app.use('/api/rankings', rankingsRouter);
+app.use('/api/chat', chatRouter);
+app.use('/api/social', socialRouter);
 
 app.get('/', (req, res) => {
     res.send('Você está no backend!');

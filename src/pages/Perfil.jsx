@@ -88,35 +88,62 @@ function NameEditSection({ nomeUsuario, editandoNome, novoNome, setNovoNome, set
 // Meus Eventos
 function EventsSection({ usuarioLogado }) {
   const [meusSquads, setMeusSquads] = useState([]);
-  const [eventos, setEventos] = useState({});
+  const [eventos, setEventos] = useState({}); // { NomeDoJogo: events[] }
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
+  const [origemEventos,setOrigemEventos] = useState('eventos'); // 'eventos' | 'games-fallback'
 
   useEffect(() => {
     async function fetchData() {
+      if(!usuarioLogado){ return; }
+      setLoading(true); setErro(null);
       try {
-        setLoading(true); setErro(null);
-        const [squads, eventosData] = await Promise.all([getItem('squads'), getItem('eventos')]);
+        // Buscar squads primeiro (se falhar já aborta)
+        const squads = await getItem('squads');
+        let eventosData = {};
+        try {
+          eventosData = await getItem('eventos');
+          setOrigemEventos('eventos');
+        } catch(evErr){
+          console.warn('Falha ao obter /api/eventos, tentando /api/games fallback', evErr);
+          try {
+            const games = await getItem('games');
+            // Reconstrói estrutura { NomeDoJogo: [events] }
+            const rebuilt = {};
+            (games||[]).forEach(g=>{ if(Array.isArray(g.events)) rebuilt[g.name] = g.events; });
+            eventosData = rebuilt;
+            setOrigemEventos('games-fallback');
+          } catch(gErr){
+            console.error('Também falhou /api/games fallback', gErr);
+            eventosData = {};
+          }
+        }
         setEventos(eventosData || {});
-        const userLower = usuarioLogado?.toLowerCase();
-        const squadsDoUsuario = squads.filter(sq => Array.isArray(sq.integrantes) && sq.integrantes.some(n => n && n.toLowerCase().trim() === userLower));
+        const userLower = usuarioLogado.toLowerCase();
+        const squadsDoUsuario = (squads||[]).filter(sq => Array.isArray(sq.integrantes) && sq.integrantes.some(n => (n||'').toLowerCase().trim() === userLower));
         setMeusSquads(squadsDoUsuario);
+        if(!Object.keys(eventosData||{}).length){
+          setErro('Nenhum evento disponível no momento.');
+        }
       } catch (e) {
-        console.error('Erro ao carregar eventos/squads', e); setErro('Falha ao carregar seus eventos.'); setMeusSquads([]);
+        console.error('Erro ao carregar dados de eventos/squads', e);
+        setErro('Falha ao carregar seus eventos.');
+        setMeusSquads([]);
       } finally { setLoading(false); }
     }
-    if (usuarioLogado) fetchData();
+    fetchData();
   }, [usuarioLogado]);
 
-  const todosEventos = Object.values(eventos).flat();
+  const todosEventos = Array.isArray(eventos) ? eventos : Object.values(eventos||{}).flat();
 
   return (
     <section className="mb-12">
       <h2 className="text-2xl font-bold mb-6 pb-2 border-b-2 border-pink-800 flex justify-center items-center text-black dark:text-gray-100">
         <i className="fas fa-calendar-alt mr-3 text-pink-800 dark:text-pink-400" /> Meus Eventos
       </h2>
-      {loading && <div className="text-center text-gray-500">Carregando eventos...</div>}
+  {loading && <div className="text-center text-gray-500">Carregando eventos...</div>}
       {erro && <div className="text-center text-red-500">{erro}</div>}
+  {!loading && !erro && origemEventos==='games-fallback' && <div className="text-center text-xs text-gray-500 mb-4">(Usando lista de eventos reconstruída a partir dos jogos)</div>}
       {!loading && !erro && meusSquads.length === 0 && <div className="text-center text-gray-500">Você ainda não está inscrito em nenhum evento.</div>}
       <div className="grid gap-5 md:grid-cols-2">
         {meusSquads.map(squad => {

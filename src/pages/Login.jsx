@@ -43,12 +43,9 @@ export default function Login() {
       }
 
       try {
-        await postItem("usuarios", {
-          nome,
-          usuario,
-          senha,
-        });
+        const novo = await postItem("usuarios", { nome, usuario, senha });
         localStorage.setItem("usuarioLogado", usuario);
+        localStorage.setItem("usuarioId", novo.id);
         alert("Cadastro realizado com sucesso!");
         navigate("/perfil");
       } catch (error) {
@@ -67,7 +64,8 @@ export default function Login() {
         return;
       }
 
-      localStorage.setItem("usuarioLogado", usuario);
+  localStorage.setItem("usuarioLogado", usuario);
+  localStorage.setItem("usuarioId", usuarioExiste.id);
       alert("Login realizado com sucesso!");
       navigate("/perfil");
     }

@@ -12,7 +12,7 @@ export default function Cadastro() {
   const [nivel, setNivel] = useState("");
 
   // Eventos carregados do backend
-  const [eventos, setEventos] = useState({});
+  const [eventos, setEventos] = useState({}); // { NomeDoJogo: [events] }
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,16 +35,16 @@ export default function Cadastro() {
 
   useEffect(() => {
     let ativo = true;
-    async function fetchEventos() {
+    async function carregarEventos() {
       try {
-        const data = await getItem("eventos");
+        const data = await getItem('eventos');
         if (!ativo) return;
-        setEventos(data);
-        // aplicar query params após carregar
+        setEventos(data || {});
+        // aplicar query params
         const params = new URLSearchParams(location.search);
         const jogoParam = params.get('jogo');
         const eventoIdParam = params.get('eventoId');
-        if (jogoParam && data[jogoParam]) {
+        if (jogoParam && data && data[jogoParam]) {
           setJogoSelecionado(jogoParam);
           if (eventoIdParam) {
             const evInt = parseInt(eventoIdParam, 10);
@@ -52,12 +52,12 @@ export default function Cadastro() {
             if (existe) setEventoSelecionado(String(evInt));
           }
         }
-      } catch (err) {
+      } catch (e) {
         if (!ativo) return;
         setEventos({});
       }
     }
-    fetchEventos();
+    carregarEventos();
     return () => { ativo = false; };
   }, [location.search]);
 

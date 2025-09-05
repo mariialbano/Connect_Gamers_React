@@ -49,7 +49,7 @@ const FAQ = () => {
           </div>
 
           <textarea 
-            className="w-full p-2 border border-gray-300 rounded focus:border-gray-500/80 focus:ring-1 focus:ring-gray-500/80 outline-none bg-gray-200 text-black dark:bg-gray-700 dark:text-white"
+            className="w-full p-2 border border-gray-500 rounded focus:border-gray-500/80 focus:ring-1 focus:ring-gray-500/80 outline-none bg-gray-200 text-black dark:bg-gray-700 dark:text-white"
             placeholder="Deixe seu comentário..."
             aria-label="Campo para comentário ou feedback"
             value={feedback}

@@ -19,6 +19,14 @@ router.get('/', (req, res) => {
     res.json(db.usuarios || []);
 });
 
+// Obter usuário por ID
+router.get('/:id', (req, res) => {
+    const db = readDB();
+    const user = (db.usuarios || []).find(u => u.id === req.params.id);
+    if(!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+    res.json(user);
+});
+
 router.post('/', (req, res) => {
     const db = readDB();
     const novoUsuario = { ...req.body, id: Date.now().toString() };

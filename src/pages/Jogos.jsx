@@ -21,23 +21,19 @@ export default function Jogos() {
         setLoading(true);
         Promise.all([
             fetch("http://localhost:5000/api/games").then(res => res.json()),
-            fetch("http://localhost:5000/api/rankings").then(res => res.json())
+            fetch("http://localhost:5000/api/rankings").then(res => res.json()),
+            fetch("http://localhost:5000/api/eventos").then(res => res.json())
         ])
-            .then(([gamesData, playersData]) => {
+            .then(([gamesData, playersData, eventosData]) => {
                 setGames(gamesData);
-                setTopPlayers(playersData);
+                setTopPlayers(playersData.topPlayers || []);
+                setEventos(eventosData || {});
                 setLoading(false);
             })
             .catch(err => {
-                setError("Erro ao buscar dados.");
+                setError("Erro ao carregar dados");
                 setLoading(false);
             });
-    }, []);
-
-    useEffect(() => {
-        fetch("http://localhost:5000/api/eventos")
-            .then(res => res.json())
-            .then(data => setEventos(data));
     }, []);
 
     const filteredGames = games.filter((game) => {
@@ -269,8 +265,8 @@ export default function Jogos() {
                                 className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-lg transition cursor-pointer"
                             >
                                 <img src={game.image} alt={game.name} className="w-full h-56 object-cover rounded-xl mb-4" />
-                                <h3 className="text-2xl font-bold mb-2">{game.name}</h3>
-                                <p className="text-gray-700 dark:text-gray-300 mb-2">{game.desc}</p>
+                                <h3 className="text-2xl font-bold mb-3">{game.name}</h3>
+                                {/* Descrição removida da listagem; exibida apenas na página de detalhe */}
                                 <div className="flex flex-wrap gap-2">
                                     {game.categories.map(cat => <span key={cat} className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white px-3 py-1 rounded-full text-sm">{cat}</span>)}
                                 </div>

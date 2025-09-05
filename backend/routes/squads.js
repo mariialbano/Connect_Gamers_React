@@ -50,6 +50,22 @@ router.post('/', (req, res) => {
 
   const novoSquad = { ...req.body, id: Date.now().toString() };
   db.squads.push(novoSquad);
+  // Criar chat de grupo automaticamente se houver mais de 1 integrante
+  try {
+    if (!db.groupChats) db.groupChats = [];
+    const userMap = new Map((db.usuarios || []).map(u => [(u.usuario || '').toLowerCase().trim(), u.id]));
+    const memberIds = integrantesNormalizados.map(n => userMap.get(n)).filter(Boolean);
+    const already = db.groupChats.some(g => g.squadId === novoSquad.id);
+    if (memberIds.length > 1 && !already) {
+      db.groupChats.push({
+        id: Date.now().toString() + '-g',
+        squadId: novoSquad.id,
+        name: novoSquad.nomeSquad || 'Squad',
+        members: memberIds,
+        messages: []
+      });
+    }
+  } catch(e){ /* silencioso */ }
   writeDB(db);
   res.status(201).json(novoSquad);
 });

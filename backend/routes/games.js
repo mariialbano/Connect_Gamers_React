@@ -21,7 +21,8 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     const db = readDB();
-    const novoJogo = { ...req.body, id: Date.now().toString() };
+    const { name, desc, image, video, categories = [], events = [] } = req.body || {};
+    const novoJogo = { id: Date.now().toString(), name, desc, image, video, categories, events };
     db.jogos.push(novoJogo);
     writeDB(db);
     res.status(201).json(novoJogo);

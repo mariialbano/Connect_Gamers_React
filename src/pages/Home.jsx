@@ -26,7 +26,7 @@ export default function Home() {
 
         <div className="mt-6 text-right">
           <Link
-            to="/pesquisa"
+            to="/comunidade"
             className="inline-flex items-center gap-2 text-pink-800 dark:text-pink-400 hover:underline font-semibold group"
             aria-label="Ir para Comunidade"
           >

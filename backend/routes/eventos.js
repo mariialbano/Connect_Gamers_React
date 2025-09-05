@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 
-// Mock de eventos organizados por jogo
 const eventosTeste = {
     "Valorant": [
         { id: 1, nome: "Spike Rush", dia: "Sábado", horario: "13:00 às 15:00" },

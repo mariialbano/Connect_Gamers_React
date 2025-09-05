@@ -1,7 +1,7 @@
 
 # 🎮 Connect Gamers
 
-Um projeto React criado com **Create React App**, voltado para gamers que desejam criar squads, participar de eventos e se conectar com outros jogadores!
+Projeto React criado com **Create React App**, voltado para gamers que desejam criar squads, participar de eventos e se conectar com outros jogadores.
 
 ---
 
@@ -22,7 +22,7 @@ cd Connect_Gamers_React
 npm install
 ```
 
-#### Em seguida, instale as dependências do backend:
+#### Depois instale as dependências do backend:
 
 ```bash
 cd backend        # acessa o diretório do backend
@@ -38,8 +38,8 @@ npm run dev
 
 Abra [http://localhost:3000/] no navegador para visualizar o app.
 
-A API estaram nos endereços: [http://localhost:5000/api/squads], [http://localhost:5000/api/usuarios], [http://localhost:5000/api/games], [http://localhost:5000/api/games] & [http://localhost:5000/api/rankings]
-Você também pode visualizar através do arquivo db.json
+Principais endpoints disponíveis: [http://localhost:5000/api/squads], [http://localhost:5000/api/usuarios], [http://localhost:5000/api/games], [http://localhost:5000/api/rankings].
+Você também pode visualizar os dados diretamente no arquivo `db.json`.
 
 ---
 
@@ -49,9 +49,11 @@ Você também pode visualizar através do arquivo db.json
 - Tailwind CSS
 - React Router DOM
 - Lucide React (ícones)
-- JSON Server (API)
-- Node.js
-- Express (API)
+- Node.js / Express
+- Persistência simples em arquivo `db.json`
+- Tailwind CSS
+- React Router DOM
+- Lucide React (ícones)
 
 ---
 
@@ -62,6 +64,13 @@ Você também pode visualizar através do arquivo db.json
 - Cadastro de squads (apenas para usuários logados)  
 - Sistema de navegação lateral (sidebar) e ícone de perfil  
 - API local com persistência de dados em `db.json`
+
+### 🔊 Funcionalidades de Chat Persistente
+
+- Canais públicos com histórico salvo (ex.: Geral, League of Legends)
+- Mensagens privadas (1 a 1) com histórico
+- Estruturas são salvas automaticamente em `db.json` quando usadas
+- Ponto de partida para futuras evoluções (amigos, status, anúncios)
 
 ---
 
@@ -74,6 +83,43 @@ Você também pode visualizar através do arquivo db.json
 ├── services           # api.js (funções de conexão com json-server)
 └── App.jsx            # Componente principal com as rotas
 ```
+
+### 📡 Endpoints de Chat (base: `/api/chat`)
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | /channels | Lista canais e contagem de mensagens |
+| GET | /messages/:channel | Mensagens de um canal |
+| POST | /messages/:channel | Envia mensagem ao canal |
+| GET | /private/:userA/:userB | Histórico privado entre dois usuários |
+| POST | /private/:userA/:userB | Envia mensagem privada |
+
+Exemplo de body para enviar mensagem pública:
+```
+{ "userId": "1", "username": "Player1", "avatar": "/path.png", "text": "olá" }
+```
+
+Exemplo de body para mensagem privada:
+```
+{ "fromUserId": "1", "username": "Player1", "avatar": "/path.png", "text": "oi" }
+```
+
+### 🤝 Endpoints Sociais (base: `/api/social`)
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| PATCH | /status | Atualiza status do usuário (body: userId, status) |
+| GET | /status/:userId | Obtém status |
+| GET | /online | Lista usuários não invisíveis |
+| POST | /friend-request | Cria pedido (body: fromUserId, toUserId) |
+| GET | /requests/:userId | Pedidos pendentes (incoming/outgoing) |
+| POST | /friend-request/:id/accept | Aceitar pedido |
+| POST | /friend-request/:id/decline | Recusar pedido |
+| GET | /friends/:userId | Lista de amigos com status |
+| GET | /search?q=term&exclude=id | Busca usuários |
+
+Status válidos: `Disponível`, `Ausente`, `Não perturbar`, `Invisível`.
+
 
 ---
 

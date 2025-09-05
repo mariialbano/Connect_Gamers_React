@@ -141,7 +141,7 @@ export default function Jogos() {
     <section className="min-h-screen pt-8 px-4">
       <header>
         {/* Carrossel */}
-  <div className="mb-24 flex justify-center mx-auto">
+        <div className="mb-24 flex justify-center mx-auto">
           <div
             ref={containerRef}
             className="relative w-full max-w-[1400px] rounded-2xl overflow-hidden shadow-2xl"
@@ -191,8 +191,8 @@ export default function Jogos() {
                     {/* Overlay de texto */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8 rounded-2xl pointer-events-none z-10">
                       <div className="pointer-events-auto">
-                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">{d.name}</h2>
-                        <p className="text-gray-200 text-base md:text-lg mb-6 drop-shadow">{d.desc}</p>
+                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 drop-shadow-lg">{d.name}</h2>
+                        {/* Descrição removida do card/carrossel; permanece apenas na página de detalhe */}
                         <button
                           className="bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white font-semibold px-8 py-3 rounded-full w-max transition pointer-events-auto"
                           onClick={() => navigate(`/jogos/${d.id}`)}
@@ -295,8 +295,8 @@ export default function Jogos() {
               >
                 <img src={srcSafe(g.image)} alt={`Capa do Jogo ${g.name}`} className="w-auto h- object-cover " />
                 <div className="p-3">
-                  <h3 className="text-md font-bold mb-1 text-gray-900 dark:text-white">{g.name}</h3>
-                  <p className="text-gray-700 dark:text-gray-300 mb-1 text-xs">{g.desc}</p>
+                  <h3 className="text-md font-bold mb-2 text-gray-900 dark:text-white">{g.name}</h3>
+                  {/* Descrição removida do card */}
                   <div className="flex flex-wrap gap-1">
                     {g.categories.map(cat => (
                       <span key={cat} className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white px-2 py-0.5 rounded-full text-xs">

@@ -82,36 +82,48 @@
       "nivel": "Competitivo",
       "dataCadastro": "2025-09-04T00:31:00.236Z",
       "id": "1756945860237"
+    },
+    {
+      "nomeSquad": "FURIA",
+      "integrantes": [
+        "neemias12345",
+        "neemiasteste1"
+      ],
+      "jogo": "Fortnite",
+      "eventoId": 11,
+      "nivel": "Competitivo",
+      "dataCadastro": "2025-09-05T04:50:38.365Z",
+      "id": "1757047838369"
     }
   ],
   "usuarios": [
     {
-      "id": "6a91",
       "nome": "Jogador1",
-      "email": "julia@exemplo.com",
-      "senha": "julia21!"
+      "usuario": "julia@exemplo.com",
+      "senha": "julia21!",
+      "id": "6a91"
     },
     {
-      "id": "60df",
       "nome": "Jogador2",
-      "email": "mari@exemplo.com",
-      "senha": "Mari21!!"
+      "usuario": "mari@exemplo.com",
+      "senha": "Mari21!!",
+      "id": "60df"
     },
     {
-      "id": "6528",
       "nome": "Neemias",
-      "email": "neemias123@gmail.com",
-      "senha": "Neemias123*"
+      "usuario": "neemias123@gmail.com",
+      "senha": "Neemias123*",
+      "id": "6528"
     },
     {
-      "id": "2275",
       "nome": "Mariana",
-      "email": "mariii@hotmail.com",
-      "senha": "Mari1234!"
+      "usuario": "mariii@hotmail.com",
+      "senha": "Mari1234!",
+      "id": "2275"
     },
     {
       "nome": "neemias teste 1",
-      "email": "neemias123@gGGGmail.com",
+      "usuario": "neemias123@gGGGmail.com",
       "senha": "Nkdsamduaw0428*",
       "id": "1754253671912"
     },
@@ -132,56 +144,513 @@
     {
       "id": "cs2",
       "name": "Counter Strike 2",
-      "desc": "FPS tático — torneios e partidas ranqueadas.",
+      "desc": "FPS tático competitivo em que duas equipes (Terroristas e Contra-Terroristas) disputam objetivos de bomba ou resgate de reféns. Destaque para economia de rounds, precisão, granadas utilitárias e coordenação estratégica em campeonatos, scrims e ligas ranqueadas.",
       "image": "/assets/cs2.png",
       "video": "/assets/cs2.mp4",
       "categories": [
         "FPS",
         "Tático"
+      ],
+      "events": [
+        {
+          "id": 13,
+          "nome": "5v5 Competitivo",
+          "dia": "Sábado",
+          "horario": "13:00 às 15:00"
+        },
+        {
+          "id": 14,
+          "nome": "2v2 Wingman",
+          "dia": "Domingo",
+          "horario": "16:00 às 18:00"
+        },
+        {
+          "id": 15,
+          "nome": "Modo Casual",
+          "dia": "Sexta",
+          "horario": "19:00 às 21:00"
+        }
       ]
     },
     {
       "id": "fortnite",
       "name": "Fortnite",
-      "desc": "Battle Royale — torneios criativos e campeonatos.",
+      "desc": "Battle Royale com construção, modos criativos e eventos sazonais ao vivo. Jogadores caem em uma ilha dinânica, coletam recursos, constroem estruturas defensivas e disputam até restar apenas um esquadrão ou jogador. Inclui arenas competitivas e mapas personalizados da comunidade.",
       "image": "/assets/fortnite.png",
       "video": "/assets/fortnite.mp4",
       "categories": [
         "Battle Royale",
         "Criativo"
+      ],
+      "events": [
+        {
+          "id": 10,
+          "nome": "Solo",
+          "dia": "Sábado",
+          "horario": "12:00 às 14:00"
+        },
+        {
+          "id": 11,
+          "nome": "Duplas",
+          "dia": "Sábado",
+          "horario": "15:00 às 17:00"
+        },
+        {
+          "id": 12,
+          "nome": "Squad",
+          "dia": "Domingo",
+          "horario": "18:00 às 20:00"
+        }
       ]
     },
     {
       "id": "lol",
       "name": "League of Legends",
-      "desc": "MOBA — ligas, scrims e campeonatos.",
+      "desc": "MOBA 5x5 focado em controle de mapa, rotações, objetivos estratégicos (torres, dragões, arauto e barão) e composição de campeões. Amplamente jogado em filas ranqueadas, ligas regionais, treinos (scrims) e campeonatos internacionais.",
       "image": "/assets/lol.png",
       "video": "/assets/lol.mp4",
       "categories": [
         "MOBA",
         "Competitivo"
+      ],
+      "events": [
+        {
+          "id": 7,
+          "nome": "5v5 Tradicional",
+          "dia": "Sábado",
+          "horario": "14:00 às 16:00"
+        },
+        {
+          "id": 8,
+          "nome": "ARAM",
+          "dia": "Domingo",
+          "horario": "17:00 às 19:00"
+        },
+        {
+          "id": 9,
+          "nome": "TFT",
+          "dia": "Segunda",
+          "horario": "20:00 às 22:00"
+        }
       ]
     },
     {
       "id": "rocketleague",
       "name": "Rocket League",
-      "desc": "Futebol com carros — eventos e partidas rápidas.",
+      "desc": "Futebol veicular arcade em alta velocidade onde equipes usam impulsos aéreos e manobras acrobáticas para marcar gols. Combina física precisa, timing e posicionamento em modos casuais, competitivos e eventos especiais.",
       "image": "/assets/rocketleague.png",
       "video": "/assets/rocketleague.mp4",
       "categories": [
         "Esporte",
         "Competitivo"
+      ],
+      "events": [
+        {
+          "id": 4,
+          "nome": "Duplas",
+          "dia": "Quarta",
+          "horario": "10:00 às 12:00"
+        },
+        {
+          "id": 5,
+          "nome": "Trio",
+          "dia": "Sábado",
+          "horario": "15:00 às 17:00"
+        },
+        {
+          "id": 6,
+          "nome": "1x1",
+          "dia": "Domingo",
+          "horario": "09:00 às 11:00"
+        }
       ]
     },
     {
       "id": "valorant",
       "name": "Valorant",
-      "desc": "FPS tático com habilidades — ligas e scrims.",
+      "desc": "FPS tático 5x5 que mistura precisão de tiro com habilidades únicas de agentes (controle de área, visão e suporte). Partidas divididas em ataque/defesa com economia de créditos, execução de estratégias e comunicação essencial em ranqueadas, scrims e campeonatos.",
       "image": "/assets/valorant.png",
       "video": "/assets/valorant.mp4",
       "categories": [
         "FPS",
         "Competitivo"
+      ],
+      "events": [
+        {
+          "id": 1,
+          "nome": "Spike Rush",
+          "dia": "Sábado",
+          "horario": "13:00 às 15:00"
+        },
+        {
+          "id": 2,
+          "nome": "Competitivo",
+          "dia": "Domingo",
+          "horario": "16:00 às 18:00"
+        },
+        {
+          "id": 3,
+          "nome": "Deathmatch",
+          "dia": "Sexta",
+          "horario": "20:00 às 22:00"
+        }
+      ]
+    }
+  ],
+  "chatChannels": {
+    "Geral": [
+      {
+        "id": "1757038949577",
+        "userId": "1756860887995",
+        "username": "neemiasteste1",
+        "text": "dad",
+        "time": "2025-09-05T02:22:29.577Z",
+        "timestamp": 1757038949577
+      },
+      {
+        "id": "1757039158712",
+        "userId": "temp-neemias123@gmail.com",
+        "username": "neemias123@gmail.com",
+        "text": "dadasdsa",
+        "time": "2025-09-05T02:25:58.712Z",
+        "timestamp": 1757039158712
+      },
+      {
+        "id": "1757039164415",
+        "userId": "temp-neemias123@gmail.com",
+        "username": "neemias123@gmail.com",
+        "text": "dasdasda",
+        "time": "2025-09-05T02:26:04.415Z",
+        "timestamp": 1757039164415
+      }
+    ],
+    "League of Legends": [
+      {
+        "id": "1757042162645",
+        "userId": "1756859484293",
+        "username": "neemias12345",
+        "text": "dadsadas",
+        "time": "2025-09-05T03:16:02.645Z",
+        "timestamp": 1757042162645
+      },
+      {
+        "id": "1757045173648",
+        "userId": "1756860887995",
+        "username": "neemiasteste1",
+        "text": "oiee",
+        "time": "2025-09-05T04:06:13.648Z",
+        "timestamp": 1757045173648
+      },
+      {
+        "id": "1757045179599",
+        "userId": "1756859484293",
+        "username": "neemias12345",
+        "text": "oii",
+        "time": "2025-09-05T04:06:19.599Z",
+        "timestamp": 1757045179599
+      },
+      {
+        "id": "1757049835669",
+        "userId": "1756860887995",
+        "username": "neemiasteste1",
+        "text": "da",
+        "time": "2025-09-05T05:23:55.669Z",
+        "timestamp": 1757049835669
+      }
+    ],
+    "Valorant": [
+      {
+        "id": "1757045170961",
+        "userId": "1756860887995",
+        "username": "neemiasteste1",
+        "text": "oiiue",
+        "time": "2025-09-05T04:06:10.961Z",
+        "timestamp": 1757045170961
+      },
+      {
+        "id": "1757045181726",
+        "userId": "1756859484293",
+        "username": "neemias12345",
+        "text": "oii",
+        "time": "2025-09-05T04:06:21.726Z",
+        "timestamp": 1757045181726
+      }
+    ],
+    "Fortnite": [
+      {
+        "id": "1757049948650",
+        "userId": "1756860887995",
+        "username": "neemiasteste1",
+        "text": "dasda🎮",
+        "time": "2025-09-05T05:25:48.650Z",
+        "timestamp": 1757049948650
+      }
+    ],
+    "CS2": [],
+    "Rocket League": [
+      {
+        "id": "1757045165097",
+        "userId": "1756860887995",
+        "username": "neemiasteste1",
+        "text": "oi",
+        "time": "2025-09-05T04:06:05.097Z",
+        "timestamp": 1757045165097
+      }
+    ]
+  },
+  "privateChats": [
+    {
+      "users": [
+        "1756859484293",
+        "1756860887995"
+      ],
+      "messages": [
+        {
+          "id": "1757039470335",
+          "fromUserId": "1756859484293",
+          "username": "neemias12345",
+          "text": "oii",
+          "time": "2025-09-05T02:31:10.335Z"
+        },
+        {
+          "id": "1757040074953",
+          "fromUserId": "1756859484293",
+          "username": "neemias12345",
+          "text": "dada",
+          "time": "2025-09-05T02:41:14.953Z"
+        },
+        {
+          "id": "1757040079548",
+          "fromUserId": "1756859484293",
+          "username": "neemias12345",
+          "text": "dasdas",
+          "time": "2025-09-05T02:41:19.548Z"
+        },
+        {
+          "id": "1757040873173",
+          "fromUserId": "1756859484293",
+          "username": "neemias12345",
+          "text": "adad",
+          "time": "2025-09-05T02:54:33.173Z"
+        },
+        {
+          "id": "1757040876030",
+          "fromUserId": "1756859484293",
+          "username": "neemias12345",
+          "text": "dadsa",
+          "time": "2025-09-05T02:54:36.030Z"
+        },
+        {
+          "id": "1757040878886",
+          "fromUserId": "1756859484293",
+          "username": "neemias12345",
+          "text": "aaaaaaa",
+          "time": "2025-09-05T02:54:38.886Z"
+        },
+        {
+          "id": "1757041899619",
+          "fromUserId": "1756859484293",
+          "username": "neemias12345",
+          "text": "aaaa",
+          "time": "2025-09-05T03:11:39.619Z"
+        },
+        {
+          "id": "1757041902910",
+          "fromUserId": "1756860887995",
+          "username": "neemiasteste1",
+          "text": "aaaa",
+          "time": "2025-09-05T03:11:42.910Z"
+        },
+        {
+          "id": "1757043909559",
+          "fromUserId": "1756859484293",
+          "username": "Neemias Silva",
+          "text": "da",
+          "time": "2025-09-05T03:45:09.559Z"
+        },
+        {
+          "id": "1757044664257",
+          "fromUserId": "1756860887995",
+          "username": "Neemias",
+          "text": "😜",
+          "time": "2025-09-05T03:57:44.257Z"
+        },
+        {
+          "id": "1757047880841",
+          "fromUserId": "1756860887995",
+          "username": "Neemias",
+          "text": "adada a",
+          "time": "2025-09-05T04:51:20.841Z"
+        },
+        {
+          "id": "1757049851735",
+          "fromUserId": "1756860887995",
+          "username": "Neemias",
+          "text": "a",
+          "time": "2025-09-05T05:24:11.735Z"
+        },
+        {
+          "id": "1757049937728",
+          "fromUserId": "1756860887995",
+          "username": "Neemias",
+          "text": "👍",
+          "time": "2025-09-05T05:25:37.728Z"
+        }
+      ]
+    },
+    {
+      "users": [
+        "ID_USUARIO_A",
+        "ID_USUARIO_B"
+      ],
+      "messages": []
+    }
+  ],
+  "statuses": {
+    "1756860887995": "Ausente",
+    "1756859484293": "Disponível"
+  },
+  "friendRequests": [
+    {
+      "id": "1757039214729",
+      "fromUserId": "1756860887995",
+      "toUserId": "1756859484293",
+      "status": "aceito",
+      "createdAt": "2025-09-05T02:26:54.729Z"
+    },
+    {
+      "id": "1757041415288",
+      "fromUserId": "1756860887995",
+      "toUserId": "2275",
+      "status": "cancelado",
+      "createdAt": "2025-09-05T03:03:35.288Z"
+    },
+    {
+      "id": "1757042420094",
+      "fromUserId": "1756859484293",
+      "toUserId": "6a91",
+      "status": "cancelado",
+      "createdAt": "2025-09-05T03:20:20.094Z"
+    },
+    {
+      "id": "1757042421575",
+      "fromUserId": "1756859484293",
+      "toUserId": "60df",
+      "status": "cancelado",
+      "createdAt": "2025-09-05T03:20:21.575Z"
+    },
+    {
+      "id": "1757042422880",
+      "fromUserId": "1756859484293",
+      "toUserId": "6528",
+      "status": "cancelado",
+      "createdAt": "2025-09-05T03:20:22.880Z"
+    },
+    {
+      "id": "1757042781742",
+      "fromUserId": "1756859484293",
+      "toUserId": "1756860887995",
+      "status": "aceito",
+      "createdAt": "2025-09-05T03:26:21.742Z"
+    },
+    {
+      "id": "1757044330878",
+      "fromUserId": "1756859484293",
+      "toUserId": "2275",
+      "status": "cancelado",
+      "createdAt": "2025-09-05T03:52:10.878Z"
+    },
+    {
+      "id": "1757044649201",
+      "fromUserId": "1756859484293",
+      "toUserId": "1756860887995",
+      "status": "aceito",
+      "createdAt": "2025-09-05T03:57:29.201Z"
+    },
+    {
+      "id": "1757044767038",
+      "fromUserId": "1756859484293",
+      "toUserId": "1756860887995",
+      "status": "cancelado",
+      "createdAt": "2025-09-05T03:59:27.038Z"
+    },
+    {
+      "id": "1757044824721",
+      "fromUserId": "1756859484293",
+      "toUserId": "1756860887995",
+      "status": "aceito",
+      "createdAt": "2025-09-05T04:00:24.721Z"
+    },
+    {
+      "id": "1757044961909",
+      "fromUserId": "1756860887995",
+      "toUserId": "6a91",
+      "status": "cancelado",
+      "createdAt": "2025-09-05T04:02:41.909Z"
+    },
+    {
+      "id": "1757046974073",
+      "fromUserId": "1756860887995",
+      "toUserId": "6a91",
+      "status": "pendente",
+      "createdAt": "2025-09-05T04:36:14.073Z"
+    },
+    {
+      "id": "1757047027196",
+      "fromUserId": "1756859484293",
+      "toUserId": "1756860887995",
+      "status": "aceito",
+      "createdAt": "2025-09-05T04:37:07.196Z"
+    },
+    {
+      "id": "1757047033544",
+      "fromUserId": "1756860887995",
+      "toUserId": "60df",
+      "status": "pendente",
+      "createdAt": "2025-09-05T04:37:13.544Z"
+    },
+    {
+      "id": "1757047818333",
+      "fromUserId": "1756859484293",
+      "toUserId": "1756860887995",
+      "status": "aceito",
+      "createdAt": "2025-09-05T04:50:18.333Z"
+    }
+  ],
+  "friendships": [
+    {
+      "id": "1757047876094",
+      "userIds": [
+        "1756859484293",
+        "1756860887995"
+      ],
+      "since": "2025-09-05T04:51:16.094Z"
+    }
+  ],
+  "groupChats": [
+    {
+      "id": "1757047838369-g",
+      "squadId": "1757047838369",
+      "name": "FURIA",
+      "members": [
+        "1756859484293",
+        "1756860887995"
+      ],
+      "messages": [
+        {
+          "id": "1757047846788",
+          "fromUserId": "1756860887995",
+          "username": "Neemias",
+          "text": "aaaaaaaaaa",
+          "time": "2025-09-05T04:50:46.788Z"
+        },
+        {
+          "id": "1757049858112",
+          "fromUserId": "1756860887995",
+          "username": "Neemias",
+          "text": "da",
+          "time": "2025-09-05T05:24:18.112Z"
+        }
       ]
     }
   ]

@@ -7,6 +7,7 @@
 		opacity: 0;
 		transform: translateY(-16px);
 	}
+
 	100% {
 		opacity: 1;
 		transform: translateY(0);
@@ -18,6 +19,7 @@
 		opacity: 1;
 		transform: translateY(0);
 	}
+
 	100% {
 		opacity: 0;
 		transform: translateY(-16px);
@@ -25,39 +27,48 @@
 }
 
 .animate-slide-fade-in {
-	animation: slide-fade-in 0.35s cubic-bezier(0.4,0,0.2,1) both;
+	animation: slide-fade-in 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
+
 .animate-slide-fade-out {
-	animation: slide-fade-out 0.25s cubic-bezier(0.4,0,0.2,1) both;
+	animation: slide-fade-out 0.25s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 
-/* Focus global arredondado universal
-	 Tema claro: anel preto (#000)
-	 Tema escuro: anel branco (#fff)
-	 Remove necessidade de classes utilitárias ring-* individuais */
-*:focus { outline: none; }
+/* Focus */
+*:focus {
+	outline: none;
+}
+
 *:focus-visible {
 	outline: none;
 	--focus-ring-color-light: #000000;
 	--focus-ring-color-dark: #ffffff;
-	--focus-ring-halo-light: rgba(0,0,0,0.15);   /* halo suave p/ contraste em superfícies claras */
-	--focus-ring-halo-dark: rgba(255,255,255,0.35); /* halo suave p/ contraste em superfícies escuras */
+	--focus-ring-halo-light: rgba(0, 0, 0, 0.15);
+	--focus-ring-halo-dark: rgba(255, 255, 255, 0.35);
 	position: relative;
 }
+
 *:focus-visible::after {
 	content: "";
 	pointer-events: none;
 	position: absolute;
-	inset: -4px; /* espaço para o anel sem deslocar layout */
-	border-radius: 0.5rem; /* rounded */
+	inset: -4px;
+	border-radius: 0.5rem;
 	border: 3px solid var(--focus-ring-color, #000);
-	box-shadow: 0 0 0 2px var(--focus-ring-halo, rgba(0,0,0,0.15));
+	box-shadow: 0 0 0 2px var(--focus-ring-halo, rgba(0, 0, 0, 0.15));
 }
-html:not(.dark) *:focus-visible { --focus-ring-color: var(--focus-ring-color-light); --focus-ring-halo: var(--focus-ring-halo-light); }
-html.dark *:focus-visible { --focus-ring-color: var(--focus-ring-color-dark); --focus-ring-halo: var(--focus-ring-halo-dark); }
 
-/* Ajuste para elementos já com border-radius grande */
+html:not(.dark) *:focus-visible {
+	--focus-ring-color: var(--focus-ring-color-light);
+	--focus-ring-halo: var(--focus-ring-halo-light);
+}
+
+html.dark *:focus-visible {
+	--focus-ring-color: var(--focus-ring-color-dark);
+	--focus-ring-halo: var(--focus-ring-halo-dark);
+}
+
 img:focus-visible::after,
 video:focus-visible::after,
 button.rounded-full:focus-visible::after,
@@ -65,9 +76,10 @@ a.rounded-full:focus-visible::after {
 	border-radius: 9999px;
 }
 
-/* Desabilitados não recebem anel */
-*:disabled:focus-visible::after { display: none; }
+*:disabled:focus-visible::after {
+	display: none;
+}
 
-.focus-none:focus-visible::after { display: none; }
-
-/* (Removido utilitário com @apply para evitar erros do linter; usando classes inline) */
+.focus-none:focus-visible::after {
+	display: none;
+}
