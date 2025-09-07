@@ -20,7 +20,7 @@ export default function Home() {
           de novas amizades e a construção de equipes sólidas para futuras competições. A plataforma busca promover a interação, o espírito de equipe e o aprendizado coletivo, essencial para quem deseja aprimorar suas habilidades
           no universo dos games de forma competitiva e divertida.
           <br /><br />
-          Ao unir tecnologia, comunidade e eSports, a<span className="text-pink-800 dark:text-pink-400 font-semibold">Connect Gamers</span> se posiciona como um ponto de encontro para todos que vivem e respiram o universo gamer.
+          Ao unir tecnologia, comunidade e eSports, a <span className="text-pink-800 dark:text-pink-400 font-semibold">Connect Gamers</span> se posiciona como um ponto de encontro para todos que vivem e respiram o universo gamer.
         </p>
 
         <div className="mt-6 text-right">

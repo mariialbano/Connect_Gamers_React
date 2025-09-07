@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { postItem, getItem } from "../services/api";
 import { useTheme } from "../theme/ThemeContext";
 
@@ -13,20 +13,14 @@ export default function Cadastro() {
   // Eventos carregados do backend
   const [eventos, setEventos] = useState({}); 
 
-  const navigate = useNavigate();
   const location = useLocation();
   const { theme } = useTheme();
 
-  // Verificação de usuários logados
+  // Inicializa primeiro integrante com usuário logado se existir (rota já protegida)
   useEffect(() => {
     const usuario = localStorage.getItem("usuarioLogado");
-    if (!usuario) {
-      alert("Você precisa estar logado para participar dos eventos.");
-      navigate("/login");
-    } else {
-      setIntegrantes([usuario]);
-    }
-  }, [navigate]);
+    if (usuario) setIntegrantes([usuario]);
+  }, []);
 
 
   const jogos = Object.keys(eventos);
@@ -116,6 +110,11 @@ export default function Cadastro() {
           ? "bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-xl text-white"
           : "bg-[#d9dbe2] p-8 rounded-xl shadow-lg w-full max-w-xl text-black"
       }>
+        {!localStorage.getItem('usuarioLogado') && (
+          <div className="mb-6 p-3 rounded-md text-sm font-medium bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300 border border-pink-300 dark:border-pink-700">
+            Faça login para continuar o cadastro.
+          </div>
+        )}
   <h1 className="text-3xl font-bold text-center text-black dark:text-white mb-8">
           Cadastre seu Squad!
         </h1>

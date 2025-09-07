@@ -51,13 +51,17 @@ export default function Navbar() {
                   <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
                 </span>
               </Link>
-              <Link to="/cadastro" className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md">
+              <Link to="/inscreva-se" className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md">
                 <span className="relative">
                   Inscreva-se
                   <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
                 </span>
               </Link>
-              <Link to="/comunidade" className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md">
+              <Link
+                to={usuarioLogado ? "/comunidade" : "/login?auth=1&from=%2Fcomunidade"}
+                className={`relative group transition-colors font-medium px-1 rounded-md hover:text-pink-800 dark:hover:text-pink-400`}
+                title={usuarioLogado ? 'Comunidade' : 'Faça login para acessar'}
+              >
                 <span className="relative">
                   Comunidade
                   <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
@@ -73,10 +77,11 @@ export default function Navbar() {
           </div>
           {/* Amigos */}
           <button
-            onClick={() => navigate('/amigos')}
-            className="mr-3 flex items-center text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-600"
+            onClick={() => usuarioLogado ? navigate('/amigos') : navigate('/login?auth=1&from=%2Famigos')}
+            className={`mr-3 flex items-center text-black dark:text-white hover:text-pink-600 dark:hover:text-pink-600`}
             style={{ border: 'none', background: 'none' }}
-            aria-label="Ir para amigos"
+            aria-label={usuarioLogado ? 'Ir para amigos' : 'Faça login para acessar amigos'}
+            title={usuarioLogado ? 'Amigos' : 'Faça login para acessar'}
           >
             <Users size={30} />
           </button>

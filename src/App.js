@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -15,6 +15,17 @@ import { useTheme } from './theme/ThemeContext';
 function App() {
   const { theme } = useTheme();
 
+  // Rota protegida: só permite acesso se houver usuário logado em localStorage
+  function RequireAuth({ children }) {
+    const location = useLocation();
+    const logged = typeof window !== 'undefined' && localStorage.getItem('usuarioLogado');
+    if (!logged) {
+      const dest = encodeURIComponent(location.pathname + location.search);
+      return <Navigate to={`/login?auth=1&from=${dest}`} replace />;
+    }
+    return children;
+  }
+
   return (
     <Router>
       <div
@@ -29,14 +40,15 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/home" />} />
             <Route path="/home" element={<Home />} />
-            <Route path="/cadastro" element={<Cadastro />} />
-            <Route path="/faq" element={<FAQ />} />
+            <Route path="/inscreva-se" element={<RequireAuth><Cadastro /></RequireAuth>} />
+            <Route path="/cadastro" element={<Navigate to="/inscreva-se" replace />} />
+            <Route path="/faq" element={<RequireAuth><FAQ /></RequireAuth>} />
             <Route path="/jogos" element={<Jogos />} />
             <Route path="/jogos/:gameId" element={<JogoDetalhe />} />
             <Route path="/login" element={<Login />} />
             <Route path="/perfil" element={<Perfil />} />
-            <Route path="/comunidade" element={<Comunidade />} />
-            <Route path="/amigos" element={<Amigos />} />
+            <Route path="/comunidade" element={<RequireAuth><Comunidade /></RequireAuth>} />
+            <Route path="/amigos" element={<RequireAuth><Amigos /></RequireAuth>} />
           </Routes>
         </main>
         <Footer />

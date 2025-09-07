@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { getItem, postItem } from "../services/api";
 
 export default function Login() {
@@ -12,6 +12,10 @@ export default function Login() {
   const [usuariosExistentes, setUsuariosExistentes] = useState([]);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const authRequired = params.get('auth') === '1';
+  const from = params.get('from');
 
   useEffect(() => {
     const fetchUsuarios = async () => {
@@ -44,10 +48,10 @@ export default function Login() {
 
       try {
         const novo = await postItem("usuarios", { nome, usuario, senha });
-        localStorage.setItem("usuarioLogado", usuario);
-        localStorage.setItem("usuarioId", novo.id);
-        alert("Cadastro realizado com sucesso!");
-        navigate("/perfil");
+  localStorage.setItem("usuarioLogado", usuario);
+  localStorage.setItem("usuarioId", novo.id);
+  alert("Cadastro realizado com sucesso!");
+  navigate(from || "/perfil");
       } catch (error) {
         alert("Erro ao cadastrar usuário.");
       }
@@ -67,7 +71,7 @@ export default function Login() {
   localStorage.setItem("usuarioLogado", usuario);
   localStorage.setItem("usuarioId", usuarioExiste.id);
       alert("Login realizado com sucesso!");
-      navigate("/perfil");
+      navigate(from || "/perfil");
     }
   };
 
@@ -85,6 +89,11 @@ export default function Login() {
   return (
     <div className="flex justify-center py-10 px-4">
   <div className="bg-[#d9dbe2] dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md text-black dark:text-white">
+        {authRequired && (
+          <div className="mb-6 p-3 rounded-md text-sm font-medium bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300 border border-pink-300 dark:border-pink-700">
+            Faça login para acessar esta página.
+          </div>
+        )}
         <div className="flex justify-around mb-6">
           <button
             onClick={() => setModo("login")}
