@@ -96,6 +96,7 @@ function EventsSection({ usuarioLogado }) {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
   const [origemEventos,setOrigemEventos] = useState('eventos');
+  const [mapUsuarios, setMapUsuarios] = useState({});
 
   useEffect(() => {
     async function fetchData() {
@@ -103,6 +104,16 @@ function EventsSection({ usuarioLogado }) {
       setLoading(true); setErro(null);
       try {
         const squads = await getItem('squads');
+        // Carrega usuarios para mapear usuario -> nome
+        let usuarios = [];
+        try { usuarios = await getItem('usuarios'); } catch { usuarios = []; }
+        const mapa = {};
+        (usuarios||[]).forEach(u => {
+          if (u && u.usuario) {
+            mapa[u.usuario.toLowerCase()] = (u.nome && u.nome.trim()) || u.usuario;
+          }
+        });
+        setMapUsuarios(mapa);
         let eventosData = {};
         try {
           eventosData = await getItem('eventos');
@@ -160,9 +171,13 @@ function EventsSection({ usuarioLogado }) {
               <p className="text-sm font-semibold mb-1 text-gray-800 dark:text-gray-200">Squad: {squad.nomeSquad}</p>
               <p className="text-xs text-gray-500 dark:text-gray-300 mb-2">Nível: {squad.nivel}</p>
               <div className="flex flex-wrap gap-2 mt-2">
-                {squad.integrantes.slice(0, 8).map((nome, idx) => (
-                  <span key={idx} className="text-xs bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-2 py-1 rounded-full">{nome || '—'}</span>
-                ))}
+                {squad.integrantes.slice(0, 8).map((usuarioRaw, idx) => {
+                  const key = (usuarioRaw||'').toLowerCase().trim();
+                  const display = mapUsuarios[key] || usuarioRaw || '—';
+                  return (
+                    <span key={idx} className="text-xs bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-2 py-1 rounded-full" title={usuarioRaw}>{display}</span>
+                  );
+                })}
               </div>
             </div>
           );

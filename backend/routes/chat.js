@@ -49,7 +49,7 @@ router.get('/log', (req,res)=>{
     res.json({ total:data.length, returned:slice.length, items:slice });
 });
 
-router.get('/raw-log', (req,res)=>{
+router.get('/chatlog', (req,res)=>{
     try{
         if(!fs.existsSync(logPath)) return res.status(404).send('Log vazio');
         res.setHeader('Content-Type','text/plain; charset=utf-8');

@@ -48,7 +48,7 @@ router.post('/feedback', (req, res) => {
     } catch (e) { return res.status(500).json({ error: 'falha inesperada' }); }
 });
 
-router.get('/feedback/summary', (req, res) => {
+router.get('/feedback/feedbacks', (req, res) => {
     try { const db = readDB(); ensureSummary(db); return res.json(db.feedbackSummary); }
     catch { return res.status(500).json({ error: 'falha ao ler summary' }); }
 });
