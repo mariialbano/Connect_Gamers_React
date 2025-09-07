@@ -51,13 +51,13 @@ function Jogos() {
     return (
         <section className="min-h-screen pt-8 px-4">
             <header>
-                <div className="mb-24 flex justify-center mx-auto">
-                    <div ref={containerRef} className="relative w-full max-w-[1400px] rounded-2xl overflow-hidden shadow-2xl" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} onMouseEnter={() => { isPausedRef.current = true; stopAutoplay(); }} onMouseLeave={() => { isPausedRef.current = false; startAutoplay(); }}>
-                        <div className="relative w-full h-[500px] md:h-[650px]">
+                <div className="mb-16 flex justify-center mx-auto">
+                    <div ref={containerRef} className="relative w-full max-w-[1180px] lg:max-w-[1280px] rounded-2xl overflow-hidden shadow-xl" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} onMouseEnter={() => { isPausedRef.current = true; stopAutoplay(); }} onMouseLeave={() => { isPausedRef.current = false; startAutoplay(); }}>
+                        <div className="relative w-full bg-black">
                             <div className="flex transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${carouselIndex * 100}%)` }}>
                                 {destaques.map(d => (
-                                    <div key={d.id} className="flex-shrink-0 w-full h-[500px] md:h-[650px] relative">
-                                        {d.video ? (isYouTube(d.video) ? <SilentYouTube url={d.video} title={d.name} className="w-full h-full" poster={d.image} /> : <video src={srcSafe(d.video)} autoPlay muted loop playsInline className="w-full h-full object-cover rounded-2xl" aria-label={`Vídeo mostrando o jogo ${d.name}`} />) : (d.image && <img src={srcSafe(d.image)} alt={d.name} className="w-full h-full object-cover rounded-2xl" />)}
+                                    <div key={d.id} className="flex-shrink-0 w-full relative bg-black">
+                                        {d.video ? (isYouTube(d.video) ? <SilentYouTube url={d.video} title={d.name} className="w-full" poster={d.image} cover forceRatio /> : <div className="yt-16-9"><video src={srcSafe(d.video)} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover rounded-2xl" aria-label={`Vídeo mostrando o jogo ${d.name}`} /></div>) : (d.image && <div className="yt-16-9"><img src={srcSafe(d.image)} alt={d.name} className="absolute inset-0 w-full h-full object-cover rounded-2xl" /></div>)}
                                         <div className="absolute left-1/2 -translate-x-1/2 bottom-6 flex items-center gap-2 z-50 ">
                                             {destaques.map((_, i) => (
                                                 <button tabIndex={-1} key={i} onClick={() => { setCarouselIndex(i); pauseAutoplayTemporarily(); }} className={`w-3 h-3 md:w-3 md:h-3 rounded-full transition-all ${i === carouselIndex ? 'scale-150 bg-pink-600' : 'bg-white/60'}`} aria-label={`Ir para destaque ${i + 1}`} />
@@ -65,8 +65,8 @@ function Jogos() {
                                         </div>
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8 rounded-2xl pointer-events-none z-10">
                                             <div className="pointer-events-auto">
-                                                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 drop-shadow-lg">{d.name}</h2>
-                                                <button className="bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white font-semibold px-8 py-3 rounded-full w-max transition pointer-events-auto" onClick={() => navigate(`/jogos/${d.id}`)} aria-label={`Ver jogo ${d.name}`}>Ver jogo</button>
+                                                <h2 className="text-3xl md:text-4xl font-bold text-white mb-5 drop-shadow-lg">{d.name}</h2>
+                                                <button className="bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white font-semibold px-6 py-2.5 rounded-full w-max transition pointer-events-auto text-sm md:text-base" onClick={() => navigate(`/jogos/${d.id}`)} aria-label={`Ver jogo ${d.name}`}>Ver jogo</button>
                                             </div>
                                         </div>
                                     </div>

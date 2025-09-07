@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Aspect ratio helper para iframes YouTube 16:9 */
+.yt-16-9 { position: relative; width: 100%; }
+.yt-16-9::before { content: ""; display: block; padding-top: 56.25%; }
+.yt-16-9 > *:first-child { position: absolute !important; inset: 0; width: 100%; height: 100%; }
+
 @keyframes slide-fade-in {
 	0% {
 		opacity: 0;
