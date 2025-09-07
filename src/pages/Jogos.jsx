@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { API_BASE } from '../services/apiBase';
 import SilentYouTube from "../components/SilentYouTube";
 import { BsFilterRight } from "react-icons/bs";
 const normalize = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -46,7 +47,7 @@ function Jogos() {
     const allCategories = [...new Set(games.flatMap(g => g.categories))];
     const filteredGames = games.filter(g => { const matchesName = normalize(g.name).includes(normalize(search)) || normalize(g.desc).includes(normalize(search)); const matchesCategory = selectedCategories.length === 0 || g.categories.some(cat => selectedCategories.includes(cat)); return matchesName && matchesCategory; });
     const filteredCategories = allCategories.filter(cat => normalize(cat).includes(normalize(categorySearch)));
-    useEffect(() => { fetch('http://localhost:5000/api/games').then(r => r.json()).then(setGames).catch(err => console.error('Erro ao buscar jogos:', err)); }, []);
+    useEffect(() => { fetch(`${API_BASE}/api/games`).then(r => r.json()).then(setGames).catch(err => console.error('Erro ao buscar jogos:', err)); }, []);
     return (
         <section className="min-h-screen pt-8 px-4">
             <header>

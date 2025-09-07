@@ -104,3 +104,69 @@ select:disabled:focus-visible,
 textarea:disabled:focus-visible {
 	box-shadow: none;
 }
+
+/* Scrollbar personalizada */
+/* Scrollbar neutra (cinza) */
+.custom-scrollbar {
+	scrollbar-width: thin;
+	scrollbar-color: #6b7280 #f1f5f9; /* (thumb, track) claro */
+}
+html.dark .custom-scrollbar {
+	scrollbar-color: #4b5563 #111827; /* escuro */
+}
+
+.custom-scrollbar::-webkit-scrollbar { width: 11px; }
+
+.custom-scrollbar::-webkit-scrollbar-track {
+	background: #f1f5f9; /* slate-50 */
+	border-radius: 10px;
+	border: 1px solid #e2e8f0; /* slate-200 */
+}
+html.dark .custom-scrollbar::-webkit-scrollbar-track {
+	background: #111827; /* gray-900 */
+	border: 1px solid #374151; /* gray-700 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+	background: linear-gradient(180deg,#9ca3af,#6b7280); /* slate 400 -> 500 */
+	border-radius: 10px;
+	border: 2px solid #f1f5f9;
+	box-shadow: 0 0 0 1px rgba(0,0,0,0.04) inset;
+}
+html.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+	background: linear-gradient(180deg,#6b7280,#4b5563); /* slate 500 -> 600 */
+	border: 2px solid #111827;
+	box-shadow: 0 0 0 1px rgba(255,255,255,0.06) inset;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+	background: linear-gradient(180deg,#81858d,#585f67);
+}
+html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+	background: linear-gradient(180deg,#5d6470,#434b55);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:active {
+	background: linear-gradient(180deg,#6b7280,#525962);
+}
+html.dark .custom-scrollbar::-webkit-scrollbar-thumb:active {
+	background: linear-gradient(180deg,#4b5563,#3a424a);
+}
+
+@media (max-width:640px){
+	.custom-scrollbar::-webkit-scrollbar { width: 8px; }
+	.custom-scrollbar::-webkit-scrollbar-thumb { border-width: 1px; }
+}
+
+/* Esconder scrollbar (conteúdo ainda rola) */
+.scrollbar-hide {
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE 10+ */
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* Quebra agressiva para textos muito longos sem espaços (URLs extensas, spam, etc.) */
+.break-anywhere {
+	overflow-wrap: anywhere; /* CSS3 */
+	word-break: break-word; /* fallback */
+}

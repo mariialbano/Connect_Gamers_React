@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { API_BASE } from '../services/apiBase';
 import EmojiPicker from './EmojiPicker';
 
 const gradients = [
@@ -22,7 +23,7 @@ export default function PrivateChat({ currentUser, friend, onClose }) {
     const fetchMessages = useCallback(async () => {
         if (!currentUser || !friend) return;
         try {
-            const r = await fetch(`http://localhost:5000/api/chat/private/${currentUser.id}/${friend.id}`);
+            const r = await fetch(`${API_BASE}/api/chat/private/${currentUser.id}/${friend.id}`);
             if (r.ok) {
                 const data = await r.json();
                 setMessages(data.map(m => {
@@ -55,7 +56,7 @@ export default function PrivateChat({ currentUser, friend, onClose }) {
                 username: currentUser.nome || currentUser.usuario || 'Você',
                 text: text.trim()
             };
-            const r = await fetch(`http://localhost:5000/api/chat/private/${currentUser.id}/${friend.id}`, {
+            const r = await fetch(`${API_BASE}/api/chat/private/${currentUser.id}/${friend.id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
@@ -87,14 +88,14 @@ export default function PrivateChat({ currentUser, friend, onClose }) {
                     <button onClick={onClose} className="px-3 py-1.5 rounded-md text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">Fechar</button>
                 </header>
                 <div
-                    className="flex-1 overflow-y-auto px-4 py-4 space-y-4 custom-scrollbars-thin focus:outline-none focus:ring-2 focus:ring-pink-500 rounded-md"
+                    className="flex-1 overflow-y-auto px-4 py-4 space-y-4 custom-scrollbars-thin focus:outline-none focus-none rounded-md"
                     tabIndex={0}
                     role="log"
                     aria-live="polite"
                     aria-label={`Histórico de mensagens privadas com ${friend.username}`}
                 >
                     {loading && <p className="text-sm text-gray-500">Carregando...</p>}
-                    {!loading && !messages.length && <p className="text-sm text-gray-500">Nenhuma mensagem ainda. Diga olá!</p>}
+                    {/* Estado vazio removido conforme solicitado */}
                     {messages.map(m => (
                         <div key={m.id} className={`flex ${m.me ? 'justify-end' : 'justify-start'}`}>
                             <div className={`max-w-[75%] rounded-xl px-4 py-2 text-sm shadow relative ${m.me ? 'bg-pink-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100'}`}>
@@ -103,7 +104,7 @@ export default function PrivateChat({ currentUser, friend, onClose }) {
                                     <span className="font-medium">{m.me ? 'Você' : m.username}</span>
                                     <span className="text-[10px] opacity-70">{m.time}</span>
                                 </div>
-                                <p className="whitespace-pre-wrap break-words leading-relaxed">{m.text}</p>
+                                <p className="whitespace-pre-wrap break-words break-anywhere leading-relaxed">{m.text}</p>
                             </div>
                         </div>
                     ))}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { API_BASE } from '../services/apiBase';
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from 'lucide-react';
 
@@ -35,8 +36,8 @@ export default function JogoDetalhe() {
         };
 
         Promise.all([
-            fetchComRetry("http://localhost:5000/api/games", controller1),
-            fetchComRetry("http://localhost:5000/api/rankings", controller2)
+            fetchComRetry(`${API_BASE}/api/games`, controller1),
+            fetchComRetry(`${API_BASE}/api/rankings`, controller2)
         ])
             .then(([gamesData, playersData]) => {
                 if (cancelado) return;

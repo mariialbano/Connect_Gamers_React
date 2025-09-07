@@ -2,6 +2,8 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const router = express.Router();
+const { aiModerate } = require('../moderacaoIA');
+const { isBlocked, applyPenalty, clearActiveBlocks, clearUserHistory } = require('../penalidade');
 
 const logPath = path.join(__dirname, '../../chat.log');
 function logMessage(entry){
@@ -82,10 +84,29 @@ router.get('/messages/:channel', (req, res) => {
 });
 
 // Enviar mensagem para um canal
-router.post('/messages/:channel', (req, res) => {
+router.post('/messages/:channel', async (req, res) => {
     const { channel } = req.params;
     const { userId, username, avatar, text } = req.body;
     if (!text || !userId) return res.status(400).json({ error: 'userId e text são obrigatórios' });
+
+    // Verifica bloqueio existente
+    const block = isBlocked(userId);
+    if(block.blocked){
+        return res.status(423).json({ error:'Usuário bloqueado temporariamente', blockUntil: block.blockUntil });
+    }
+
+    const moderation = await aiModerate(text);
+    if (!moderation.allowed) {
+        // Aplica penalidade severity 3
+        const penalty = applyPenalty(userId, 3);
+        return res.status(400).json({ error: 'Mensagem bloqueada por violar políticas.', reasons: moderation.reasons, severity: moderation.severity, penalty });
+    }
+    if(moderation.severity === 2){
+        const penalty = applyPenalty(userId, 2);
+        if(penalty?.applied){
+            // Nota de aviso pode ser retornada
+        }
+    }
 
     const db = readDB();
     ensureStructures(db);
@@ -95,7 +116,7 @@ router.post('/messages/:channel', (req, res) => {
         id: now.toString(),
         userId,
         username,
-        text,
+        text: moderation.filteredText,
         time: new Date(now).toISOString(),
         timestamp: now
     };
@@ -122,10 +143,22 @@ router.get('/private/:userA/:userB', (req, res) => {
 });
 
 // Enviar mensagem
-router.post('/private/:userA/:userB', (req, res) => {
+router.post('/private/:userA/:userB', async (req, res) => {
     const { userA, userB } = req.params;
     const { fromUserId, text, username } = req.body;
     if (!text || !fromUserId) return res.status(400).json({ error: 'fromUserId e text são obrigatórios' });
+    const block = isBlocked(fromUserId);
+    if(block.blocked){
+        return res.status(423).json({ error:'Usuário bloqueado temporariamente', blockUntil: block.blockUntil });
+    }
+    const moderation = await aiModerate(text);
+    if (!moderation.allowed) {
+        const penalty = applyPenalty(fromUserId, 3);
+        return res.status(400).json({ error: 'Mensagem bloqueada por violar políticas.', reasons: moderation.reasons, severity: moderation.severity, penalty });
+    }
+    if(moderation.severity === 2){
+        applyPenalty(fromUserId, 2);
+    }
     const db = readDB();
     ensureStructures(db);
     const keySet = new Set([userA, userB]);
@@ -135,7 +168,7 @@ router.post('/private/:userA/:userB', (req, res) => {
         db.privateChats.push(convo);
     }
     const now = Date.now();
-    const message = { id: now.toString(), fromUserId, username, text, time: new Date(now).toISOString(), timestamp: now };
+    const message = { id: now.toString(), fromUserId, username, text: moderation.filteredText, time: new Date(now).toISOString(), timestamp: now };
     convo.messages.push(message);
     writeDB(db);
     logMessage({ type:'private', users:[userA,userB], message });
@@ -170,17 +203,73 @@ router.get('/group/:id/messages', (req, res) => {
 });
 
 // Enviar mensagem para grupo
-router.post('/group/:id/messages', (req, res) => {
+router.post('/group/:id/messages', async (req, res) => {
     const { fromUserId, username, text } = req.body || {};
     if (!fromUserId || !text) return res.status(400).json({ error: 'fromUserId e text são obrigatórios' });
+    const block = isBlocked(fromUserId);
+    if(block.blocked){
+        return res.status(423).json({ error:'Usuário bloqueado temporariamente', blockUntil: block.blockUntil });
+    }
+    const moderation = await aiModerate(text);
+    if (!moderation.allowed) {
+        const penalty = applyPenalty(fromUserId, 3);
+        return res.status(400).json({ error: 'Mensagem bloqueada por violar políticas.', reasons: moderation.reasons, severity: moderation.severity, penalty });
+    }
+    if(moderation.severity === 2){
+        applyPenalty(fromUserId, 2);
+    }
     const db = readDB(); ensureStructures(db);
     const g = (db.groupChats || []).find(g => g.id === req.params.id);
     if (!g) return res.status(404).json({ error: 'Grupo não encontrado' });
     if (!g.members.includes(fromUserId)) return res.status(403).json({ error: 'Não participante do grupo' });
     const now = Date.now();
-    const message = { id: now.toString(), fromUserId, username, text, time: new Date(now).toISOString(), timestamp: now };
+    const message = { id: now.toString(), fromUserId, username, text: moderation.filteredText, time: new Date(now).toISOString(), timestamp: now };
     g.messages.push(message);
     writeDB(db);
     logMessage({ type:'group', groupId:g.id, squadId:g.squadId, message });
     res.status(201).json(message);
+});
+
+// Estado de bloqueio de um usuário (para UI exibir aviso)
+router.get('/block-status/:userId', (req,res)=>{
+    const { userId } = req.params;
+    if(!userId) return res.status(400).json({ error:'userId obrigatório'});
+    try {
+        // Lê DB direto para expor histórico de infrações básicas ao cliente (somente metadados).
+        const db = readDB();
+        let history = [];
+        if(db.moderation && db.moderation.users && db.moderation.users[userId]){
+            history = (db.moderation.users[userId].infractions||[]).slice(-5).map(i=>({ severity:i.severity, timestamp:i.timestamp }));
+        }
+        const block = isBlocked(userId);
+        if(block.blocked){
+            const remainingMs = Math.max(block.blockUntil - Date.now(), 0);
+            return res.json({ blocked:true, blockUntil:block.blockUntil, remainingMs, recentInfractions: history });
+        }
+        return res.json({ blocked:false, recentInfractions: history });
+    } catch(e){
+        res.status(500).json({ error:'Falha ao verificar bloqueio'});
+    }
+});
+
+// Desbloqueia apenas usuários atualmente bloqueados (mantém histórico de infrações)
+router.post('/clear-active-blocks', (req,res)=>{
+    try {
+        const result = clearActiveBlocks();
+        res.json({ ok:true, ...result });
+    } catch(e){
+        res.status(500).json({ error:'Falha ao limpar bloqueios ativos' });
+    }
+});
+
+// Limpa histórico (infrações + bloqueio) de um usuário específico
+router.post('/clear-user-history/:userId', (req,res)=>{
+    const { userId } = req.params;
+    if(!userId) return res.status(400).json({ error:'userId obrigatório' });
+    try {
+        const result = clearUserHistory(userId);
+        res.json({ ok:true, ...result });
+    } catch(e){
+        res.status(500).json({ error:'Falha ao limpar histórico do usuário' });
+    }
 });

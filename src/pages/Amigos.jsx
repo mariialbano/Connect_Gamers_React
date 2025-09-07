@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { API_BASE } from '../services/apiBase';
 import PrivateChat from '../components/PrivateChat';
 import StatusMenu from '../components/StatusMenu';
 
@@ -34,10 +35,10 @@ export default function Amigos(){
             if(currentUser){ if(!abort) setLoading(false); return; }
             try{
                 if(usuarioId){
-                    const r=await fetch(`http://localhost:5000/api/usuarios/${usuarioId}`);
+                    const r=await fetch(`${API_BASE}/api/usuarios/${usuarioId}`);
                     if(r.ok){ const u=await r.json(); if(!abort){ setCurrentUser(u); setLoading(false); return; } }
                 }
-                const r=await fetch('http://localhost:5000/api/usuarios');
+                const r=await fetch(`${API_BASE}/api/usuarios`);
                 if(r.ok){
                     const d=await r.json();
                     const u=d.find(x=>x.id===usuarioId||x.usuario===usuarioLogado||x.nome===usuarioLogado);
@@ -53,7 +54,7 @@ export default function Amigos(){
         if(!currentUser) return; 
         try{ 
             setFriendsError(null);
-            const r=await fetch(`http://localhost:5000/api/social/friends/${currentUser.id}`); 
+            const r=await fetch(`${API_BASE}/api/social/friends/${currentUser.id}`); 
             if(!r.ok) throw new Error('HTTP '+r.status);
             setFriends(await r.json());
         }catch(e){ setFriendsError('Erro ao carregar amigos'); }
@@ -61,15 +62,15 @@ export default function Amigos(){
     const fetchGroups = useCallback(async()=>{
         if(!currentUser) return;
         try{
-            const r = await fetch(`http://localhost:5000/api/chat/groups?userId=${currentUser.id}`);
+            const r = await fetch(`${API_BASE}/api/chat/groups?userId=${currentUser.id}`);
             if(r.ok){ const data = await r.json(); setGroupChats(data); }
         }catch(e){}
     },[currentUser]);
-    const fetchOnline = useCallback(async()=>{ try{ const r=await fetch('http://localhost:5000/api/social/online'); if(r.ok){ const l=await r.json(); setOnline(l.filter(o=>o.id!==currentUser?.id)); }}catch(e){} },[currentUser]);
+    const fetchOnline = useCallback(async()=>{ try{ const r=await fetch(`${API_BASE}/api/social/online`); if(r.ok){ const l=await r.json(); setOnline(l.filter(o=>o.id!==currentUser?.id)); }}catch(e){} },[currentUser]);
     const fetchRequests = useCallback(async()=>{ 
         if(!currentUser) return; 
         try{ 
-            const r=await fetch(`http://localhost:5000/api/social/requests/${currentUser.id}`); 
+            const r=await fetch(`${API_BASE}/api/social/requests/${currentUser.id}`); 
             if(r.ok){
                 const data = await r.json();
                 setRequests(data);
@@ -83,7 +84,7 @@ export default function Amigos(){
                 if(missing.length){
 
                     const fetched = await Promise.all(missing.map(async id=>{
-                        try{ const ru = await fetch(`http://localhost:5000/api/usuarios/${id}`); if(ru.ok){ const u=await ru.json(); return [id,(u.nome||u.usuario||id)]; } }catch(e){}
+                        try{ const ru = await fetch(`${API_BASE}/api/usuarios/${id}`); if(ru.ok){ const u=await ru.json(); return [id,(u.nome||u.usuario||id)]; } }catch(e){}
                         return [id,id];
                     }));
                     setUserNames(prev=>{ const copy={...prev}; fetched.forEach(([i,n])=>{ copy[i]=n; }); return copy; });
@@ -110,7 +111,7 @@ export default function Amigos(){
             if(!search.trim()||!currentUser){ setResults([]); setSearchError(null); return; }
             setSearchLoading(true); setSearchError(null);
             try {
-                const url = `http://localhost:5000/api/social/search?q=${encodeURIComponent(search)}&exclude=${currentUser.id}`;
+                const url = `${API_BASE}/api/social/search?q=${encodeURIComponent(search)}&exclude=${currentUser.id}`;
                 const r = await fetch(url,{signal:ctrl.signal});
                 if(!r.ok) throw new Error('HTTP '+r.status);
                 const data = await r.json();
@@ -127,7 +128,7 @@ export default function Amigos(){
         setRequestInfo(null);
         setRequestSending(true);
         try{
-            const r = await fetch('http://localhost:5000/api/social/friend-request',{
+            const r = await fetch(`${API_BASE}/api/social/friend-request`,{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({fromUserId:currentUser.id,toUserId})
@@ -149,10 +150,10 @@ export default function Amigos(){
             setRequestSending(false);
         }
     }
-    async function actOnRequest(id,action){ try{ const r=await fetch(`http://localhost:5000/api/social/friend-request/${id}/${action}`,{method:'POST'}); if(r.ok){ fetchRequests(); fetchFriends(); } }catch(e){} }
+    async function actOnRequest(id,action){ try{ const r=await fetch(`${API_BASE}/api/social/friend-request/${id}/${action}`,{method:'POST'}); if(r.ok){ fetchRequests(); fetchFriends(); } }catch(e){} }
     async function cancelRequest(id){
         try{
-            const r=await fetch(`http://localhost:5000/api/social/friend-request/${id}`,{method:'DELETE'});
+            const r=await fetch(`${API_BASE}/api/social/friend-request/${id}`,{method:'DELETE'});
             if(r.ok){ fetchRequests(); }
         }catch(e){}
     }
@@ -172,30 +173,32 @@ export default function Amigos(){
                 </div>
                 <div className="flex-1 overflow-y-auto custom-scrollbars-thin p-2 space-y-4 text-sm">
                     <div>
-                        <p className="text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-2">Grupos</p>
-                        <div className="space-y-1">
-                            {groupChats.map(g=> (
-                                <button key={g.id} onClick={()=>setOpenGroup(g)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-left hover:bg-white dark:hover:bg-gray-700/60 bg-gray-50/70 dark:bg-gray-700/40">
-                                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xs text-white font-semibold">{(g.name||'?').slice(0,2).toUpperCase()}</div>
-                                    <span className="truncate font-medium flex-1 text-sm md:text-base">{g.name}</span>
-                                    <span className="text-xs text-gray-500 dark:text-gray-400">{g.members.length}</span>
-                                </button>
-                            ))}
+                                        <p className="text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-2">Grupos</p>
+                                        <div className="flex flex-col gap-2">
+                                            {groupChats.map(g=> (
+                                                <button key={g.id} onClick={()=>setOpenGroup(g)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-left hover:bg-white dark:hover:bg-gray-700/60 bg-gray-50/70 dark:bg-gray-700/40">
+                                                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xs text-white font-semibold">{(g.name||'?').slice(0,2).toUpperCase()}</div>
+                                                    <span className="truncate font-medium flex-1 text-sm md:text-base">{g.name}</span>
+                                                    <span className="text-xs text-gray-500 dark:text-gray-400">{g.members.length}</span>
+                                                </button>
+                                            ))}
                             {!groupChats.length && <div className="text-[11px] text-gray-500 dark:text-gray-300">Sem grupos</div>}
                         </div>
                     </div>
                     <div>
                         <p className="text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-2">Amigos</p>
-                    {sorted.map(f=> (
-                        <button key={f.id} onClick={()=>setOpenFriend(f)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-left hover:bg-white dark:hover:bg-gray-700/60 bg-gray-50/70 dark:bg-gray-700/40">
-                            <span className={`w-2 h-2 rounded-full ${STATUS[f.status]||STATUS['Invisível']}`}></span>
-                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xs text-white font-semibold">
-                                {(f.username||'?').charAt(0).toUpperCase()}
-                            </div>
-                            <span className="truncate font-medium text-sm md:text-base">{f.username}</span>
-                        </button>
-                    ))}
-                    {!sorted.length && <div className="text-[11px] text-gray-500 dark:text-gray-300">Sem amigos</div>}
+                        <div className="flex flex-col gap-2">
+                            {sorted.map(f=> (
+                                <button key={f.id} onClick={()=>setOpenFriend(f)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-left hover:bg-white dark:hover:bg-gray-700/60 bg-gray-50/70 dark:bg-gray-700/40">
+                                    <span className={`w-2 h-2 rounded-full ${STATUS[f.status]||STATUS['Invisível']}`}></span>
+                                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xs text-white font-semibold">
+                                        {(f.username||'?').charAt(0).toUpperCase()}
+                                    </div>
+                                    <span className="truncate font-medium text-sm md:text-base">{f.username}</span>
+                                </button>
+                            ))}
+                            {!sorted.length && <div className="text-[11px] text-gray-500 dark:text-gray-300">Sem amigos</div>}
+                        </div>
                     </div>
                 </div>
             </aside>
@@ -309,7 +312,7 @@ function FriendActions({ friend, currentUser, onRemoved }){
 
     async function removeFriend(){
         try{
-            const r = await fetch(`http://localhost:5000/api/social/friends/${currentUser.id}/${friend.id}`,{ method:'DELETE' });
+            const r = await fetch(`${API_BASE}/api/social/friends/${currentUser.id}/${friend.id}`,{ method:'DELETE' });
             if(r.ok){ setOpen(false); onRemoved?.(); }
         }catch(e){}
     }
@@ -337,7 +340,7 @@ function GroupChatModal({ group, currentUser, onClose }){
     useEffect(()=>{
         let int;
         async function load(){
-            try{ const r=await fetch(`http://localhost:5000/api/chat/group/${group.id}/messages`); if(r.ok){ const data=await r.json(); setMessages(data.map(m=>{ const ts=m.timestamp||Date.parse(m.time)||Number(m.id)||Date.now(); return ({...m, me:m.fromUserId===currentUser.id, time:new Date(ts).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) }); })); } }
+            try{ const r=await fetch(`${API_BASE}/api/chat/group/${group.id}/messages`); if(r.ok){ const data=await r.json(); setMessages(data.map(m=>{ const ts=m.timestamp||Date.parse(m.time)||Number(m.id)||Date.now(); return ({...m, me:m.fromUserId===currentUser.id, time:new Date(ts).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) }); })); } }
             catch(e){}
             finally{ setLoading(false); }
         }
@@ -350,7 +353,7 @@ function GroupChatModal({ group, currentUser, onClose }){
         if(!text.trim()) return;
         try{
             const body={ fromUserId:currentUser.id, username: currentUser.nome || currentUser.usuario, text: text.trim() };
-            const r=await fetch(`http://localhost:5000/api/chat/group/${group.id}/messages`,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+            const r=await fetch(`${API_BASE}/api/chat/group/${group.id}/messages`,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
             if(r.ok){ const saved=await r.json(); const ts=saved.timestamp||Date.parse(saved.time)||Number(saved.id)||Date.now(); setMessages(v=>[...v, {...saved, me:true, time:new Date(ts).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) }]); setText(''); }
         }catch(e){}
     }

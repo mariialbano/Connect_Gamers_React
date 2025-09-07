@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { API_BASE } from '../services/apiBase';
 import { Circle, Clock3, EyeOff, Minus, ChevronDown } from 'lucide-react';
 
 // Mapeamento dos status
@@ -28,7 +29,7 @@ export default function StatusMenu({ userId, onChange }) {
         let abort = false;
         async function load() {
             if (!userId) return;
-            try { const r = await fetch(`http://localhost:5000/api/social/status/${userId}`); if (r.ok) { const j = await r.json(); if (!abort) setCurrent(j.status); } } catch (e) { }
+            try { const r = await fetch(`${API_BASE}/api/social/status/${userId}`); if (r.ok) { const j = await r.json(); if (!abort) setCurrent(j.status); } } catch (e) { }
         }
         load();
         return () => { abort = true; };
@@ -38,7 +39,7 @@ export default function StatusMenu({ userId, onChange }) {
         if (st === current) { setOpen(false); return; }
         setLoading(true);
         try {
-            const r = await fetch('http://localhost:5000/api/social/status', {
+            const r = await fetch(`${API_BASE}/api/social/status`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, status: st })

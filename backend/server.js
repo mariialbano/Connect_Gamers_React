@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const usersRouter = require('./routes/users');
@@ -6,11 +7,13 @@ const gamesRouter = require('./routes/games');
 const eventosRouter = require('./routes/eventos');
 const rankingsRouter = require('./routes/rankings');
 const chatRouter = require('./routes/chat');
+const faqRouter = require('./routes/faq');
 const socialRouter = require('./routes/social');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const BASE_PORT = parseInt(process.env.PORT, 10) || 5000;
+let currentPort = BASE_PORT;
 
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000,
@@ -33,12 +36,29 @@ app.use('/api/games', gamesRouter);
 app.use('/api/eventos', eventosRouter);
 app.use('/api/rankings', rankingsRouter);
 app.use('/api/chat', chatRouter);
+app.use('/api/faq', faqRouter);
 app.use('/api/social', socialRouter);
 
 app.get('/', (req, res) => {
     res.send('Você está no backend!');
 });
 
-app.listen(PORT, () => {
-    console.log(`Servidor está rodando em http://localhost:${PORT}`);
-});
+function start(port){
+    const server = app.listen(port, () => {
+        console.log(`Servidor está rodando em http://localhost:${port}`);
+    });
+    server.on('error', (err)=>{
+        if(err.code === 'EADDRINUSE'){
+            if(port < BASE_PORT + 20){
+                console.warn(`Porta ${port} ocupada. Tentando ${port+1}...`);
+                start(port+1);
+            } else {
+                console.error('Não foi possível encontrar porta livre (tentadas +20).');
+            }
+        } else {
+            console.error('Erro ao iniciar servidor:', err);
+        }
+    });
+}
+
+start(currentPort);

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE } from '../services/apiBase';
 import { getItem } from '../services/api';
 
 // Avatar
@@ -255,7 +256,7 @@ const Profile = () => {
       const usuario = usuarios.find(u => u.usuario === usuarioLogado);
       if (!usuario) return alert('Usuário não encontrado.');
       if (usuario.senha !== currentPassword) return alert('Senha atual incorreta!');
-      const response = await fetch(`http://localhost:5000/api/usuarios/${usuario.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ senha: newPassword }) });
+  const response = await fetch(`${API_BASE}/api/usuarios/${usuario.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ senha: newPassword }) });
       if (!response.ok) throw new Error('Erro ao atualizar senha.');
       alert('Senha alterada com sucesso!');
       setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); setShowPasswordSection(false);
@@ -270,7 +271,7 @@ const Profile = () => {
       const usuarios = await getItem('usuarios');
       const usuario = usuarios.find(u => u.usuario === usuarioLogado);
       if (!usuario) return;
-      const response = await fetch(`http://localhost:5000/api/usuarios/${usuario.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: novoNome }) });
+  const response = await fetch(`${API_BASE}/api/usuarios/${usuario.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: novoNome }) });
       if (!response.ok) throw new Error('Falha ao atualizar nome');
       setNomeUsuario(novoNome); setEditandoNome(false);
     } catch (e) { console.error('Erro ao atualizar nome', e); alert('Não foi possível atualizar o nome.'); }
