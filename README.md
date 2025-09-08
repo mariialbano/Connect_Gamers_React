@@ -38,6 +38,24 @@ npm run dev
 
 Abra [http://localhost:3000/] no navegador para visualizar o app.
 
+### 4. Implementando API OpenIA
+
+Cada pessoa do grupo deve criar seu próprio arquivo `.env` na pasta `backend` usando o modelo `.env.example`. O arquivo `.env` nunca deve ser enviado para o GitHub porque contém informações privadas, como chaves de API. Se alguém subir esse arquivo, pode expor a chave para pessoas de fora, mesmo que o repositório seja privado.
+
+- Nunca compartilhe sua chave real em grupos, e-mails ou no próprio repositório.
+- O arquivo `.env` está listado no `.gitignore` e não será versionado.
+- Use o arquivo `backend/.env.example` como modelo. Copie-o para um novo arquivo chamado `.env` dentro da pasta `backend` e preencha com sua API Key:
+
+```bash
+cp backend/.env.example backend/.env    #Copia o arquivo .env.example para o mesmo diretório
+```
+
+```bash
+ OPENAI_API_KEY= 'Chave OpenAI API'     #Coloque sua API Key aqui
+```
+
+---
+
 Principais endpoints disponíveis: [http://localhost:5000/api/squads], [http://localhost:5000/api/usuarios], [http://localhost:5000/api/games], [http://localhost:5000/api/rankings].
 Você também pode visualizar os dados diretamente no arquivo `db.json`.
 
@@ -48,12 +66,13 @@ Você também pode visualizar os dados diretamente no arquivo `db.json`.
 - React
 - Tailwind CSS
 - React Router DOM
-- Lucide React (ícones)
+- Lucide React 
 - Node.js / Express
 - Persistência simples em arquivo `db.json`
-- Tailwind CSS
-- React Router DOM
-- Lucide React (ícones)
+- dotenv 
+- express-rate-limit 
+- CORS 
+- OpenAI
 
 ---
 
