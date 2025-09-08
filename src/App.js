@@ -26,6 +26,11 @@ function App() {
     return children;
   }
 
+  function RedirectCadastro(){
+    const location = useLocation();
+    return <Navigate to={`/inscreva-se${location.search||''}`} replace />;
+  }
+
   return (
     <Router>
       <div
@@ -41,7 +46,7 @@ function App() {
             <Route path="/" element={<Navigate to="/home" />} />
             <Route path="/home" element={<Home />} />
             <Route path="/inscreva-se" element={<RequireAuth><Cadastro /></RequireAuth>} />
-            <Route path="/cadastro" element={<Navigate to="/inscreva-se" replace />} />
+            <Route path="/cadastro" element={<RedirectCadastro />} />
             <Route path="/faq" element={<RequireAuth><FAQ /></RequireAuth>} />
             <Route path="/jogos" element={<Jogos />} />
             <Route path="/jogos/:gameId" element={<JogoDetalhe />} />

@@ -37,6 +37,42 @@
       "nivel": "Competitivo",
       "dataCadastro": "2025-09-07T20:29:58.427Z",
       "id": "1757276998437"
+    },
+    {
+      "nomeSquad": "teste2",
+      "integrantes": [
+        "Neemias",
+        "Danilo"
+      ],
+      "jogo": "Fortnite",
+      "eventoId": 11,
+      "nivel": "Competitivo",
+      "dataCadastro": "2025-09-07T22:59:46.205Z",
+      "id": "1757285986215"
+    },
+    {
+      "nomeSquad": "aaaaaaaaaaaa",
+      "integrantes": [
+        "Neemias",
+        "Danilo"
+      ],
+      "jogo": "Fortnite",
+      "eventoId": 11,
+      "nivel": "Avançado",
+      "dataCadastro": "2025-09-07T23:09:53.356Z",
+      "id": "1757286593358"
+    },
+    {
+      "nomeSquad": "teste 3",
+      "integrantes": [
+        "Neemias",
+        "Danilo"
+      ],
+      "jogo": "Fortnite",
+      "eventoId": 11,
+      "nivel": "Intermediário",
+      "dataCadastro": "2025-09-07T23:19:23.150Z",
+      "id": "1757287163152"
     }
   ],
   "usuarios": [
@@ -317,6 +353,22 @@
         "text": "estou aguardando",
         "time": "2025-09-07T20:46:10.406Z",
         "timestamp": 1757277970406
+      },
+      {
+        "id": "1757286067977",
+        "userId": "1757275491312",
+        "username": "Neemias Silva",
+        "text": "oi",
+        "time": "2025-09-07T23:01:07.977Z",
+        "timestamp": 1757286067977
+      },
+      {
+        "id": "1757286083361",
+        "userId": "1757275491312",
+        "username": "Neemias Silva",
+        "text": "filho da p**a",
+        "time": "2025-09-07T23:01:23.361Z",
+        "timestamp": 1757286083361
       }
     ],
     "League of Legends": [],
@@ -418,6 +470,30 @@
           "text": "ja vou entrar",
           "time": "2025-09-07T20:14:48.656Z",
           "timestamp": 1757276088656
+        },
+        {
+          "id": "1757286738320",
+          "fromUserId": "1757275602282",
+          "username": "Danilo Senna",
+          "text": "aaaaaaaaaa",
+          "time": "2025-09-07T23:12:18.320Z",
+          "timestamp": 1757286738320
+        },
+        {
+          "id": "1757286851114",
+          "fromUserId": "1757275491312",
+          "username": "Neemias Silva",
+          "text": "oii",
+          "time": "2025-09-07T23:14:11.114Z",
+          "timestamp": 1757286851114
+        },
+        {
+          "id": "1757287313503",
+          "fromUserId": "1757275602282",
+          "username": "Danilo Senna",
+          "text": "oiii",
+          "time": "2025-09-07T23:21:53.503Z",
+          "timestamp": 1757287313503
         }
       ]
     },
@@ -728,17 +804,57 @@
           "timestamp": 1757277121782
         }
       ]
+    },
+    {
+      "id": "1757285986215-g",
+      "squadId": "1757285986215",
+      "name": "teste2",
+      "members": [
+        "1757275491312",
+        "1757275602282"
+      ],
+      "messages": []
+    },
+    {
+      "id": "1757286593358-g",
+      "squadId": "1757286593358",
+      "name": "aaaaaaaaaaaa",
+      "members": [
+        "1757275491312",
+        "1757275602282"
+      ],
+      "messages": []
+    },
+    {
+      "id": "1757287163152-g",
+      "squadId": "1757287163152",
+      "name": "teste 3",
+      "members": [
+        "1757275491312",
+        "1757275602282"
+      ],
+      "messages": []
     }
   ],
   "moderation": {
-    "users": {}
+    "users": {
+      "1757275491312": {
+        "infractions": [
+          {
+            "severity": 3,
+            "timestamp": 1757287249824
+          }
+        ],
+        "blockUntil": 1757373649824
+      }
+    }
   },
   "feedbackSummary": {
-    "total": 2,
+    "total": 5,
     "categories": {
-      "geral": 2
+      "geral": 5
     },
-    "lastUpdate": "2025-09-07T21:22:29.307Z",
+    "lastUpdate": "2025-09-07T23:21:19.176Z",
     "last": [
       {
         "id": "1757279850696",
@@ -752,6 +868,27 @@
         "timestamp": "2025-09-07T21:22:29.307Z",
         "category": "geral",
         "text": "Gostei Muito",
+        "rating": 5
+      },
+      {
+        "id": "1757286122695",
+        "timestamp": "2025-09-07T23:02:02.695Z",
+        "category": "geral",
+        "text": "aaaaa",
+        "rating": 5
+      },
+      {
+        "id": "1757286673464",
+        "timestamp": "2025-09-07T23:11:13.464Z",
+        "category": "geral",
+        "text": "aaaaaaaaaaaaaaaaaaaaaa",
+        "rating": 5
+      },
+      {
+        "id": "1757287279176",
+        "timestamp": "2025-09-07T23:21:19.176Z",
+        "category": "geral",
+        "text": "otimo",
         "rating": 5
       }
     ]

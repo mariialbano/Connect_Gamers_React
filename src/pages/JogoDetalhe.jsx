@@ -152,7 +152,7 @@ export default function JogoDetalhe() {
                                                     <span className="text-sm text-gray-600 dark:text-gray-300">{ev.dia} • {ev.horario}</span>
                                                 </div>
                                                     <button
-                                                    onClick={() => navigate(`/cadastro?jogo=${encodeURIComponent(game.name)}&eventoId=${ev.id}`)}
+                                                    onClick={() => navigate(`/inscreva-se?jogo=${encodeURIComponent(game.name)}&eventoId=${ev.id}`)}
                                                         className="self-start md:self-auto bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white text-sm font-medium px-4 py-2 rounded-full transition shadow"
                                                     aria-label={`Inscrever-se no evento ${ev.nome}`}
                                                 >
