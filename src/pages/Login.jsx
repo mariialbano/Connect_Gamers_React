@@ -33,14 +33,14 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!usuario || !senha || !seguranca || !compartilharDados || (modo === "cadastro" && !nome)) {
-      alert("Preencha todos os campos e aceite os termos.");
+    if (!usuario || !senha || (modo === "cadastro" && (!seguranca || !compartilharDados || !nome))) {
+      alert("Preencha todos os campos e, no cadastro, aceite os termos.");
       return;
     }
 
     const usuarioExiste = usuariosExistentes.find((u) => u.usuario === usuario);
 
-    if (modo === "cadastro") {
+  if (modo === "cadastro") {
       if (usuarioExiste) {
         alert("Este nome de usuário já está cadastrado!");
         return;
@@ -58,31 +58,35 @@ export default function Login() {
     }
 
     if (modo === "login") {
-      if (!usuarioExiste) {
-        alert("Usuário não encontrado. Verifique ou cadastre-se primeiro.");
-        return;
-      }
+        if (!usuarioExiste) {
+          alert("Usuário não encontrado. Verifique ou cadastre-se primeiro.");
+          return;
+        }
 
-      if (usuarioExiste.senha !== senha) {
-        alert("Senha incorreta!");
-        return;
-      }
-
-  localStorage.setItem("usuarioLogado", usuario);
-  localStorage.setItem("usuarioId", usuarioExiste.id);
-      alert("Login realizado com sucesso!");
-      navigate(from || "/perfil");
+        try {
+          // Chama a rota de login no backend que faz a verificação com bcrypt
+          const logged = await postItem('usuarios/login', { usuario, senha });
+          // Se retornou OK, salva info e navega
+          localStorage.setItem('usuarioLogado', logged.usuario || usuario);
+          localStorage.setItem('usuarioId', logged.id);
+          alert('Login realizado com sucesso!');
+          navigate(from || '/perfil');
+        } catch (err) {
+          // postItem lança erro se response.ok for false
+          alert('Usuário ou senha inválidos.');
+        }
     }
   };
 
   const handleEsqueciSenha = () => {
     const usuarioEncontrado = usuariosExistentes.find((u) => u.usuario === usuario);
     if (!usuario) {
-      alert("Digite seu nome de usuário para recuperar a senha.");
+      alert('Digite seu nome de usuário para recuperar a senha.');
     } else if (!usuarioEncontrado) {
-      alert("Usuário não encontrado.");
+      alert('Usuário não encontrado.');
     } else {
-      alert(`Sua senha é: ${usuarioEncontrado.senha}`);
+      // Não exibir hash ou senha armazenada. Orientar para redefinir.
+      alert('Para recuperar/resetar sua senha, cadastre-se novamente com outro usuário ou entre em contato com o suporte.');
     }
   };
 

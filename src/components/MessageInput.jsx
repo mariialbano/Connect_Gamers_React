@@ -67,7 +67,7 @@ export default function MessageInput({ onSend, blockInfo }) {
                     <p className="mt-1 text-xs md:text-sm text-amber-300">Liberação em {formatRemaining(remaining ?? blockInfo.remainingMs)}</p>
                 </div>
             )}
-            <form onSubmit={e=>{e.preventDefault(); handleSend();}} className="flex items-end gap-3" aria-disabled={blocked}>
+            <form onSubmit={e=>{e.preventDefault(); handleSend();}} className="flex items-end gap-3">
                 <textarea
                     value={text}
                     onChange={e => setText(e.target.value)}

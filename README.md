@@ -16,24 +16,15 @@ git clone https://github.com/mariialbano/Connect_Gamers_React.git
 cd Connect_Gamers_React
 ```
 
-### 2. Instale as dependências do frontend
+### 2. Instale as dependências do projeto
 
 ```bash
-npm install
+npm run install-all     #Instala dependencias do frontend e backend
 ```
-
-#### Depois instale as dependências do backend:
-
-```bash
-cd backend        # acessa o diretório do backend
-npm install       # instala dependências do backend
-cd ..             # retorna um diretório (diretório raiz)
-```
-
 ### 3. Inicie o projeto
 
 ```bash
-npm run dev        
+npm run dev
 ```
 
 Abra [http://localhost:3000/] no navegador para visualizar o app.
@@ -73,6 +64,7 @@ Você também pode visualizar os dados diretamente no arquivo `db.json`.
 - express-rate-limit 
 - CORS 
 - OpenAI
+- Bcrypt
 
 ---
 
@@ -153,5 +145,5 @@ Fique à vontade para abrir uma issue ou contribuir com melhorias!
 - [Ana Julia Gonçalves](https://github.com/dsgana)
 - [Jéssica Brito](https://github.com/jessbrt19)
 - [Mariana Albano](https://github.com/mariialbano)
-- [Neemias Silva](https://github.com/neemiasv)
+- [Neemias Silva](https://github.com/neemiasjls)
 - [Danilo Senna](https://github.com/)

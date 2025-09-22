@@ -105,6 +105,12 @@
       "usuario": "MarianaAlbano",
       "senha": "Mariana123*",
       "id": "1757275766810"
+    },
+    {
+      "nome": "Neemias Silva",
+      "usuario": "NeemiasTesteBcrypt",
+      "senha": "$2b$10$sGc56YtaqHlVp3rJqOwGs.BvKvf/QCEKtaf7D8uiNidRx0qRX5equ",
+      "id": "1758579908903"
     }
   ],
   "jogos": [
