@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import Perfil from './pages/Perfil';
 import Comunidade from './pages/Comunidade';
 import Amigos from './pages/Amigos';
+import Dashboard from './pages/Dashboard'
 import { useTheme } from './theme/ThemeContext';
 
 function App() {
@@ -52,6 +53,7 @@ function App() {
             <Route path="/jogos/:gameId" element={<JogoDetalhe />} />
             <Route path="/login" element={<Login />} />
             <Route path="/perfil" element={<Perfil />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/comunidade" element={<RequireAuth><Comunidade /></RequireAuth>} />
             <Route path="/amigos" element={<RequireAuth><Amigos /></RequireAuth>} />
           </Routes>

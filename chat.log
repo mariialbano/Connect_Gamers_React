@@ -27,3 +27,4 @@
 {"type":"private","users":["1757275602282","1757275491312"],"message":{"id":"1757286738320","fromUserId":"1757275602282","username":"Danilo Senna","text":"aaaaaaaaaa","time":"2025-09-07T23:12:18.320Z","timestamp":1757286738320}}
 {"type":"private","users":["1757275491312","1757275602282"],"message":{"id":"1757286851114","fromUserId":"1757275491312","username":"Neemias Silva","text":"oii","time":"2025-09-07T23:14:11.114Z","timestamp":1757286851114}}
 {"type":"private","users":["1757275602282","1757275491312"],"message":{"id":"1757287313503","fromUserId":"1757275602282","username":"Danilo Senna","text":"oiii","time":"2025-09-07T23:21:53.503Z","timestamp":1757287313503}}
+{"type":"channel","channel":"Geral","message":{"id":"1759879024845","userId":"1759878977623","username":"Mariana","text":"ooi","time":"2025-10-07T23:17:04.845Z","timestamp":1759879024845}}

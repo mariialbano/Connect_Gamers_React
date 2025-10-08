@@ -375,6 +375,14 @@
         "text": "filho da p**a",
         "time": "2025-09-07T23:01:23.361Z",
         "timestamp": 1757286083361
+      },
+      {
+        "id": "1759879024845",
+        "userId": "1759878977623",
+        "username": "Mariana",
+        "text": "ooi",
+        "time": "2025-10-07T23:17:04.845Z",
+        "timestamp": 1759879024845
       }
     ],
     "League of Legends": [],
@@ -517,7 +525,8 @@
     "1757275602282": "Disponível",
     "1757275491312": "Disponível",
     "1757275558975": "Ausente",
-    "1757275766810": "Não perturbar"
+    "1757275766810": "Não perturbar",
+    "1759878977623": "Invisível"
   },
   "friendRequests": [
     {
