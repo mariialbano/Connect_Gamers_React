@@ -24,3 +24,4 @@
 {"time":"2025-10-10T18:14:59.166Z","ip":"::1","usuario":"Danilo","userId":"1759865296354","cargo":"organizador","ok":true}
 {"time":"2025-10-10T18:15:04.667Z","ip":"::1","usuario":"Danilo","ok":false,"reason":"wrong_password","userId":"1759865296354"}
 {"time":"2025-10-10T18:15:07.205Z","ip":"::1","usuario":"Danilo","userId":"1759865296354","cargo":"organizador","ok":true}
+{"time":"2025-10-10T19:49:13.762Z","ip":"::1","usuario":"Danilo","userId":"1759865296354","cargo":"organizador","ok":true}

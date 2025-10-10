@@ -99,13 +99,13 @@ export default function Dashboard() {
     const [erro, setErro] = useState(null);
     const [carregando, setCarregando] = useState(true);
     const [carregandoSquads, setCarregandoSquads] = useState(true);
-    // Filtro global (aplica em todos os gráficos) presets + custom
-    const [globalRange, setGlobalRange] = useState('7d'); // 7d | 30d | 60d | 6m | 1y | custom
+    // Filtro global
+    const [globalRange, setGlobalRange] = useState('7d'); 
     const [customStart, setCustomStart] = useState('');
     const [customEnd, setCustomEnd] = useState('');
-    // Filtros da tabela de usuários
+    // Filtro usuários
     const [userSearch, setUserSearch] = useState('');
-    const [userRole, setUserRole] = useState('todos'); // todos | user | organizador | admin
+    const [userRole, setUserRole] = useState('todos');
     const [createdStart, setCreatedStart] = useState('');
     const [createdEnd, setCreatedEnd] = useState('');
 
@@ -126,7 +126,6 @@ export default function Dashboard() {
                 const dataSq = await getItem('squads');
                 if (ativo) setSquads(Array.isArray(dataSq) ? dataSq : []);
             } catch (err) {
-                // não trava dashboard se squads falhar
             } finally {
                 if (ativo) setCarregandoSquads(false);
             }
@@ -152,7 +151,6 @@ export default function Dashboard() {
             ? 42
             : Math.min(100, Math.round((recentes / Math.max(totalUsuarios, 1)) * 55 + 38));
 
-        // Série mensal (12 meses) para análise preditiva
         const months = getLastMonths(12);
         const rangeStart = months[0];
         const monthKeys = months.map((month) => `${month.getFullYear()}-${month.getMonth()}`);
@@ -193,7 +191,6 @@ export default function Dashboard() {
             }
         });
 
-        // Série mensal agregada
         let monthlyGrowthSeries = [];
         let simulatedGrowth = false;
         if (hasAnyTimestamp) {
@@ -211,10 +208,9 @@ export default function Dashboard() {
             });
         }
 
-        // Série diária de 1 ano (365 dias)
         const nowDate = new Date();
         const startDaily = new Date(nowDate);
-        startDaily.setDate(startDaily.getDate() - 364); // total 365 dias incluindo hoje
+        startDaily.setDate(startDaily.getDate() - 364);
         let baselineDaily = 0;
         const creationDates = usuarios.map(u => u.createdAt || u.Data).filter(Boolean).map(d => new Date(d)).filter(d => !Number.isNaN(d));
         creationDates.forEach(d => { if (d < startDaily) baselineDaily += 1; });
@@ -233,7 +229,6 @@ export default function Dashboard() {
             const pointDate = new Date(cursor);
             growthHistory.push({ date: pointDate, value: runningDaily });
         }
-        // Se simulado (sem timestamps) criar histórico diário sintético
         if (!hasAnyTimestamp) {
             growthHistory.length = 0;
             const fallbackBase = totalUsuarios || 8;
@@ -274,7 +269,6 @@ export default function Dashboard() {
     }, [analytics.retentionSeries]);
 
     const predictiveWindow = useMemo(() => {
-        // Determina janela
         const mapDays = { '7d': 7, '30d': 30, '60d': 60, '6m': 180, '1y': 365 };
         const MS_DAY = 24 * 60 * 60 * 1000;
         const agora = Date.now();
@@ -284,13 +278,12 @@ export default function Dashboard() {
             inicioMs = Number.isFinite(s) ? s : (agora - 30 * MS_DAY);
             if (customEnd) {
                 const e = new Date(customEnd).getTime();
-                if (Number.isFinite(e)) fimMs = e + (23 * 60 * 60 * 1000); // inclui dia final
+                if (Number.isFinite(e)) fimMs = e + (23 * 60 * 60 * 1000);
             }
         } else {
             const dias = mapDays[globalRange] || 7;
             inicioMs = agora - dias * MS_DAY;
         }
-        // Normaliza para meia-noite
         const startDate = new Date(new Date(inicioMs).toDateString());
         const endDate = new Date(new Date(fimMs).toDateString());
         const periodDays = Math.max(1, Math.round((endDate - startDate) / MS_DAY) + 1);
@@ -299,9 +292,7 @@ export default function Dashboard() {
             const dates = records.map(getDate).filter(Boolean).map(d => new Date(d)).filter(d => !Number.isNaN(d));
             const startMs = startDate.getTime();
             const endMs = endDate.getTime();
-            // baseline: registros anteriores ao início
             const baseline = dates.filter(d => d.getTime() < startMs).length;
-            // contagem diária dentro da janela
             const addsByDay = {};
             dates.forEach(d => {
                 const t = d.getTime();
@@ -310,7 +301,6 @@ export default function Dashboard() {
                     addsByDay[key] = (addsByDay[key] || 0) + 1;
                 }
             });
-            // série cumulativa diária na janela
             const cumulative = [];
             let running = baseline;
             const dayKeys = [];
@@ -321,7 +311,6 @@ export default function Dashboard() {
                 cumulative.push(running);
             }
 
-            // regressão se houver ao menos 3 pontos; projeta até o fim do próximo período de mesmo tamanho
             let nextPeriod = cumulative[cumulative.length - 1] || baseline;
             let trend = 'estável';
             if (cumulative.length >= 3) {
@@ -338,23 +327,36 @@ export default function Dashboard() {
             // médias e crescimento por período
             const totalAdds = cumulative.length ? (cumulative[cumulative.length - 1] - baseline) : 0;
             const avgPerDay = totalAdds / periodDays;
-            const avgPerPeriod = Math.max(0, avgPerDay * periodDays);
+            const avgPerPeriod = Math.max(0, avgPerDay);
 
-            // taxa de crescimento: compara média diária da primeira metade vs segunda metade
+            // taxa de crescimento
             let growthRate = null;
-            if (periodDays >= 4) {
+            if (periodDays >= 2) {
                 const mid = Math.floor(periodDays / 2);
+                const secondHalfDays = periodDays - mid;
                 let sum1 = 0, sum2 = 0;
+                
                 for (let i = 0; i < mid; i++) {
-                    const key = dayKeys[i]; sum1 += (addsByDay[key] || 0);
+                    const key = dayKeys[i];
+                    sum1 += (addsByDay[key] || 0);
                 }
                 for (let i = mid; i < periodDays; i++) {
-                    const key = dayKeys[i]; sum2 += (addsByDay[key] || 0);
+                    const key = dayKeys[i];
+                    sum2 += (addsByDay[key] || 0);
                 }
-                const avg1 = sum1 / Math.max(1, mid);
-                const avg2 = sum2 / Math.max(1, periodDays - mid);
+                
+                // Calcular médias diárias de cada metade
+                const avg1 = sum1 / mid;
+                const avg2 = sum2 / secondHalfDays;
+                
+                // Calcular taxa de crescimento entre médias
                 if (avg1 > 0) {
                     growthRate = ((avg2 - avg1) / avg1) * 100;
+                } else if (avg2 > 0) {
+                    // Se não há registros na 1ª metade mas há na 2ª, marcar como crescimento infinito/máximo
+                    growthRate = null; // Será exibido como "—" ou texto específico
+                } else {
+                    growthRate = 0;
                 }
             }
 
@@ -365,8 +367,6 @@ export default function Dashboard() {
         const squadsPred = buildPredictiveFrom(squads, (s) => s.dataCadastro || s.createdAt);
         return { users: usersPred, squads: squadsPred };
     }, [usuarios, squads, globalRange, customStart, customEnd]);
-
-    // squadsPredictive removido; projeções passaram a usar predictiveWindow
 
     const insights = useMemo(() => {
         const lista = [];
@@ -419,7 +419,6 @@ export default function Dashboard() {
         return lista;
     }, [analytics, retentionAverage, predictiveWindow]);
 
-    // Distribuição por jogo das inscrições (squads) conforme período global
     const gameDistribution = useMemo(() => {
         const mapDays = { '7d': 7, '30d': 30, '60d': 60, '6m': 180, '1y': 365 };
         const agora = Date.now();
@@ -430,10 +429,10 @@ export default function Dashboard() {
             if (customEnd) {
                 const e = new Date(customEnd).getTime();
                 if (Number.isFinite(e)) {
-                    if (e < s) { // se usuário escolheu invertido, troca
+                    if (e < s) {
                         inicioMs = e; fimMs = s;
                     } else {
-                        fimMs = e + (23 * 60 * 60 * 1000); // inclui dia final
+                        fimMs = e + (23 * 60 * 60 * 1000);
                     }
                 }
             }
@@ -475,7 +474,7 @@ export default function Dashboard() {
         const cx = radius;
         const cy = radius;
         const total = data.reduce((a, b) => a + b.value, 0) || 1;
-        let startAngle = -90; // inicia no topo
+        let startAngle = -90;
         const slices = data.map((d, idx) => {
             const angle = (d.value / total) * 360;
             const endAngle = startAngle + angle;
@@ -536,18 +535,15 @@ export default function Dashboard() {
                             <li key={d.name} className="flex items-center gap-2">
                                 <span className="inline-block w-3 h-3 rounded-sm" style={{ background: slices[i].color }}></span>
                                 <span className="font-medium" title={d.name}>{d.name}</span>
-                                {/* Para garantir contraste AA, não usamos o mesmo tom claro/indigo para o texto; usamos classes tema-aware */}
                                 <span className="font-semibold text-gray-900 dark:text-gray-100" aria-label={`Percentual de ${d.name}`}>{d.percent.toFixed(1)}%</span>
                             </li>
                         ))}
                     </ul>
                 </div>
-                {/* Contagem movida para o topo */}
             </div>
         );
     };
 
-    // Série de crescimento filtrada pelo período global usando histórico diário para granularidade
     const filteredGrowthSeries = useMemo(() => {
         const mapDays = { '7d': 7, '30d': 30, '60d': 60, '6m': 180, '1y': 365 };
         const agora = Date.now();
@@ -571,7 +567,6 @@ export default function Dashboard() {
             return t >= inicioMs && t <= fimMs;
         });
         if (!filtrado.length) return [];
-        // Reduzir quantidade de labels para evitar poluição visual
         const step = Math.ceil(filtrado.length / 8);
         return filtrado.map((p, idx) => ({
             value: p.value,
@@ -580,11 +575,6 @@ export default function Dashboard() {
         }));
     }, [analytics.growthHistory, globalRange, customStart, customEnd]);
 
-    // Retenção semanal removida da seção inferior
-
-    // Removidas variáveis derivadas de predictiveAnalysis (não utilizadas)
-
-    // Último valor da série de crescimento (para exibir inline no header)
     const lastGrowthValue = filteredGrowthSeries.length
         ? filteredGrowthSeries[filteredGrowthSeries.length - 1].value
         : (analytics.monthlyGrowthSeries.length
@@ -658,8 +648,6 @@ export default function Dashboard() {
 
             {predictiveWindow && (
                 <>
-                    {/* Título e filtro serão renderizados dentro da section abaixo */}
-                    {/* Seção única para preditivo, gráficos e demais análises */}
                     <section className="bg-white dark:bg-gray-900/60 border border-pink-100 dark:border-gray-700 rounded-xl shadow-lg p-6 md:p-8 mt-6" aria-label="Visualizações e análises">
                         {/* Header da Análise Preditiva movido para dentro */}
                         <div className="flex items-center gap-3 mb-4">
@@ -668,7 +656,6 @@ export default function Dashboard() {
                                 <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">Projeções baseadas em regressão linear e tendências matemáticas</p>
                             </div>
                         </div>
-                        {/* Filtro por período logo abaixo do título */}
                         <div className="mb-6 flex items-center gap-3 flex-wrap">
                             <div className="flex gap-1">
                                 {[
@@ -769,13 +756,11 @@ export default function Dashboard() {
                                 }</p>
                                 <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1">novas inscrições no período</p>
                             </div>
-                            {/* 5) Inscrições (próx. mês) */}
                             <div className="bg-white dark:bg-gray-900/70 border border-pink-100 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-all duração-200 p-6 flex flex-col justify-between group hover:scale-[1.02]">
                                 <p className="text-[10px] font-semibold text-pink-600 dark:text-pink-400 uppercase tracking-wide mb-2">Previsão de Inscrições para o próximo período</p>
                                 <p className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-gray-100">{predictiveWindow ? numberFormatter.format((predictiveWindow.squads.nextPeriod || predictiveWindow.squads.nextMonth) || 0) : '—'}</p>
                                 <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1">novas inscrições previstas</p>
                             </div>
-                            {/* 6) Taxa de Crescimento (Inscrições) */}
                             <div className="bg-white dark:bg-gray-900/70 border border-pink-100 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-all duração-200 p-6 flex flex-col justify-between group hover:scale-[1.02]">
                                 <p className="text-[10px] font-semibold text-pink-600 dark:text-pink-400 uppercase tracking-wide mb-2">Taxa de Crescimento de Inscrições</p>
                                 <p className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-gray-100">{predictiveWindow && Number.isFinite(predictiveWindow.squads.growthRate) ? `${predictiveWindow.squads.growthRate.toFixed(1)}%` : '—'}</p>
@@ -798,7 +783,6 @@ export default function Dashboard() {
                                     <div className="flex-1 flex">
                                         <UserGrowthChart data={filteredGrowthSeries} simulated={analytics.simulatedGrowth} height={80} />
                                     </div>
-                                    {/* Período aplicado via filtro global acima */}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-3">
@@ -808,7 +792,6 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        {/* Bloco de Retenção (semanal) removido conforme solicitado */}
                         <div className="mt-8 pt-8 border-t border-pink-200 dark:border-gray-700">
                             <h3 className="text-sm font-bold text-pink-700 dark:text-pink-400 uppercase tracking-wider mb-4">Insights Automáticos</h3>
                             <div className="grid md:grid-cols-2 gap-4" aria-label="Insights gerados automaticamente">

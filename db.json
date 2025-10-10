@@ -38,6 +38,18 @@
       "nivel": "Competitivo",
       "dataCadastro": "2025-10-08T23:28:10.377Z",
       "id": "1759966090381"
+    },
+    {
+      "nomeSquad": "CarSoccer",
+      "integrantes": [
+        "Danilo",
+        "Mariana"
+      ],
+      "jogo": "Rocket League",
+      "eventoId": 4,
+      "nivel": "Intermediário",
+      "dataCadastro": "2025-10-10T19:48:50.222Z",
+      "id": "1760125730235"
     }
   ],
   "usuarios": [
@@ -103,6 +115,15 @@
       "id": "1760040963896",
       "createdAt": "2025-10-09T20:16:03.896Z",
       "Data": "2025-10-09T20:16:03.896Z"
+    },
+    {
+      "nome": "TESTE",
+      "usuario": "teste",
+      "senha": "$2b$10$YOkWwQ6l71yUsHJ2NGBSFOEJAeWun9baRFhFSDRqu/Vam.aJvsnAW",
+      "cargo": "user",
+      "id": "1760125748733",
+      "createdAt": "2025-10-10T19:49:08.733Z",
+      "Data": "2025-10-10T19:49:08.733Z"
     }
   ],
   "jogos": [
@@ -585,6 +606,16 @@
       "members": [
         "1759866873862",
         "1759865232559"
+      ],
+      "messages": []
+    },
+    {
+      "id": "1760125730235-g",
+      "squadId": "1760125730235",
+      "name": "CarSoccer",
+      "members": [
+        "1759865296354",
+        "1759865360978"
       ],
       "messages": []
     }
