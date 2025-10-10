@@ -5,9 +5,31 @@ const router = express.Router();
 const { aiModerate } = require('../moderacaoIA');
 const { isBlocked, applyPenalty, clearActiveBlocks, clearUserHistory } = require('../penalidade');
 
-const logPath = path.join(__dirname, '../../chat.log');
-function logMessage(entry){
-    try { fs.appendFileSync(logPath, JSON.stringify(entry)+"\n"); } catch(e) {}
+const logsDir = path.join(__dirname, '../../logs');
+const chatLogPath = path.join(logsDir, 'chat.log');
+function ensureLogsDir() { try { if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true }); } catch (e) { } }
+function logMessage(entry) {
+    // Normaliza antes de persistir no log
+    try {
+        const cloned = { ...entry };
+        if (cloned.message) {
+            const m = { ...cloned.message };
+            const messageId = m.messageId || m.id || Date.now().toString();
+            const authorId = m.id || m.userId || m.fromUserId;
+            const normalized = {
+                messageId: String(messageId),
+                id: String(authorId || messageId),
+                username: m.username,
+                text: m.text,
+                time: m.time || new Date().toISOString()
+            };
+            if (m.role) normalized.role = m.role;
+            if (m.avatar) normalized.avatar = m.avatar;
+            cloned.message = normalized;
+        }
+        ensureLogsDir();
+        fs.appendFileSync(chatLogPath, JSON.stringify(cloned) + "\n");
+    } catch (e) { }
 }
 
 const dbPath = path.join(__dirname, '../../db.json');
@@ -34,35 +56,40 @@ const DEFAULT_CHANNELS = [
     'CS2'
 ];
 
-router.get('/log', (req,res)=>{
-    const { type, limit='100', offset='0' } = req.query;
-    let data=[];
-    try{
-        if(fs.existsSync(logPath)){
-            const lines = fs.readFileSync(logPath,'utf8').trim().split(/\n+/).filter(l=>l);
-            lines.forEach(l=>{ try{ const o=JSON.parse(l); if(!type || o.type===type) data.push(o);}catch(e){} });
+router.get('/log', (req, res) => {
+    const { type, limit = '100', offset = '0' } = req.query;
+    let data = [];
+    try {
+        if (fs.existsSync(chatLogPath)) {
+            const lines = fs.readFileSync(chatLogPath, 'utf8').trim().split(/\n+/).filter(l => l);
+            lines.forEach(l => { try { const o = JSON.parse(l); if (!type || o.type === type) data.push(o); } catch (e) { } });
         }
-    }catch(e){ return res.status(500).json({ error:'Falha ao ler log'}); }
-    const off = Math.max(parseInt(offset)||0,0);
-    const lim = Math.min(Math.max(parseInt(limit)||50,1),500);
-    const slice = data.slice(-1 * (off+lim), data.length - off || undefined);
-    res.json({ total:data.length, returned:slice.length, items:slice });
+    } catch (e) { return res.status(500).json({ error: 'Falha ao ler log' }); }
+    const off = Math.max(parseInt(offset) || 0, 0);
+    const lim = Math.min(Math.max(parseInt(limit) || 50, 1), 500);
+    const slice = data.slice(-1 * (off + lim), data.length - off || undefined);
+    res.json({ total: data.length, returned: slice.length, items: slice });
 });
 
-router.get('/chatlog', (req,res)=>{
-    try{
-        if(!fs.existsSync(logPath)) return res.status(404).send('Log vazio');
-        res.setHeader('Content-Type','text/plain; charset=utf-8');
-        res.send(fs.readFileSync(logPath,'utf8'));
-    }catch(e){ res.status(500).send('Erro lendo log'); }
+router.get('/chatlog', (req, res) => {
+    try {
+        if (!fs.existsSync(chatLogPath)) return res.status(404).send('Log vazio');
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.send(fs.readFileSync(chatLogPath, 'utf8'));
+    } catch (e) { res.status(500).send('Erro lendo log'); }
 });
 
 router.get('/channels', (req, res) => {
     const db = readDB();
     ensureStructures(db);
+    // Garante canais padrão visíveis na Comunidade
     DEFAULT_CHANNELS.forEach(ch => { if (!db.chatChannels[ch]) db.chatChannels[ch] = []; });
     writeDB(db);
-    const result = Object.keys(db.chatChannels).map(ch => ({ name: ch, count: db.chatChannels[ch].length }));
+    // Esconde canais "Avisos" por jogo (ids de jogos) da lista da Comunidade
+    const gameIds = new Set(Array.isArray(db.jogos) ? db.jogos.map(j => String(j.id)) : []);
+    const result = Object.keys(db.chatChannels)
+        .filter(ch => !gameIds.has(String(ch)))
+        .map(ch => ({ name: ch, count: db.chatChannels[ch].length }));
     res.json(result);
 });
 
@@ -72,59 +99,108 @@ router.get('/messages/:channel', (req, res) => {
     const db = readDB();
     ensureStructures(db);
     if (!db.chatChannels[channel]) db.chatChannels[channel] = [];
-    let changed = false;
-    db.chatChannels[channel].forEach(m => {
-        if (!m.timestamp) {
-            const ts = m.time ? Date.parse(m.time) : (Number(m.id) || Date.now());
-            if (ts && !isNaN(ts)) { m.timestamp = ts; changed = true; }
-        }
-    });
-    if (changed) writeDB(db);
     res.json(db.chatChannels[channel]);
 });
 
 // Enviar mensagem para um canal
 router.post('/messages/:channel', async (req, res) => {
     const { channel } = req.params;
-    const { userId, username, avatar, text } = req.body;
-    if (!text || !userId) return res.status(400).json({ error: 'userId e text são obrigatórios' });
+    const { id, userId: legacyUserId, username, avatar, text } = req.body;
+    const senderId = id || legacyUserId;
+    if (!text || !senderId) return res.status(400).json({ error: 'id e text são obrigatórios' });
 
     // Verifica bloqueio existente
-    const block = isBlocked(userId);
-    if(block.blocked){
-        return res.status(423).json({ error:'Usuário bloqueado temporariamente', blockUntil: block.blockUntil });
+    const block = isBlocked(senderId);
+    if (block.blocked) {
+        return res.status(423).json({ error: 'Usuário bloqueado temporariamente', blockUntil: block.blockUntil });
     }
 
     const moderation = await aiModerate(text);
     if (!moderation.allowed) {
         // Aplica penalidade severity 3
-        const penalty = applyPenalty(userId, 3);
+        const penalty = applyPenalty(senderId, 3);
         return res.status(400).json({ error: 'Mensagem bloqueada por violar políticas.', reasons: moderation.reasons, severity: moderation.severity, penalty });
     }
-    if(moderation.severity === 2){
-        const penalty = applyPenalty(userId, 2);
-        if(penalty?.applied){
+    if (moderation.severity === 2) {
+        const penalty = applyPenalty(senderId, 2);
+        if (penalty?.applied) {
             // Nota de aviso pode ser retornada
         }
     }
 
     const db = readDB();
     ensureStructures(db);
+    // Se o canal for de um jogo (id de jogo), restringe envio a admin/organizador
+    const isGameChannel = Array.isArray(db.jogos) && db.jogos.some(j => String(j.id) === String(channel));
+    if (isGameChannel) {
+        const sender = (db.usuarios || []).find(u => String(u.id) === String(senderId));
+        const role = String((sender?.cargo || sender?.nivelAcesso || 'user')).toLowerCase();
+        if (role !== 'admin' && role !== 'organizador') {
+            return res.status(403).json({ error: 'Apenas organizadores e admins podem enviar mensagens neste chat.' });
+        }
+        // role válido para mensagens de canal de jogo
+        req._senderRole = role;
+    }
     if (!db.chatChannels[channel]) db.chatChannels[channel] = [];
     const now = Date.now();
     const message = {
-        id: now.toString(),
-        userId,
+        messageId: now.toString(),
+        id: senderId,
         username,
         text: moderation.filteredText,
-        time: new Date(now).toISOString(),
-        timestamp: now
+        time: new Date(now).toISOString()
     };
-    if (avatar) message.avatar = avatar; 
+    // inclui cargo/role quando disponível
+    if (req._senderRole) message.role = req._senderRole;
+    if (avatar) message.avatar = avatar;
+    // Inicializa reações como mapa emoji -> [userIds]
+    message.reactions = {};
     db.chatChannels[channel].push(message);
     writeDB(db);
-    logMessage({ type:'channel', channel, message });
+    logMessage({ type: 'channel', channel, message });
     res.status(201).json(message);
+});
+
+// Limpar mensagens de um canal (somente admin/organizador)
+router.post('/messages/:channel/clear', (req, res) => {
+    const { channel } = req.params;
+    const { id: actorId } = req.body || {};
+    if (!actorId) return res.status(400).json({ error: 'id do solicitante é obrigatório' });
+    const db = readDB(); ensureStructures(db);
+    const actor = (db.usuarios || []).find(u => String(u.id) === String(actorId));
+    const role = String((actor?.cargo || actor?.nivelAcesso || 'user')).toLowerCase();
+    if (role !== 'admin' && role !== 'organizador') {
+        return res.status(403).json({ error: 'Apenas organizadores e admins podem limpar o chat.' });
+    }
+    if (!db.chatChannels[channel]) db.chatChannels[channel] = [];
+    db.chatChannels[channel] = [];
+    writeDB(db);
+    // removed chat_requests log
+    res.json({ ok: true, cleared: channel });
+});
+
+// Reagir a uma mensagem com emoji (toggle)
+router.post('/messages/:channel/:messageId/react', (req, res) => {
+    const { channel, messageId } = req.params;
+    const { userId, emoji } = req.body || {};
+    if (!userId || !emoji) return res.status(400).json({ error: 'userId e emoji são obrigatórios' });
+    const db = readDB(); ensureStructures(db);
+    if (!db.chatChannels[channel]) db.chatChannels[channel] = [];
+    const msg = db.chatChannels[channel].find(m => String(m.messageId) === String(messageId));
+    if (!msg) return res.status(404).json({ error: 'Mensagem não encontrada' });
+    if (!msg.reactions || typeof msg.reactions !== 'object') msg.reactions = {};
+    const key = String(emoji);
+    const set = new Set(Array.isArray(msg.reactions[key]) ? msg.reactions[key].map(String) : []);
+    const uid = String(userId);
+    if (set.has(uid)) {
+        set.delete(uid);
+    } else {
+        set.add(uid);
+    }
+    msg.reactions[key] = Array.from(set);
+    writeDB(db);
+    // removed chat_requests log
+    res.json({ ok: true, messageId, reactions: msg.reactions });
 });
 
 // Chat privado
@@ -145,19 +221,20 @@ router.get('/private/:userA/:userB', (req, res) => {
 // Enviar mensagem
 router.post('/private/:userA/:userB', async (req, res) => {
     const { userA, userB } = req.params;
-    const { fromUserId, text, username } = req.body;
-    if (!text || !fromUserId) return res.status(400).json({ error: 'fromUserId e text são obrigatórios' });
-    const block = isBlocked(fromUserId);
-    if(block.blocked){
-        return res.status(423).json({ error:'Usuário bloqueado temporariamente', blockUntil: block.blockUntil });
+    const { id, fromUserId: legacyFromId, text, username } = req.body;
+    const senderId = id || legacyFromId;
+    if (!text || !senderId) return res.status(400).json({ error: 'id e text são obrigatórios' });
+    const block = isBlocked(senderId);
+    if (block.blocked) {
+        return res.status(423).json({ error: 'Usuário bloqueado temporariamente', blockUntil: block.blockUntil });
     }
     const moderation = await aiModerate(text);
     if (!moderation.allowed) {
-        const penalty = applyPenalty(fromUserId, 3);
+        const penalty = applyPenalty(senderId, 3);
         return res.status(400).json({ error: 'Mensagem bloqueada por violar políticas.', reasons: moderation.reasons, severity: moderation.severity, penalty });
     }
-    if(moderation.severity === 2){
-        applyPenalty(fromUserId, 2);
+    if (moderation.severity === 2) {
+        applyPenalty(senderId, 2);
     }
     const db = readDB();
     ensureStructures(db);
@@ -168,10 +245,10 @@ router.post('/private/:userA/:userB', async (req, res) => {
         db.privateChats.push(convo);
     }
     const now = Date.now();
-    const message = { id: now.toString(), fromUserId, username, text: moderation.filteredText, time: new Date(now).toISOString(), timestamp: now };
+    const message = { messageId: now.toString(), id: senderId, username, text: moderation.filteredText, time: new Date(now).toISOString() };
     convo.messages.push(message);
     writeDB(db);
-    logMessage({ type:'private', users:[userA,userB], message });
+    logMessage({ type: 'private', users: [userA, userB], message });
     res.status(201).json(message);
 });
 
@@ -191,85 +268,78 @@ router.get('/group/:id/messages', (req, res) => {
     const db = readDB(); ensureStructures(db);
     const g = (db.groupChats || []).find(g => g.id === req.params.id);
     if (!g) return res.status(404).json({ error: 'Grupo não encontrado' });
-    let changed = false;
-    (g.messages||[]).forEach(m => {
-        if (!m.timestamp){
-            const ts = m.time ? Date.parse(m.time) : (Number(m.id)||Date.now());
-            if (ts && !isNaN(ts)) { m.timestamp = ts; changed = true; }
-        }
-    });
-    if (changed) writeDB(db);
     res.json(g.messages || []);
 });
 
 // Enviar mensagem para grupo
 router.post('/group/:id/messages', async (req, res) => {
-    const { fromUserId, username, text } = req.body || {};
-    if (!fromUserId || !text) return res.status(400).json({ error: 'fromUserId e text são obrigatórios' });
-    const block = isBlocked(fromUserId);
-    if(block.blocked){
-        return res.status(423).json({ error:'Usuário bloqueado temporariamente', blockUntil: block.blockUntil });
+    const { id, fromUserId: legacyFromId, username, text } = req.body || {};
+    const senderId = id || legacyFromId;
+    if (!senderId || !text) return res.status(400).json({ error: 'id e text são obrigatórios' });
+    const block = isBlocked(senderId);
+    if (block.blocked) {
+        return res.status(423).json({ error: 'Usuário bloqueado temporariamente', blockUntil: block.blockUntil });
     }
     const moderation = await aiModerate(text);
     if (!moderation.allowed) {
-        const penalty = applyPenalty(fromUserId, 3);
+        const penalty = applyPenalty(senderId, 3);
         return res.status(400).json({ error: 'Mensagem bloqueada por violar políticas.', reasons: moderation.reasons, severity: moderation.severity, penalty });
     }
-    if(moderation.severity === 2){
-        applyPenalty(fromUserId, 2);
+    if (moderation.severity === 2) {
+        applyPenalty(senderId, 2);
     }
     const db = readDB(); ensureStructures(db);
     const g = (db.groupChats || []).find(g => g.id === req.params.id);
     if (!g) return res.status(404).json({ error: 'Grupo não encontrado' });
-    if (!g.members.includes(fromUserId)) return res.status(403).json({ error: 'Não participante do grupo' });
+    if (!g.members.includes(senderId)) return res.status(403).json({ error: 'Não participante do grupo' });
     const now = Date.now();
-    const message = { id: now.toString(), fromUserId, username, text: moderation.filteredText, time: new Date(now).toISOString(), timestamp: now };
+    const message = { messageId: now.toString(), id: senderId, username, text: moderation.filteredText, time: new Date(now).toISOString() };
     g.messages.push(message);
     writeDB(db);
-    logMessage({ type:'group', groupId:g.id, squadId:g.squadId, message });
+    logMessage({ type: 'group', groupId: g.id, squadId: g.squadId, message });
     res.status(201).json(message);
 });
 
 // Estado de bloqueio de um usuário (para UI exibir aviso)
-router.get('/block-status/:userId', (req,res)=>{
+router.get('/block-status/:userId', (req, res) => {
     const { userId } = req.params;
-    if(!userId) return res.status(400).json({ error:'userId obrigatório'});
+    if (!userId) return res.status(400).json({ error: 'userId obrigatório' });
     try {
         // Lê DB direto para expor histórico de infrações básicas ao cliente (somente metadados).
         const db = readDB();
         let history = [];
-        if(db.moderation && db.moderation.users && db.moderation.users[userId]){
-            history = (db.moderation.users[userId].infractions||[]).slice(-5).map(i=>({ severity:i.severity, timestamp:i.timestamp }));
+        if (db.moderation && db.moderation.users && db.moderation.users[userId]) {
+            history = (db.moderation.users[userId].infractions || []).slice(-5).map(i => ({ severity: i.severity, timestamp: i.timestamp }));
         }
         const block = isBlocked(userId);
-        if(block.blocked){
+        if (block.blocked) {
             const remainingMs = Math.max(block.blockUntil - Date.now(), 0);
-            return res.json({ blocked:true, blockUntil:block.blockUntil, remainingMs, recentInfractions: history });
+            return res.json({ blocked: true, blockUntil: block.blockUntil, remainingMs, recentInfractions: history });
         }
-        return res.json({ blocked:false, recentInfractions: history });
-    } catch(e){
-        res.status(500).json({ error:'Falha ao verificar bloqueio'});
+        return res.json({ blocked: false, recentInfractions: history });
+    } catch (e) {
+        res.status(500).json({ error: 'Falha ao verificar bloqueio' });
     }
 });
 
 // Desbloqueia apenas usuários atualmente bloqueados (mantém histórico de infrações)
-router.post('/clear-active-blocks', (req,res)=>{
+router.post('/clear-active-blocks', (req, res) => {
     try {
         const result = clearActiveBlocks();
-        res.json({ ok:true, ...result });
-    } catch(e){
-        res.status(500).json({ error:'Falha ao limpar bloqueios ativos' });
+        res.json({ ok: true, ...result });
+    } catch (e) {
+        res.status(500).json({ error: 'Falha ao limpar bloqueios ativos' });
     }
 });
 
 // Limpa histórico (infrações + bloqueio) de um usuário específico
-router.post('/clear-user-history/:userId', (req,res)=>{
+router.post('/clear-user-history/:userId', (req, res) => {
     const { userId } = req.params;
-    if(!userId) return res.status(400).json({ error:'userId obrigatório' });
+    if (!userId) return res.status(400).json({ error: 'userId obrigatório' });
     try {
         const result = clearUserHistory(userId);
-        res.json({ ok:true, ...result });
-    } catch(e){
-        res.status(500).json({ error:'Falha ao limpar histórico do usuário' });
+        res.json({ ok: true, ...result });
+    } catch (e) {
+        res.status(500).json({ error: 'Falha ao limpar histórico do usuário' });
     }
 });

@@ -42,7 +42,7 @@ export default function StatusMenu({ userId, onChange }) {
             const r = await fetch(`${API_BASE}/api/social/status`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, status: st })
+                body: JSON.stringify({ id: userId, status: st })
             });
             if (r.ok) { setCurrent(st); onChange && onChange(st); }
         } catch (e) { }

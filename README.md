@@ -29,7 +29,15 @@ npm run dev
 
 Abra [http://localhost:3000/] no navegador para visualizar o app.
 
-### 4. Implementando API OpenIA
+### 4. Conta administrador padrão
+
+- Ao iniciar o backend, um usuário especial é criado automaticamente com as credenciais:
+	- **Usuário:** `admin`
+	- **Senha:** `admin`
+- Apenas esse login consegue abrir a rota protegida `http://localhost:3000/dashboard`.
+- Assim que possível, acesse o menu Perfil &rarr; Alterar Senha para definir uma senha forte. O backend mantém essa conta com a role `admin`.
+
+### 5. Implementando API OpenIA
 
 Cada pessoa do grupo deve criar seu próprio arquivo `.env` na pasta `backend` usando o modelo `.env.example`. O arquivo `.env` nunca deve ser enviado para o GitHub porque contém informações privadas, como chaves de API. Se alguém subir esse arquivo, pode expor a chave para pessoas de fora, mesmo que o repositório seja privado.
 
@@ -107,22 +115,22 @@ Você também pode visualizar os dados diretamente no arquivo `db.json`.
 
 Exemplo de body para enviar mensagem pública:
 ```
-{ "userId": "1", "username": "Player1", "avatar": "/path.png", "text": "olá" }
+{ "id": "1", "username": "Player1", "avatar": "/path.png", "text": "olá" }
 ```
 
 Exemplo de body para mensagem privada:
 ```
-{ "fromUserId": "1", "username": "Player1", "avatar": "/path.png", "text": "oi" }
+{ "id": "1", "username": "Player1", "avatar": "/path.png", "text": "oi" }
 ```
 
 ### 🤝 Endpoints Sociais (base: `/api/social`)
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| PATCH | /status | Atualiza status do usuário (body: userId, status) |
+| PATCH | /status | Atualiza status do usuário (body: id, status) |
 | GET | /status/:userId | Obtém status |
 | GET | /online | Lista usuários não invisíveis |
-| POST | /friend-request | Cria pedido (body: fromUserId, toUserId) |
+| POST | /friend-request | Cria pedido (body: id/senderId, targetId) |
 | GET | /requests/:userId | Pedidos pendentes (incoming/outgoing) |
 | POST | /friend-request/:id/accept | Aceitar pedido |
 | POST | /friend-request/:id/decline | Recusar pedido |

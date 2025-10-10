@@ -1,6 +1,9 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
+const bcrypt = require('bcrypt');
 const usersRouter = require('./routes/users');
 const squadsRouter = require('./routes/squads');
 const gamesRouter = require('./routes/games');
@@ -11,16 +14,180 @@ const faqRouter = require('./routes/faq');
 const socialRouter = require('./routes/social');
 const rateLimit = require('express-rate-limit');
 
+const dbPath = path.join(__dirname, '../db.json');
+const logsDir = path.join(__dirname, '../logs');
+
+function ensureLogsDir() {
+    try {
+        if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
+    } catch (e) {
+        console.error('Falha ao criar pasta de logs:', e);
+    }
+}
+
+function migrateRootLogs() {
+    try {
+        const rootDir = path.join(__dirname, '..');
+        const files = fs.readdirSync(rootDir, { withFileTypes: true })
+            .filter(d => d.isFile() && d.name.toLowerCase().endsWith('.log'))
+            .map(d => d.name);
+        files.forEach(name => {
+            const from = path.join(rootDir, name);
+            const to = path.join(logsDir, name);
+            try {
+                if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
+                const data = fs.readFileSync(from);
+                fs.appendFileSync(to, data);
+                fs.unlinkSync(from);
+                console.log(`[logs] Migrado ${name} para /logs/${name}`);
+            } catch (e) {
+                console.warn(`[logs] Falha ao migrar ${name}:`, e.message);
+            }
+        });
+    } catch (e) {
+        console.warn('[logs] Erro na migração de logs da raiz:', e.message);
+    }
+}
+
+function ensureAdminUser() {
+    const ADMIN_USERNAME = (process.env.ADMIN_DEFAULT_USER || 'admin').trim();
+    const ADMIN_PASSWORD = (process.env.ADMIN_DEFAULT_PASS || 'admin').trim();
+    const ADMIN_NAME = (process.env.ADMIN_DEFAULT_NAME || 'Administrador').trim();
+
+    if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
+        console.warn();
+        return;
+    }
+
+    let db;
+    try {
+        const raw = fs.readFileSync(dbPath, 'utf-8');
+        db = JSON.parse(raw);
+    } catch (err) {
+        db = { usuarios: [] };
+    }
+
+    db.usuarios = Array.isArray(db.usuarios) ? db.usuarios : [];
+
+    const now = new Date().toISOString();
+    const adminUser = db.usuarios.find((u) => String(u.usuario || '').toLowerCase() === ADMIN_USERNAME.toLowerCase());
+    let changed = false;
+
+    if (!adminUser) {
+        const hash = bcrypt.hashSync(ADMIN_PASSWORD, 10);
+        db.usuarios.push({
+            id: Date.now().toString(),
+            nome: ADMIN_NAME,
+            usuario: ADMIN_USERNAME,
+            senha: hash,
+            cargo: 'admin',
+            createdAt: now,
+            Data: now,
+            mustChangePassword: true
+        });
+        changed = true;
+        console.log(`Usuário administrador '${ADMIN_USERNAME}' criado automaticamente.`);
+    } else {
+        if (!adminUser.id) {
+            adminUser.id = Date.now().toString();
+            changed = true;
+        }
+        if (!adminUser.nome) {
+            adminUser.nome = ADMIN_NAME;
+            changed = true;
+        }
+        if (adminUser.usuario !== ADMIN_USERNAME) {
+            adminUser.usuario = ADMIN_USERNAME;
+            changed = true;
+        }
+        if ((adminUser.cargo || adminUser.nivelAcesso || '').toLowerCase() !== 'admin') {
+            adminUser.cargo = 'admin';
+            changed = true;
+        }
+        const senhaAtual = String(adminUser.senha || '');
+        if (!senhaAtual.startsWith('$2')) {
+            adminUser.senha = bcrypt.hashSync(ADMIN_PASSWORD, 10);
+            adminUser.mustChangePassword = true;
+            changed = true;
+            console.log(`Senha do administrador '${ADMIN_USERNAME}' padronizada e protegida com hash.`);
+        }
+        if ('role' in adminUser) {
+            delete adminUser.role;
+            changed = true;
+        }
+        if ('updatedAt' in adminUser) {
+            delete adminUser.updatedAt;
+            changed = true;
+        }
+        if (!adminUser.createdAt) {
+            adminUser.createdAt = now;
+            changed = true;
+        }
+        if (!adminUser.Data) {
+            adminUser.Data = now;
+            changed = true;
+        } else if (changed) {
+            adminUser.Data = now;
+        }
+    }
+
+    if (changed) {
+        try {
+            fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
+        } catch (err) {
+            console.error('Falha ao gravar db.json ao garantir admin:', err);
+        }
+    }
+}
+
+ensureAdminUser();
+ensureLogsDir();
+migrateRootLogs();
+
+try {
+    const ensureFiles = ['login.log', 'ratelimit.log'];
+    ensureFiles.forEach(f => {
+        const p = path.join(logsDir, f);
+        if (!fs.existsSync(p)) fs.writeFileSync(p, '');
+    });
+    try {
+        const p = path.join(logsDir, 'chat_requests.log');
+        if (fs.existsSync(p)) fs.unlinkSync(p);
+    } catch (e) { }
+} catch (e) {
+    console.warn('[logs] Não foi possível pré-criar arquivos de log:', e.message);
+}
+
 const app = express();
 const BASE_PORT = parseInt(process.env.PORT, 10) || 5000;
 let currentPort = BASE_PORT;
+const LOG_DEDUP_MS = Math.max(parseInt(process.env.LOG_DEDUP_MS || '0', 10) || 0, 0);
 
 const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000,
+    windowMs: 60 * 1000,
     max: 100,
     standardHeaders: true,
     legacyHeaders: false,
-    message: 'Você excedeu o limite de requisições, tente novamente mais tarde.'
+    skipSuccessfulRequests: false,
+    skipFailedRequests: false,
+    handler: (req, res, next, options) => {
+        const logEntry = {
+            time: new Date().toISOString(),
+            ip: req.ip || req.connection.remoteAddress,
+            method: req.method,
+            url: req.originalUrl || req.url,
+            reason: 'rate_limited'
+        };
+        try {
+            fs.appendFileSync(path.join(logsDir, 'ratelimit.log'), JSON.stringify(logEntry) + '\n');
+        } catch (e) {
+            console.error('Erro ao gravar ratelimit.log:', e);
+        }
+        res.status(429).json({ 
+            error: 'Muitas requisições. Tente novamente mais tarde.',
+            retryAfter: Math.ceil(options.windowMs / 1000)
+        });
+    }
 });
 
 app.set('trust proxy', 1);
@@ -43,15 +210,27 @@ app.get('/', (req, res) => {
     res.send('Você está no backend!');
 });
 
-function start(port){
+function start(port) {
     const server = app.listen(port, () => {
         console.log(`Servidor está rodando em http://localhost:${port}`);
+        try {
+            const boot = {
+                time: new Date().toISOString(),
+                ip: '::1',
+                method: 'SERVER',
+                url: '/server-started',
+                status: 0,
+                durationMs: 0,
+                ua: `node ${process.version}`,
+                port
+            };
+        } catch (e) { }
     });
-    server.on('error', (err)=>{
-        if(err.code === 'EADDRINUSE'){
-            if(port < BASE_PORT + 20){
-                console.warn(`Porta ${port} ocupada. Tentando ${port+1}...`);
-                start(port+1);
+    server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            if (port < BASE_PORT + 20) {
+                console.warn(`Porta ${port} ocupada. Tentando ${port + 1}...`);
+                start(port + 1);
             } else {
                 console.error('Não foi possível encontrar porta livre (tentadas +20).');
             }

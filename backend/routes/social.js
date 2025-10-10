@@ -11,6 +11,43 @@ function ensure(db) {
     if (!db.statuses) db.statuses = {};
     if (!db.friendRequests) db.friendRequests = [];
     if (!db.friendships) db.friendships = [];
+    if (normalizeFriendData(db)) writeDB(db);
+}
+
+function normalizeFriendData(db) {
+    let changed = false;
+    if (!Array.isArray(db.friendRequests)) {
+        db.friendRequests = [];
+        changed = true;
+    } else {
+        db.friendRequests = db.friendRequests.map(fr => {
+            const senderId = fr.senderId || fr.fromUserId;
+            const receiverId = fr.receiverId || fr.toUserId;
+            const normalized = { ...fr, senderId, receiverId };
+            if (fr.fromUserId !== undefined) { delete normalized.fromUserId; changed = true; }
+            if (fr.toUserId !== undefined) { delete normalized.toUserId; changed = true; }
+            if (fr.senderId !== senderId) changed = true;
+            if (fr.receiverId !== receiverId) changed = true;
+            return normalized;
+        });
+    }
+    if (!Array.isArray(db.friendships)) {
+        db.friendships = [];
+        changed = true;
+    } else {
+        db.friendships = db.friendships.map(f => {
+            if (Array.isArray(f.userIds)) return f;
+            if (f.userId && f.friendId) {
+                changed = true;
+                const copy = { ...f, userIds: [f.userId, f.friendId] };
+                delete copy.userId;
+                delete copy.friendId;
+                return copy;
+            }
+            return f;
+        });
+    }
+    return changed;
 }
 
 router.get('/', (req, res) => {
@@ -34,47 +71,51 @@ const VALID_STATUS = ['Disponível', 'Ausente', 'Não perturbar', 'Invisível'];
 
 // Atualizar status
 router.patch('/status', (req, res) => {
-    const { userId, status } = req.body;
-    if (!userId || !status) return res.status(400).json({ error: 'userId e status são obrigatórios' });
+    const { id, userId, status } = req.body;
+    const targetId = id || userId;
+    if (!targetId || !status) return res.status(400).json({ error: 'id e status são obrigatórios' });
     if (!VALID_STATUS.includes(status)) return res.status(400).json({ error: 'Status inválido' });
     const db = readDB(); ensure(db);
-    db.statuses[userId] = status;
+    db.statuses[targetId] = status;
     writeDB(db);
-    res.json({ userId, status });
+    res.json({ id: targetId, status });
 });
 
 // Obter status
 router.get('/status/:userId', (req, res) => {
     const db = readDB(); ensure(db);
     const status = db.statuses[req.params.userId] || 'Disponível';
-    res.json({ userId: req.params.userId, status });
+    res.json({ id: req.params.userId, status });
 });
 
 // Online
 router.get('/online', (req, res) => {
     const db = readDB(); ensure(db);
-    const online = Object.entries(db.statuses)
-        .filter(([_, st]) => st !== 'Invisível')
-        .map(([userId, st]) => {
-            const user = (db.usuarios || []).find(u => u.id === userId) || { id: userId, nome: 'Desconhecido' };
-            return { id: userId, username: user.nome || user.usuario, status: st };
-        });
+    // Disponível por padrão'.
+    const online = (db.usuarios || [])
+        .map(u => {
+            const st = db.statuses[u.id] || 'Disponível';
+            return { id: u.id, username: u.nome || u.usuario, status: st };
+        })
+        .filter(u => u.status !== 'Invisível');
     res.json(online);
 });
 
 // Enviar pedido de amizade
 router.post('/friend-request', (req, res) => {
-    const { fromUserId, toUserId } = req.body;
-    if (!fromUserId || !toUserId) return res.status(400).json({ error: 'IDs obrigatórios' });
-    if (fromUserId === toUserId) return res.status(400).json({ error: 'Não pode adicionar a si mesmo' });
+    const { id, senderId, fromUserId, targetId, toUserId } = req.body || {};
+    const requesterId = senderId || fromUserId || id;
+    const recipientId = targetId || toUserId;
+    if (!requesterId || !recipientId) return res.status(400).json({ error: 'IDs obrigatórios' });
+    if (requesterId === recipientId) return res.status(400).json({ error: 'Não pode adicionar a si mesmo' });
     const db = readDB(); ensure(db);
     // Já amigos?
-    const alreadyFriends = db.friendships.some(f => f.userIds.includes(fromUserId) && f.userIds.includes(toUserId));
+    const alreadyFriends = db.friendships.some(f => f.userIds.includes(requesterId) && f.userIds.includes(recipientId));
     if (alreadyFriends) return res.status(409).json({ error: 'Já são amigos' });
     // Pedido pendente existente
-    const pending = db.friendRequests.find(fr => fr.status === 'pendente' && ((fr.fromUserId === fromUserId && fr.toUserId === toUserId) || (fr.fromUserId === toUserId && fr.toUserId === fromUserId)));
+    const pending = db.friendRequests.find(fr => fr.status === 'pendente' && ((fr.senderId === requesterId && fr.receiverId === recipientId) || (fr.senderId === recipientId && fr.receiverId === requesterId)));
     if (pending) return res.status(409).json({ error: 'Pedido já pendente' });
-    const fr = { id: Date.now().toString(), fromUserId, toUserId, status: 'pendente', createdAt: new Date().toISOString() };
+    const fr = { id: Date.now().toString(), senderId: requesterId, receiverId: recipientId, status: 'pendente', createdAt: new Date().toISOString() };
     db.friendRequests.push(fr);
     writeDB(db);
     res.status(201).json(fr);
@@ -84,8 +125,8 @@ router.post('/friend-request', (req, res) => {
 router.get('/requests/:userId', (req, res) => {
     const { userId } = req.params;
     const db = readDB(); ensure(db);
-    const incoming = db.friendRequests.filter(fr => fr.toUserId === userId && fr.status === 'pendente');
-    const outgoing = db.friendRequests.filter(fr => fr.fromUserId === userId && fr.status === 'pendente');
+    const incoming = db.friendRequests.filter(fr => fr.receiverId === userId && fr.status === 'pendente');
+    const outgoing = db.friendRequests.filter(fr => fr.senderId === userId && fr.status === 'pendente');
     res.json({ incoming, outgoing });
 });
 
@@ -96,7 +137,7 @@ router.post('/friend-request/:id/accept', (req, res) => {
     if (!fr) return res.status(404).json({ error: 'Pedido não encontrado' });
     if (fr.status !== 'pendente') return res.status(400).json({ error: 'Pedido já processado' });
     fr.status = 'aceito';
-    db.friendships.push({ id: Date.now().toString(), userIds: [fr.fromUserId, fr.toUserId], since: new Date().toISOString() });
+    db.friendships.push({ id: Date.now().toString(), userIds: [fr.senderId, fr.receiverId], since: new Date().toISOString() });
     writeDB(db);
     res.json(fr);
 });
@@ -121,7 +162,7 @@ router.delete('/friend-request/:id', (req, res) => {
     // Marcar como cancelado para manter histórico
     fr.status = 'cancelado';
     writeDB(db);
-    res.json({ success:true, id: fr.id, status: fr.status });
+    res.json({ success: true, id: fr.id, status: fr.status });
 });
 
 // Lista de amigos

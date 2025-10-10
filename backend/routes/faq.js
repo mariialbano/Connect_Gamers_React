@@ -2,8 +2,13 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const router = express.Router();
+// Endpoint simples para teste de disponibilidade
+router.get('/', (req, res) => {
+    res.json({ ok: true, service: 'faq' });
+});
 
-const logPath = path.join(__dirname, '../../feedback.log');
+const logsDir = path.join(__dirname, '../../logs');
+const logPath = path.join(logsDir, 'feedback.log');
 const dbPath = path.join(__dirname, '../../db.json');
 
 function readDB() {
@@ -34,14 +39,14 @@ router.post('/feedback', (req, res) => {
         const id = Date.now().toString();
         const timestamp = new Date().toISOString();
         const entry = { id, timestamp, category, text: safe, ...(rate !== undefined ? { rating: rate } : {}), ...(userId ? { userId } : {}), ...(username ? { username } : {}) };
-        try { fs.appendFileSync(logPath, JSON.stringify(entry) + '\n'); }
+        try { if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true }); fs.appendFileSync(logPath, JSON.stringify(entry) + '\n'); }
         catch { return res.status(500).json({ error: 'falha ao gravar log' }); }
         const db = readDB();
         ensureSummary(db);
         db.feedbackSummary.total += 1;
         db.feedbackSummary.categories[category] = (db.feedbackSummary.categories[category] || 0) + 1;
         db.feedbackSummary.lastUpdate = timestamp;
-        db.feedbackSummary.last.push({ id, timestamp, category, text: safe.slice(0,240), ...(rate!==undefined?{rating:rate}:{}) });
+        db.feedbackSummary.last.push({ id, timestamp, category, text: safe.slice(0, 240), ...(rate !== undefined ? { rating: rate } : {}) });
         if (db.feedbackSummary.last.length > 5) db.feedbackSummary.last = db.feedbackSummary.last.slice(-5);
         writeDB(db);
         return res.status(201).json({ ok: true, id });

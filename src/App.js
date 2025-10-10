@@ -10,12 +10,13 @@ import Login from './pages/Login';
 import Perfil from './pages/Perfil';
 import Comunidade from './pages/Comunidade';
 import Amigos from './pages/Amigos';
+import Dashboard from './pages/Dashboard';
 import { useTheme } from './theme/ThemeContext';
 
 function App() {
   const { theme } = useTheme();
 
-  // Rota protegida: só permite acesso se houver usuário logado em localStorage
+  // Rota protegida: só permite acesso se houver usuário logado
   function RequireAuth({ children }) {
     const location = useLocation();
     const logged = typeof window !== 'undefined' && localStorage.getItem('usuarioLogado');
@@ -26,9 +27,26 @@ function App() {
     return children;
   }
 
-  function RedirectCadastro(){
+  function RequireAdmin({ children }) {
     const location = useLocation();
-    return <Navigate to={`/inscreva-se${location.search||''}`} replace />;
+    const logged = typeof window !== 'undefined' && localStorage.getItem('usuarioLogado');
+    const nivelAcesso = typeof window !== 'undefined' ? (localStorage.getItem('usuarioNivelAcesso') || '').toLowerCase() : null;
+    const dest = encodeURIComponent(location.pathname + location.search);
+
+    if (!logged) {
+      return <Navigate to={`/login?auth=1&admin=1&from=${dest}`} replace />;
+    }
+
+    if (nivelAcesso !== 'admin') {
+      return <Navigate to="/home" replace state={{ denied: 'admin' }} />;
+    }
+
+    return children;
+  }
+
+  function RedirectCadastro() {
+    const location = useLocation();
+    return <Navigate to={`/inscreva-se${location.search || ''}`} replace />;
   }
 
   return (
@@ -54,6 +72,7 @@ function App() {
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/comunidade" element={<RequireAuth><Comunidade /></RequireAuth>} />
             <Route path="/amigos" element={<RequireAuth><Amigos /></RequireAuth>} />
+            <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
           </Routes>
         </main>
         <Footer />

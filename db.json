@@ -3,28 +3,17 @@
     {
       "nomeSquad": "FuriaTEAM",
       "integrantes": [
-        "Neemias",
-        "MarianaAlbano",
-        "Ana",
-        "Jessica",
-        "Danilo"
+        "Ana Julia",
+        "Danilo Senna",
+        "Jéssica Oliveira",
+        "Mariana Albano",
+        "Neemias Silva"
       ],
       "jogo": "Valorant",
       "eventoId": 2,
       "nivel": "Avançado",
       "dataCadastro": "2025-09-07T20:11:18.406Z",
       "id": "1757275878408"
-    },
-    {
-      "nomeSquad": "Neemias ",
-      "integrantes": [
-        "Neemias"
-      ],
-      "jogo": "Fortnite",
-      "eventoId": 10,
-      "nivel": "Competitivo",
-      "dataCadastro": "2025-09-07T20:11:46.304Z",
-      "id": "1757275906307"
     },
     {
       "nomeSquad": "Cloud9",
@@ -35,82 +24,85 @@
       "jogo": "Fortnite",
       "eventoId": 11,
       "nivel": "Competitivo",
-      "dataCadastro": "2025-09-07T20:29:58.427Z",
-      "id": "1757276998437"
+      "dataCadastro": "2025-10-08T23:20:34.066Z",
+      "id": "1759965634070"
     },
     {
-      "nomeSquad": "teste2",
+      "nomeSquad": "Team Vitality",
       "integrantes": [
         "Neemias",
-        "Danilo"
+        "Anajulia"
       ],
-      "jogo": "Fortnite",
-      "eventoId": 11,
+      "jogo": "Counter Strike 2",
+      "eventoId": 14,
       "nivel": "Competitivo",
-      "dataCadastro": "2025-09-07T22:59:46.205Z",
-      "id": "1757285986215"
-    },
-    {
-      "nomeSquad": "aaaaaaaaaaaa",
-      "integrantes": [
-        "Neemias",
-        "Danilo"
-      ],
-      "jogo": "Fortnite",
-      "eventoId": 11,
-      "nivel": "Avançado",
-      "dataCadastro": "2025-09-07T23:09:53.356Z",
-      "id": "1757286593358"
-    },
-    {
-      "nomeSquad": "teste 3",
-      "integrantes": [
-        "Neemias",
-        "Danilo"
-      ],
-      "jogo": "Fortnite",
-      "eventoId": 11,
-      "nivel": "Intermediário",
-      "dataCadastro": "2025-09-07T23:19:23.150Z",
-      "id": "1757287163152"
+      "dataCadastro": "2025-10-08T23:28:10.377Z",
+      "id": "1759966090381"
     }
   ],
   "usuarios": [
     {
-      "nome": "Neemias Silva",
-      "usuario": "Neemias",
-      "senha": "Neemias123*",
-      "id": "1757275491312"
+      "nome": "Administrador",
+      "usuario": "admin",
+      "senha": "$2b$10$VXSz6reRoz3XfoMw3wurjuJuSAyA5RqhqDsKri3oeRfm8DA2gkjSa",
+      "id": "admin",
+      "cargo": "admin",
+      "createdAt": "2025-10-07T19:11:14.452Z",
+      "Data": "2025-10-08T20:35:54.598Z"
     },
     {
       "nome": "Ana Julia",
-      "usuario": "Ana",
-      "senha": "Anajulia123*",
-      "id": "1757275558975"
-    },
-    {
-      "nome": "Jessica Oliveira",
-      "usuario": "Jessica",
-      "senha": "Jessica123*",
-      "id": "1757275578902"
+      "usuario": "Anajulia",
+      "senha": "$2b$10$oLDCz4HS8g5qgbkPqfeaceR5SgeRE.SRROoCuZQK5m.1ri3Lnln2e",
+      "id": "1759865232559",
+      "cargo": "user",
+      "createdAt": "2025-10-07T19:27:12.559Z",
+      "Data": "2025-10-07T19:27:36.431Z"
     },
     {
       "nome": "Danilo Senna",
       "usuario": "Danilo",
-      "senha": "Danilo123*",
-      "id": "1757275602282"
+      "senha": "$2b$10$m9fia6z4Y4DymIqt3d4FX.gB88qd9LIEnvgDNqKOu4DtdD3d8qydm",
+      "id": "1759865296354",
+      "cargo": "organizador",
+      "createdAt": "2025-10-07T19:28:16.354Z",
+      "Data": "2025-10-07T19:28:16.354Z"
+    },
+    {
+      "nome": "Jéssica Oliveira",
+      "usuario": "Jessica",
+      "senha": "$2b$10$8I5QFPwK13lvGn8w6qO49.by1aaPS5SF5tQ.YXR.yKNuP8ayKlfli",
+      "id": "1759865562222",
+      "cargo": "user",
+      "createdAt": "2025-10-07T19:32:42.222Z",
+      "Data": "2025-10-07T19:32:42.222Z"
     },
     {
       "nome": "Mariana Albano",
-      "usuario": "MarianaAlbano",
-      "senha": "Mariana123*",
-      "id": "1757275766810"
+      "usuario": "Mariana",
+      "senha": "$2b$10$pez0ShBIp.DyWTE0wo6NweOcEbp.j7nqZxUb5GVyPLE/dH2bcnfG.",
+      "id": "1759865360978",
+      "cargo": "user",
+      "createdAt": "2025-10-07T19:29:20.978Z",
+      "Data": "2025-10-07T19:29:20.978Z"
     },
     {
       "nome": "Neemias Silva",
-      "usuario": "NeemiasTesteBcrypt",
-      "senha": "$2b$10$sGc56YtaqHlVp3rJqOwGs.BvKvf/QCEKtaf7D8uiNidRx0qRX5equ",
-      "id": "1758579908903"
+      "usuario": "Neemias",
+      "senha": "$2b$10$jCiZPnceugzGYr8CtOugtOiEha9zic7O8t1gwWJGhsQ7bKM6mJDAu",
+      "id": "1759866873862",
+      "cargo": "user",
+      "createdAt": "2025-10-07T19:54:33.862Z",
+      "Data": "2025-10-07T19:54:33.862Z"
+    },
+    {
+      "nome": "João Gamer",
+      "usuario": "joaozinho123",
+      "senha": "$2b$10$VNQPf9fEI145IQVIL.CbA.G9JD77lfA0vo69J0j70.EL2.Obt42M.",
+      "cargo": "user",
+      "id": "1760040963896",
+      "createdAt": "2025-10-09T20:16:03.896Z",
+      "Data": "2025-10-09T20:16:03.896Z"
     }
   ],
   "jogos": [
@@ -273,587 +265,332 @@
   "chatChannels": {
     "Geral": [
       {
-        "id": "1757277389529",
-        "userId": "1757275491312",
+        "messageId": "1757277389529",
+        "id": "1759866873862",
         "username": "Neemias",
         "text": "oi gente, boa tarde",
-        "time": "2025-09-07T20:36:29.529Z",
-        "timestamp": 1757277389529
+        "time": "2025-09-07T20:36:29.529Z"
       },
       {
-        "id": "1757277393670",
-        "userId": "1757275491312",
+        "messageId": "1757277393670",
+        "id": "1759866873862",
         "username": "Neemias",
         "text": "alguem querendo jogar algum jogo diferente?",
-        "time": "2025-09-07T20:36:33.670Z",
-        "timestamp": 1757277393670
+        "time": "2025-09-07T20:36:33.670Z"
       },
       {
-        "id": "1757277453174",
-        "userId": "1757275578902",
+        "messageId": "1757277453174",
+        "id": "1759865562222",
         "username": "Jessica",
         "text": "Oii eu quero",
-        "time": "2025-09-07T20:37:33.174Z",
-        "timestamp": 1757277453174
+        "time": "2025-09-07T20:37:33.174Z"
       },
       {
-        "id": "1757277455913",
-        "userId": "1757275578902",
+        "messageId": "1757277455913",
+        "id": "1759865562222",
         "username": "Jessica",
         "text": "quer jogar o que?",
-        "time": "2025-09-07T20:37:35.913Z",
-        "timestamp": 1757277455913
+        "time": "2025-09-07T20:37:35.913Z"
       },
       {
-        "id": "1757277465771",
-        "userId": "1757275491312",
+        "messageId": "1757277465771",
+        "id": "1759866873862",
         "username": "Neemias",
         "text": "que tal among us?",
-        "time": "2025-09-07T20:37:45.771Z",
-        "timestamp": 1757277465771
+        "time": "2025-09-07T20:37:45.771Z"
       },
       {
-        "id": "1757277480049",
-        "userId": "1757275578902",
+        "messageId": "1757277480049",
+        "id": "1759865562222",
         "username": "Jessica",
         "text": "perfeito",
-        "time": "2025-09-07T20:38:00.049Z",
-        "timestamp": 1757277480049
+        "time": "2025-09-07T20:38:00.049Z"
       },
       {
-        "id": "1757277507995",
-        "userId": "1757275578902",
+        "messageId": "1757277507995",
+        "id": "1759865562222",
         "username": "Jessica",
         "text": "me adiciona como amigo na connect gamers",
-        "time": "2025-09-07T20:38:27.995Z",
-        "timestamp": 1757277507995
+        "time": "2025-09-07T20:38:27.995Z"
       },
       {
-        "id": "1757277646757",
-        "userId": "1757275578902",
+        "messageId": "1757277646757",
+        "id": "1759865562222",
         "username": "Jessica Oliveira",
         "text": "meu usuario é Jessica",
-        "time": "2025-09-07T20:40:46.757Z",
-        "timestamp": 1757277646757
+        "time": "2025-09-07T20:40:46.757Z"
       },
       {
-        "id": "1757277662311",
-        "userId": "1757275491312",
+        "messageId": "1757277662311",
+        "id": "1759866873862",
         "username": "Neemias Silva",
         "text": "irei mandar solicitação",
-        "time": "2025-09-07T20:41:02.311Z",
-        "timestamp": 1757277662311
+        "time": "2025-09-07T20:41:02.311Z"
       },
       {
-        "id": "1757277965561",
-        "userId": "1757275578902",
+        "messageId": "1757277965561",
+        "id": "1759865562222",
         "username": "Jessica Oliveira",
         "text": "ok",
-        "time": "2025-09-07T20:46:05.561Z",
-        "timestamp": 1757277965561
+        "time": "2025-09-07T20:46:05.561Z"
       },
       {
-        "id": "1757277970406",
-        "userId": "1757275578902",
+        "messageId": "1757277970406",
+        "id": "1759865562222",
         "username": "Jessica Oliveira",
         "text": "estou aguardando",
-        "time": "2025-09-07T20:46:10.406Z",
-        "timestamp": 1757277970406
+        "time": "2025-09-07T20:46:10.406Z"
       },
       {
-        "id": "1757286067977",
-        "userId": "1757275491312",
+        "messageId": "1757286067977",
+        "id": "1759866873862",
         "username": "Neemias Silva",
         "text": "oi",
-        "time": "2025-09-07T23:01:07.977Z",
-        "timestamp": 1757286067977
+        "time": "2025-09-07T23:01:07.977Z"
       },
       {
-        "id": "1757286083361",
-        "userId": "1757275491312",
+        "messageId": "1757286083361",
+        "id": "1759866873862",
         "username": "Neemias Silva",
         "text": "filho da p**a",
-        "time": "2025-09-07T23:01:23.361Z",
-        "timestamp": 1757286083361
+        "time": "2025-09-07T23:01:23.361Z"
       }
     ],
     "League of Legends": [],
     "Valorant": [],
     "Fortnite": [
       {
-        "id": "1757276109906",
-        "userId": "1757275491312",
+        "messageId": "1757276109906",
+        "id": "1759866873862",
         "username": "Neemias",
         "text": "Oii",
-        "time": "2025-09-07T20:15:09.906Z",
-        "timestamp": 1757276109906
+        "time": "2025-09-07T20:15:09.906Z"
       },
       {
-        "id": "1757276110835",
-        "userId": "1757275491312",
+        "messageId": "1757276110835",
+        "id": "1759866873862",
         "username": "Neemias",
         "text": "boa tarde",
-        "time": "2025-09-07T20:15:10.835Z",
-        "timestamp": 1757276110835
+        "time": "2025-09-07T20:15:10.835Z"
       },
       {
-        "id": "1757276128978",
-        "userId": "1757275491312",
+        "messageId": "1757276128978",
+        "id": "1759866873862",
         "username": "Neemias",
         "text": "Preciso de uma pessoa para completar trio, alguem?",
-        "time": "2025-09-07T20:15:28.978Z",
-        "timestamp": 1757276128978
+        "time": "2025-09-07T20:15:28.978Z"
       },
       {
-        "id": "1757276379075",
-        "userId": "1757275558975",
+        "messageId": "1757276379075",
+        "id": "1759865232559",
         "username": "Ana",
         "text": "Eu",
-        "time": "2025-09-07T20:19:39.075Z",
-        "timestamp": 1757276379075
+        "time": "2025-09-07T20:19:39.075Z"
       },
       {
-        "id": "1757276644013",
-        "userId": "1757275491312",
+        "messageId": "1757276644013",
+        "id": "1759866873862",
         "username": "Neemias",
         "text": "me manda seu nick",
-        "time": "2025-09-07T20:24:04.013Z",
-        "timestamp": 1757276644013
+        "time": "2025-09-07T20:24:04.013Z"
       },
       {
-        "id": "1757276672644",
-        "userId": "1757275558975",
+        "messageId": "1757276672644",
+        "id": "1759865232559",
         "username": "Ana",
         "text": "AnaGamer123",
-        "time": "2025-09-07T20:24:32.644Z",
-        "timestamp": 1757276672644
+        "time": "2025-09-07T20:24:32.644Z"
       }
     ],
     "CS2": [],
-    "Rocket League": []
+    "Rocket League": [],
+    "lol": [
+      {
+        "messageId": "1760115601370",
+        "id": "1759865296354",
+        "username": "Danilo",
+        "text": "Evento começa em 10 minutos!!!",
+        "time": "2025-10-10T17:00:01.370Z",
+        "role": "organizador",
+        "reactions": {}
+      }
+    ],
+    "cs2": [
+      {
+        "messageId": "1760115595363",
+        "id": "1759865296354",
+        "username": "Danilo",
+        "text": "Evento começa em 10 minutos!!!",
+        "time": "2025-10-10T16:59:55.363Z",
+        "role": "organizador",
+        "reactions": {}
+      }
+    ],
+    "fortnite": [
+      {
+        "messageId": "1760116051134",
+        "id": "1759865296354",
+        "username": "Danilo",
+        "text": "Evento começa em 10 minutos!!!",
+        "time": "2025-10-10T17:07:31.134Z",
+        "role": "organizador",
+        "reactions": {}
+      }
+    ],
+    "rocketleague": [
+      {
+        "messageId": "1760115602871",
+        "id": "1759865296354",
+        "username": "Danilo",
+        "text": "Evento começa em 10 minutos!!!",
+        "time": "2025-10-10T17:00:02.871Z",
+        "role": "organizador",
+        "reactions": {}
+      }
+    ],
+    "valorant": [
+      {
+        "messageId": "1760115604649",
+        "id": "1759865296354",
+        "username": "Danilo",
+        "text": "Evento começa em 10 minutos!!!",
+        "time": "2025-10-10T17:00:04.649Z",
+        "role": "organizador",
+        "reactions": {}
+      }
+    ]
   },
   "privateChats": [
     {
-      "users": [
-        "1756859484293",
-        "1756860887995"
-      ],
+      "users": [],
       "messages": []
     },
     {
       "users": [
-        "ID_USUARIO_A",
-        "ID_USUARIO_B"
-      ],
-      "messages": []
-    },
-    {
-      "users": [
-        "1757275491312",
-        "1757275602282"
+        "1759865296354",
+        "1759866873862"
       ],
       "messages": [
         {
-          "id": "1757276049853",
-          "fromUserId": "1757275491312",
+          "messageId": "1760116459289",
+          "id": "1759865296354",
+          "username": "Danilo Senna",
+          "text": "eae, bora jogar?",
+          "time": "2025-10-10T17:14:19.289Z"
+        },
+        {
+          "messageId": "1760116474721",
+          "id": "1759866873862",
           "username": "Neemias Silva",
-          "text": "Eae mano, bora jogar uma partida?",
-          "time": "2025-09-07T20:14:09.853Z",
-          "timestamp": 1757276049853
-        },
-        {
-          "id": "1757276084706",
-          "fromUserId": "1757275602282",
-          "username": "Danilo Senna",
-          "text": "bora",
-          "time": "2025-09-07T20:14:44.706Z",
-          "timestamp": 1757276084706
-        },
-        {
-          "id": "1757276088656",
-          "fromUserId": "1757275602282",
-          "username": "Danilo Senna",
-          "text": "ja vou entrar",
-          "time": "2025-09-07T20:14:48.656Z",
-          "timestamp": 1757276088656
-        },
-        {
-          "id": "1757286738320",
-          "fromUserId": "1757275602282",
-          "username": "Danilo Senna",
-          "text": "aaaaaaaaaa",
-          "time": "2025-09-07T23:12:18.320Z",
-          "timestamp": 1757286738320
-        },
-        {
-          "id": "1757286851114",
-          "fromUserId": "1757275491312",
-          "username": "Neemias Silva",
-          "text": "oii",
-          "time": "2025-09-07T23:14:11.114Z",
-          "timestamp": 1757286851114
-        },
-        {
-          "id": "1757287313503",
-          "fromUserId": "1757275602282",
-          "username": "Danilo Senna",
-          "text": "oiii",
-          "time": "2025-09-07T23:21:53.503Z",
-          "timestamp": 1757287313503
+          "text": "bora, ja estou entrando no fortnite",
+          "time": "2025-10-10T17:14:34.721Z"
         }
       ]
-    },
-    {
-      "users": [
-        "1757275491312",
-        "1757275558975"
-      ],
-      "messages": []
     }
   ],
   "statuses": {
-    "1756860887995": "Ausente",
-    "1756859484293": "Disponível",
-    "1757275602282": "Disponível",
-    "1757275491312": "Disponível",
-    "1757275558975": "Ausente",
-    "1757275766810": "Não perturbar"
+    "1759865296354": "Disponível",
+    "1759866873862": "Disponível"
   },
   "friendRequests": [
     {
-      "id": "1757039214729",
-      "fromUserId": "1756860887995",
-      "toUserId": "1756859484293",
+      "id": "1760116431824",
+      "senderId": "1759865296354",
+      "receiverId": "1759866873862",
       "status": "aceito",
-      "createdAt": "2025-09-05T02:26:54.729Z"
-    },
-    {
-      "id": "1757041415288",
-      "fromUserId": "1756860887995",
-      "toUserId": "2275",
-      "status": "cancelado",
-      "createdAt": "2025-09-05T03:03:35.288Z"
-    },
-    {
-      "id": "1757042420094",
-      "fromUserId": "1756859484293",
-      "toUserId": "6a91",
-      "status": "cancelado",
-      "createdAt": "2025-09-05T03:20:20.094Z"
-    },
-    {
-      "id": "1757042421575",
-      "fromUserId": "1756859484293",
-      "toUserId": "60df",
-      "status": "cancelado",
-      "createdAt": "2025-09-05T03:20:21.575Z"
-    },
-    {
-      "id": "1757042422880",
-      "fromUserId": "1756859484293",
-      "toUserId": "6528",
-      "status": "cancelado",
-      "createdAt": "2025-09-05T03:20:22.880Z"
-    },
-    {
-      "id": "1757042781742",
-      "fromUserId": "1756859484293",
-      "toUserId": "1756860887995",
-      "status": "aceito",
-      "createdAt": "2025-09-05T03:26:21.742Z"
-    },
-    {
-      "id": "1757044330878",
-      "fromUserId": "1756859484293",
-      "toUserId": "2275",
-      "status": "cancelado",
-      "createdAt": "2025-09-05T03:52:10.878Z"
-    },
-    {
-      "id": "1757044649201",
-      "fromUserId": "1756859484293",
-      "toUserId": "1756860887995",
-      "status": "aceito",
-      "createdAt": "2025-09-05T03:57:29.201Z"
-    },
-    {
-      "id": "1757044767038",
-      "fromUserId": "1756859484293",
-      "toUserId": "1756860887995",
-      "status": "cancelado",
-      "createdAt": "2025-09-05T03:59:27.038Z"
-    },
-    {
-      "id": "1757044824721",
-      "fromUserId": "1756859484293",
-      "toUserId": "1756860887995",
-      "status": "aceito",
-      "createdAt": "2025-09-05T04:00:24.721Z"
-    },
-    {
-      "id": "1757044961909",
-      "fromUserId": "1756860887995",
-      "toUserId": "6a91",
-      "status": "cancelado",
-      "createdAt": "2025-09-05T04:02:41.909Z"
-    },
-    {
-      "id": "1757046974073",
-      "fromUserId": "1756860887995",
-      "toUserId": "6a91",
-      "status": "pendente",
-      "createdAt": "2025-09-05T04:36:14.073Z"
-    },
-    {
-      "id": "1757047027196",
-      "fromUserId": "1756859484293",
-      "toUserId": "1756860887995",
-      "status": "aceito",
-      "createdAt": "2025-09-05T04:37:07.196Z"
-    },
-    {
-      "id": "1757047033544",
-      "fromUserId": "1756860887995",
-      "toUserId": "60df",
-      "status": "pendente",
-      "createdAt": "2025-09-05T04:37:13.544Z"
-    },
-    {
-      "id": "1757047818333",
-      "fromUserId": "1756859484293",
-      "toUserId": "1756860887995",
-      "status": "aceito",
-      "createdAt": "2025-09-05T04:50:18.333Z"
-    },
-    {
-      "id": "1757275916879",
-      "fromUserId": "1757275491312",
-      "toUserId": "1757275558975",
-      "status": "aceito",
-      "createdAt": "2025-09-07T20:11:56.879Z"
-    },
-    {
-      "id": "1757275917622",
-      "fromUserId": "1757275491312",
-      "toUserId": "1757275578902",
-      "status": "cancelado",
-      "createdAt": "2025-09-07T20:11:57.622Z"
-    },
-    {
-      "id": "1757275918159",
-      "fromUserId": "1757275491312",
-      "toUserId": "1757275602282",
-      "status": "aceito",
-      "createdAt": "2025-09-07T20:11:58.159Z"
-    },
-    {
-      "id": "1757275918796",
-      "fromUserId": "1757275491312",
-      "toUserId": "1757275766810",
-      "status": "cancelado",
-      "createdAt": "2025-09-07T20:11:58.796Z"
-    },
-    {
-      "id": "1757277798088",
-      "fromUserId": "1757275491312",
-      "toUserId": "1757275578902",
-      "status": "pendente",
-      "createdAt": "2025-09-07T20:43:18.088Z"
-    },
-    {
-      "id": "1757277802198",
-      "fromUserId": "1757275491312",
-      "toUserId": "1757275766810",
-      "status": "aceito",
-      "createdAt": "2025-09-07T20:43:22.198Z"
+      "createdAt": "2025-10-10T17:13:51.824Z"
     }
   ],
   "friendships": [
     {
-      "id": "1757047876094",
+      "id": "1760116440053",
       "userIds": [
-        "1756859484293",
-        "1756860887995"
+        "1759865296354",
+        "1759866873862"
       ],
-      "since": "2025-09-05T04:51:16.094Z"
-    },
-    {
-      "id": "1757275988982",
-      "userIds": [
-        "1757275491312",
-        "1757275602282"
-      ],
-      "since": "2025-09-07T20:13:08.982Z"
-    },
-    {
-      "id": "1757276882075",
-      "userIds": [
-        "1757275491312",
-        "1757275558975"
-      ],
-      "since": "2025-09-07T20:28:02.075Z"
-    },
-    {
-      "id": "1757277830745",
-      "userIds": [
-        "1757275491312",
-        "1757275766810"
-      ],
-      "since": "2025-09-07T20:43:50.745Z"
+      "since": "2025-10-10T17:14:00.053Z"
     }
   ],
   "groupChats": [
-    {
-      "id": "1757047838369-g",
-      "squadId": "1757047838369",
-      "name": "FURIA",
-      "members": [
-        "1756859484293",
-        "1756860887995"
-      ],
-      "messages": [
-        {
-          "id": "1757049858112",
-          "fromUserId": "1756860887995",
-          "username": "Neemias",
-          "text": "da",
-          "time": "2025-09-05T05:24:18.112Z",
-          "timestamp": 1757049858112
-        }
-      ]
-    },
     {
       "id": "1757275878408-g",
       "squadId": "1757275878408",
       "name": "FuriaTEAM",
       "members": [
-        "1757275491312",
-        "1757275766810",
-        "1757275558975",
-        "1757275578902",
-        "1757275602282"
+        "1759865232559",
+        "1759865296354",
+        "1759865562222",
+        "1759865360978",
+        "1759866873862"
       ],
       "messages": [
         {
-          "id": "1757276713593",
-          "fromUserId": "1757275491312",
+          "messageId": "1757276713593",
+          "id": "1759866873862",
           "username": "Neemias Silva",
           "text": "oi gente",
-          "time": "2025-09-07T20:25:13.593Z",
-          "timestamp": 1757276713593
+          "time": "2025-09-07T20:25:13.593Z"
         },
         {
-          "id": "1757276724430",
-          "fromUserId": "1757275602282",
+          "messageId": "1757276724430",
+          "id": "1759865296354",
           "username": "Danilo Senna",
           "text": "eai, tudo certo?",
-          "time": "2025-09-07T20:25:24.430Z",
-          "timestamp": 1757276724430
+          "time": "2025-09-07T20:25:24.430Z"
         },
         {
-          "id": "1757276808107",
-          "fromUserId": "1757275558975",
+          "messageId": "1757276808107",
+          "id": "1759865232559",
           "username": "Ana Julia",
           "text": "oii",
-          "time": "2025-09-07T20:26:48.107Z",
-          "timestamp": 1757276808107
+          "time": "2025-09-07T20:26:48.107Z"
         },
         {
-          "id": "1757276840752",
-          "fromUserId": "1757275491312",
+          "messageId": "1757276840752",
+          "id": "1759866873862",
           "username": "Neemias Silva",
           "text": "estão preparados para o evento?",
-          "time": "2025-09-07T20:27:20.752Z",
-          "timestamp": 1757276840752
+          "time": "2025-09-07T20:27:20.752Z"
         },
         {
-          "id": "1757276853545",
-          "fromUserId": "1757275558975",
+          "messageId": "1757276853545",
+          "id": "1759865232559",
           "username": "Ana Julia",
           "text": "sim, e vocês?",
-          "time": "2025-09-07T20:27:33.545Z",
-          "timestamp": 1757276853545
+          "time": "2025-09-07T20:27:33.545Z"
         },
         {
-          "id": "1757276861620",
-          "fromUserId": "1757275602282",
+          "messageId": "1757276861620",
+          "id": "1759865296354",
           "username": "Danilo Senna",
           "text": "também estou",
-          "time": "2025-09-07T20:27:41.620Z",
-          "timestamp": 1757276861620
+          "time": "2025-09-07T20:27:41.620Z"
         }
       ]
     },
     {
-      "id": "1757276998437-g",
-      "squadId": "1757276998437",
+      "id": "1759965634070-g",
+      "squadId": "1759965634070",
       "name": "Cloud9",
       "members": [
-        "1757275491312",
-        "1757275602282"
-      ],
-      "messages": [
-        {
-          "id": "1757277043239",
-          "fromUserId": "1757275491312",
-          "username": "Neemias Silva",
-          "text": "jaja começa o evento, ta entrando?",
-          "time": "2025-09-07T20:30:43.239Z",
-          "timestamp": 1757277043239
-        },
-        {
-          "id": "1757277121782",
-          "fromUserId": "1757275602282",
-          "username": "Danilo Senna",
-          "text": "entro em 5 minutos",
-          "time": "2025-09-07T20:32:01.782Z",
-          "timestamp": 1757277121782
-        }
-      ]
-    },
-    {
-      "id": "1757285986215-g",
-      "squadId": "1757285986215",
-      "name": "teste2",
-      "members": [
-        "1757275491312",
-        "1757275602282"
+        "1759866873862",
+        "1759865296354"
       ],
       "messages": []
     },
     {
-      "id": "1757286593358-g",
-      "squadId": "1757286593358",
-      "name": "aaaaaaaaaaaa",
+      "id": "1759966090381-g",
+      "squadId": "1759966090381",
+      "name": "Team Vitality",
       "members": [
-        "1757275491312",
-        "1757275602282"
-      ],
-      "messages": []
-    },
-    {
-      "id": "1757287163152-g",
-      "squadId": "1757287163152",
-      "name": "teste 3",
-      "members": [
-        "1757275491312",
-        "1757275602282"
+        "1759866873862",
+        "1759865232559"
       ],
       "messages": []
     }
   ],
   "moderation": {
-    "users": {
-      "1757275491312": {
-        "infractions": [
-          {
-            "severity": 3,
-            "timestamp": 1757287249824
-          }
-        ],
-        "blockUntil": 1757373649824
-      }
-    }
+    "users": {}
   },
   "feedbackSummary": {
     "total": 5,

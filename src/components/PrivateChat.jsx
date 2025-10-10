@@ -20,6 +20,17 @@ export default function PrivateChat({ currentUser, friend, onClose }) {
     const pollRef = useRef(null);
     const bottomRef = useRef(null);
 
+    const resolveTimestamp = useCallback((message) => {
+        if (!message) return Date.now();
+        const parsed = message.time ? Date.parse(message.time) : NaN;
+        if (Number.isFinite(parsed)) return parsed;
+        const numericMessageId = Number(message.messageId);
+        if (Number.isFinite(numericMessageId)) return numericMessageId;
+        const numericLegacyId = Number(message.id);
+        if (Number.isFinite(numericLegacyId)) return numericLegacyId;
+        return Date.now();
+    }, []);
+
     const fetchMessages = useCallback(async () => {
         if (!currentUser || !friend) return;
         try {
@@ -27,17 +38,21 @@ export default function PrivateChat({ currentUser, friend, onClose }) {
             if (r.ok) {
                 const data = await r.json();
                 setMessages(data.map(m => {
-                    const ts = m.timestamp || Date.parse(m.time) || Number(m.id) || Date.now();
+                    const ts = resolveTimestamp(m);
+                    const senderId = m.fromUserId ? m.fromUserId : m.id;
                     return {
-                        ...m,
-                        me: m.fromUserId === currentUser.id,
-                        time: new Date(ts).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                        messageId: m.messageId || m.id,
+                        id: senderId,
+                        username: m.username || m.nome || m.usuario || 'Usuário',
+                        text: m.text,
+                        time: new Date(ts).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                        me: senderId === currentUser.id
                     };
                 }));
             }
-        } catch (e) { /* noop */ }
+        } catch (e) {}
         finally { setLoading(false); }
-    }, [currentUser, friend]);
+    }, [currentUser, friend, resolveTimestamp]);
 
     useEffect(() => { fetchMessages(); }, [fetchMessages]);
     useEffect(() => {
@@ -52,7 +67,7 @@ export default function PrivateChat({ currentUser, friend, onClose }) {
         if (!text.trim()) return;
         try {
             const body = {
-                fromUserId: currentUser.id,
+                id: currentUser.id,
                 username: currentUser.nome || currentUser.usuario || 'Você',
                 text: text.trim()
             };
@@ -64,13 +79,16 @@ export default function PrivateChat({ currentUser, friend, onClose }) {
             if (r.ok) {
                 const saved = await r.json();
                 setMessages(prev => [...prev, {
-                    ...saved,
+                    messageId: saved.messageId || saved.id,
+                    id: saved.id || currentUser.id,
+                    username: saved.username || body.username || friend.username,
+                    text: saved.text,
                     me: true,
-                    time: new Date(saved.timestamp || Date.parse(saved.time) || Number(saved.id) || Date.now()).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                    time: new Date(resolveTimestamp(saved)).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
                 }]);
                 setText('');
             }
-        } catch (e) { /* noop */ }
+        } catch (e) {}
     }
 
     function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
@@ -95,12 +113,11 @@ export default function PrivateChat({ currentUser, friend, onClose }) {
                     aria-label={`Histórico de mensagens privadas com ${friend.username}`}
                 >
                     {loading && <p className="text-sm text-gray-500">Carregando...</p>}
-                    {/* Estado vazio removido conforme solicitado */}
                     {messages.map(m => (
-                        <div key={m.id} className={`flex ${m.me ? 'justify-end' : 'justify-start'}`}>
+                        <div key={m.messageId || m.id} className={`flex ${m.me ? 'justify-end' : 'justify-start'}`}>
                             <div className={`max-w-[75%] rounded-xl px-4 py-2 text-sm shadow relative ${m.me ? 'bg-pink-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100'}`}>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-r ${colorFor(m.fromUserId || '')} text-xs text-white font-semibold`}>{(m.username || '?')[0]}</span>
+                                    <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-r ${colorFor(m.id || '')} text-xs text-white font-semibold`}>{(m.username || '?')[0]}</span>
                                     <span className="font-medium">{m.me ? 'Você' : m.username}</span>
                                     <span className="text-[10px] opacity-70">{m.time}</span>
                                 </div>

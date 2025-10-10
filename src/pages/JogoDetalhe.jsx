@@ -1,20 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { API_BASE } from '../services/apiBase';
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from 'lucide-react';
+import ChatWindow from '../components/ChatWindow';
+import MessageInput from '../components/MessageInput';
 
 export default function JogoDetalhe() {
     const { gameId } = useParams();
     const navigate = useNavigate();
     const [search, setSearch] = useState("");
     const [selectedCategories, setSelectedCategories] = useState([]);
-        const [games, setGames] = useState([]);
+    const [games, setGames] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [rankings, setTopPlayers] = useState([]);
-    const [chatMessages] = useState([
-        { user: "Organizador", text: "Evento em 10 minutos!" },
-    ]);
+    const [channelMessages, setChannelMessages] = useState([]);
+    const [loadingChat, setLoadingChat] = useState(false);
+    const [blockInfo, setBlockInfo] = useState(null);
+    const mainColRef = useRef(null);
+    const [chatHeight, setChatHeight] = useState(null);
 
     useEffect(() => {
         let cancelado = false;
@@ -58,6 +62,79 @@ export default function JogoDetalhe() {
         };
     }, []);
 
+    useEffect(() => {
+        function computeHeight() {
+            if (!mainColRef.current) return;
+            const styles = getComputedStyle(mainColRef.current);
+            const gap = parseFloat(styles.rowGap || '0');
+            const children = Array.from(mainColRef.current.children).filter(el => el instanceof HTMLElement);
+            let total = 0;
+            children.forEach((el, idx) => {
+                total += el.getBoundingClientRect().height;
+                if (idx < children.length - 1) total += gap;
+            });
+            if (Number.isFinite(total) && total > 0) setChatHeight(Math.round(total));
+        }
+        computeHeight();
+        window.addEventListener('resize', computeHeight);
+        return () => window.removeEventListener('resize', computeHeight);
+    }, [rankings.length, games.length, loading]);
+
+    // Dados do usuário atual
+    const currentUser = useMemo(() => {
+        const id = localStorage.getItem('usuarioId') || '';
+        const role = (localStorage.getItem('usuarioNivelAcesso') || 'user').toLowerCase();
+        const username = localStorage.getItem('usuarioLogado') || 'Usuário';
+        return { id, role, username };
+    }, []);
+
+    // Carrega mensagens do chat do jogo e status de bloqueio
+    useEffect(() => {
+        if (!gameId) return;
+        let aborted = false;
+        async function load() {
+            try {
+                setLoadingChat(true);
+                const [msgsRes, blockRes] = await Promise.all([
+                    fetch(`${API_BASE}/api/chat/messages/${gameId}`),
+                    currentUser.id ? fetch(`${API_BASE}/api/chat/block-status/${currentUser.id}`) : Promise.resolve({ ok: true, json: async () => ({ blocked: false }) })
+                ]);
+                const msgs = msgsRes.ok ? await msgsRes.json() : [];
+                const block = await blockRes.json().catch(() => ({ blocked: false }));
+                if (!aborted) {
+                    setChannelMessages(msgs);
+                    setBlockInfo(block.blocked ? block : null);
+                }
+            } catch (e) {
+                if (!aborted) {}
+            } finally { if (!aborted) setLoadingChat(false); }
+        }
+        load();
+        return () => { aborted = true; };
+    }, [gameId, currentUser.id]);
+
+    async function sendChannelMessage(text) {
+        try {
+            const body = { id: currentUser.id, username: currentUser.username, text };
+            const res = await fetch(`${API_BASE}/api/chat/messages/${gameId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                alert(err.error || 'Falha ao enviar mensagem');
+                return;
+            }
+            const msg = await res.json();
+            setChannelMessages(prev => [...prev, msg]);
+        } catch (e) { alert('Erro de rede ao enviar'); }
+    }
+
+    async function clearChannel() {
+        if (!window.confirm('Tem certeza que deseja limpar o chat deste jogo?')) return;
+        try {
+            const res = await fetch(`${API_BASE}/api/chat/messages/${gameId}/clear`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: currentUser.id }) });
+            if (!res.ok) { const err = await res.json().catch(() => ({})); alert(err.error || 'Falha ao limpar'); return; }
+            setChannelMessages([]);
+        } catch (e) { alert('Erro ao limpar chat'); }
+    }
 
     const filteredGames = games.filter((game) => {
         const matchesName = game.name.toLowerCase().includes(search.toLowerCase());
@@ -87,7 +164,7 @@ export default function JogoDetalhe() {
         return (
             <div className="text-center mt-10">
                 <h2 className="text-3xl font-bold text-red-600">{error}</h2>
-                    <button className="mt-6 bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white px-6 py-3 rounded-lg transition shadow" onClick={() => window.location.reload()}>
+                <button className="mt-6 bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white px-6 py-3 rounded-lg transition shadow" onClick={() => window.location.reload()}>
                     Tentar novamente
                 </button>
             </div>
@@ -98,7 +175,7 @@ export default function JogoDetalhe() {
         return (
             <div className="text-center mt-10">
                 <h2 className="text-3xl font-bold">Jogo não encontrado</h2>
-                    <button className="mt-6 bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white px-6 py-3 rounded-lg transition shadow" onClick={() => navigate("/jogos")}> {/* rota ajustada */}
+                <button className="mt-6 bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white px-6 py-3 rounded-lg transition shadow" onClick={() => navigate("/jogos")}> {/* rota ajustada */}
                     Voltar para jogos
                 </button>
             </div>
@@ -106,7 +183,7 @@ export default function JogoDetalhe() {
     }
 
     if (gameId && game) {
-    const eventosDoJogo = Array.isArray(game.events) ? game.events : [];
+        const eventosDoJogo = Array.isArray(game.events) ? game.events : [];
 
         return (
             <section className="min-h-screen px-8 py-12 flex justify-center" aria-labelledby="game-page-title">
@@ -138,9 +215,9 @@ export default function JogoDetalhe() {
                         </div>
                     </header>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
                         {/* Rankings */}
-                        <main className="lg:col-span-2 flex flex-col gap-6" aria-label="Eventos e rankings">
+                        <main ref={mainColRef} className="lg:col-span-2 flex flex-col gap-6" aria-label="Eventos e rankings">
                             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-8 min-h-[300px]">
                                 <h2 className="text-2xl font-bold mb-4">Próximos Eventos</h2>
                                 <ul className="space-y-3 text-gray-800 dark:text-gray-200 text-base">
@@ -151,9 +228,9 @@ export default function JogoDetalhe() {
                                                     <p className="font-semibold">{ev.nome}</p>
                                                     <span className="text-sm text-gray-600 dark:text-gray-300">{ev.dia} • {ev.horario}</span>
                                                 </div>
-                                                    <button
+                                                <button
                                                     onClick={() => navigate(`/inscreva-se?jogo=${encodeURIComponent(game.name)}&eventoId=${ev.id}`)}
-                                                        className="self-start md:self-auto bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white text-sm font-medium px-4 py-2 rounded-full transition shadow"
+                                                    className="self-start md:self-auto bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white text-sm font-medium px-4 py-2 rounded-full transition shadow"
                                                     aria-label={`Inscrever-se no evento ${ev.nome}`}
                                                 >
                                                     Participar
@@ -183,20 +260,37 @@ export default function JogoDetalhe() {
                         </main>
 
 
-                        {/* Avisos */}
-                        <aside className="flex flex-col gap-6" aria-label="Painel lateral: chat e interações">
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 flex flex-col h-full">
-                                <h2 className="text-2xl font-bold mb-4">Avisos</h2>
-                                <div
-                                    className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-3 overflow-y-auto mb-3"
-                                    aria-label="Avisos do jogo"
-                                    role="log"
-                                    aria-live="polite"
-                                >
-                                    {chatMessages.map((msg, idx) => (
-                                        <p key={idx} className="text-sm"><strong>[{msg.user}]:</strong> {msg.text}</p>
-                                    ))}
+                        {/* Chat do jogo */}
+                        <aside className="flex flex-col gap-6 h-full min-h-0" aria-label="Painel lateral: chat e interações">
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow flex flex-col min-h-0 overflow-hidden" style={chatHeight ? { height: `${chatHeight}px` } : undefined}>
+                                <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                                    <h2 className="text-2xl font-bold">Avisos</h2>
+                                    {(currentUser.role === 'admin' || currentUser.role === 'organizador') && (
+                                        <button onClick={clearChannel} className="text-xs px-3 py-1.5 rounded-md bg-red-600 text-white hover:bg-red-700">Limpar chat</button>
+                                    )}
                                 </div>
+                                <div className="flex-1 flex min-h-0">
+                                    {loadingChat && (
+                                        <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400">Carregando chat…</div>
+                                    )}
+                                    <ChatWindow channel={gameId} messages={channelMessages.map(m => {
+                                        const cargo = (m.role || '').toLowerCase();
+                                        return ({
+                                            ...m,
+                                            username: `${m.username || 'Usuário'}`,
+                                            roleBadge: cargo || undefined,
+                                            color: 'from-pink-500 to-pink-700',
+                                            time: new Date(m.time).toLocaleTimeString('pt-BR', { hour: '2-digit', 'minute': '2-digit' })
+                                        });
+                                    })} />
+                                </div>
+                                {/* Área de reações removida */}
+                                {/* Input: somente admin/organizador pode enviar no chat de jogo */}
+                                {(currentUser.role === 'admin' || currentUser.role === 'organizador') ? (
+                                    <MessageInput onSend={sendChannelMessage} blockInfo={blockInfo?.blocked ? blockInfo : null} />
+                                ) : (
+                                    <div className="p-4 text-xs text-gray-600 dark:text-gray-300 border-t border-gray-200 dark:border-gray-700">Somente organizadores e admins podem enviar mensagens neste chat.</div>
+                                )}
                             </div>
                         </aside>
                     </div>

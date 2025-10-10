@@ -1,34 +1,33 @@
-// IA de moderação usando OpenAI + fallback local
-const OpenAI = require('openai');
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// IA de moderação usando OpenAI
+let client = null;
+let hasOpenAI = false;
+try {
+    const OpenAI = require('openai');
+    if (process.env.OPENAI_API_KEY) {
+        client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        hasOpenAI = true;
+    }
+} catch (e) {
+    console.warn('[moderacaoIA] OpenAI não inicializado:', e.message);
+}
 
-// ===== FALLBACK REGRAS (quando não há OPENAI_API_KEY) =====
-// Monta regex que aceita asteriscos no meio (ex: "p**a" para "puta")
-// Gera regex tolerando asteriscos entre caracteres alfanuméricos, evitando padrões inválidos (**)
-// e tratando hífens ou outros símbolos como literais fixos.
 function censoredRegex(word){
     const raw = word;
-    // Escapa tudo primeiro
     const escaped = raw.replace(/[-/\\^$*+?.()|[\]{}]/g,'\\$&');
     if(raw.length < 3){
         return new RegExp('\\b'+escaped+'\\b','gi');
     }
-    // Para cada caractere original (não a versão escapada separada por backslashes adicionais)
     const chars = raw.split('');
     let pattern = '\\b';
     for(let i=0;i<chars.length;i++){
         const c = chars[i];
         const esc = c.replace(/[-/\\^$*+?.()|[\]{}]/g,'\\$&');
         if(/[0-9a-zá-úç]/i.test(c)){
-            // caractere alfanumérico: aceita opcional bloco de asteriscos depois
             pattern += esc + '(?:\\*+)?';
         } else {
-            // símbolo (ex: hífen) mantido sem quantificador para não gerar **
             pattern += esc;
         }
-    }
-    // Remove possível '(?:\\*+)?' terminal para evitar exigir asteriscos ao fim
-    pattern = pattern.replace(/(?:\(\?:\\\*\+\)\)\?)+$/,'');
+    }    pattern = pattern.replace(/(?:\(\?:\\\*\+\)\)\?)+$/,'');
     pattern += '\\b';
     return new RegExp(pattern,'gi');
 }
@@ -43,7 +42,6 @@ const AMEACAS = [
     /\b(se mata|se mate|va(i|) morrer|morra)\b/gi
 ];
 
-// Pré-constrói padrões
 const FALLBACK_PATTERNS = [
     ...PROFANIDADES.map(w=>({ re: censoredRegex(w), label:'profanidade', weight:1 })),
     ...INSULTOS.map(w=>({ re: censoredRegex(w), label:'insulto', weight:2 })),
@@ -66,7 +64,6 @@ function fallbackMask(text){
     let highestWeight = 0;
 
     FALLBACK_PATTERNS.forEach(p => {
-        // Reinicia lastIndex para segurança em múltiplos testes.
         p.re.lastIndex = 0;
         result = result.replace(p.re, m => {
             // Guardar match sem criar falsos positivos de letras isoladas.
@@ -80,19 +77,18 @@ function fallbackMask(text){
         });
     });
 
-    // Heurística de severidade mais conservadora para evitar falso severity 2 por matches isolados.
+    // Evitando falso severity 2 por matches isolados.
     let severity = 0;
     const distinct = reasons.size;
     const totalProf = counts.profanidade;
     if(highestWeight === 3 || counts.ameaça) severity = 3;
     else if(distinct >= 2 || counts.insulto > 0 || totalProf >= 3) severity = 2;
     else if(distinct === 1) severity = 1;
-
     return { text: result, reasons: [...reasons], severity, triggers };
 }
 
 async function aiModerate(text){
-    if(!process.env.OPENAI_API_KEY){
+    if(!hasOpenAI || !client){
     const fb = fallbackMask(text);
     const severity = fb.severity;
     const allowed = severity < 3;
@@ -113,7 +109,7 @@ async function aiModerate(text){
             `Mensagem: ${text}`
         ].join('\n');
 
-        const response = await client.responses.create({
+    const response = await client.responses.create({
             model: process.env.OPENAI_MODERATION_MODEL || 'gpt-5-nano',
             input: prompt,
             temperature: 0,

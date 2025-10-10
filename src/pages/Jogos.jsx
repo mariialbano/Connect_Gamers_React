@@ -8,10 +8,16 @@ const normalize = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").to
 function Jogos() {
     const navigate = useNavigate();
     const [games, setGames] = useState([]);
-    const destaques = games.slice(0, 5);
+    const [error, setError] = useState("");
+    const safeGames = Array.isArray(games) ? games : [];
+    const destaques = safeGames.slice(0, 5);
     const [carouselIndex, setCarouselIndex] = useState(0);
-    const next = () => setCarouselIndex(i => (i + 1) % destaques.length);
-    const prev = () => setCarouselIndex(i => (i - 1 + destaques.length) % destaques.length);
+    const next = () => {
+        if (destaques.length > 1) setCarouselIndex(i => (i + 1) % destaques.length);
+    };
+    const prev = () => {
+        if (destaques.length > 1) setCarouselIndex(i => (i - 1 + destaques.length) % destaques.length);
+    };
     const srcSafe = (s) => (s ? encodeURI(s) : "");
     const isYouTube = url => /youtube\.com|youtu\.be/.test(url || '');
     const AUTOPLAY_MS = 5000;
@@ -20,7 +26,8 @@ function Jogos() {
     const pauseTimeoutRef = useRef(null);
     const startAutoplay = useCallback(() => {
         clearInterval(autoplayRef.current);
-        if (!isPausedRef.current) {
+        // Só inicia autoplay quando há mais de um destaque
+        if (!isPausedRef.current && destaques.length > 1) {
             autoplayRef.current = setInterval(() => setCarouselIndex(i => (i + 1) % destaques.length), AUTOPLAY_MS);
         }
     }, [destaques.length]);
@@ -44,10 +51,42 @@ function Jogos() {
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [categorySearch, setCategorySearch] = useState("");
-    const allCategories = [...new Set(games.flatMap(g => g.categories))];
-    const filteredGames = games.filter(g => { const matchesName = normalize(g.name).includes(normalize(search)) || normalize(g.desc).includes(normalize(search)); const matchesCategory = selectedCategories.length === 0 || g.categories.some(cat => selectedCategories.includes(cat)); return matchesName && matchesCategory; });
+    const allCategories = [...new Set(safeGames.flatMap(g => g.categories || []))];
+    const filteredGames = safeGames.filter(g => {
+        const name = String(g.name || "");
+        const desc = String(g.desc || "");
+        const matchesName = normalize(name).includes(normalize(search)) || normalize(desc).includes(normalize(search));
+        const matchesCategory = selectedCategories.length === 0 || (g.categories || []).some(cat => selectedCategories.includes(cat));
+        return matchesName && matchesCategory;
+    });
     const filteredCategories = allCategories.filter(cat => normalize(cat).includes(normalize(categorySearch)));
-    useEffect(() => { fetch(`${API_BASE}/api/games`).then(r => r.json()).then(setGames).catch(err => console.error('Erro ao buscar jogos:', err)); }, []);
+    useEffect(() => {
+        let aborted = false;
+        async function load() {
+            try {
+                setError("");
+                const r = await fetch(`${API_BASE}/api/games`);
+                if (!r.ok) {
+                    const data = await r.json().catch(() => ({}));
+                    if (!aborted) {
+                        setGames([]);
+                        setError(data.error || `Falha ao carregar jogos (HTTP ${r.status})`);
+                    }
+                    return;
+                }
+                const data = await r.json();
+                if (!aborted) setGames(Array.isArray(data) ? data : []);
+            } catch (err) {
+                if (!aborted) {
+                    console.error('Erro ao buscar jogos:', err);
+                    setError('Erro de rede ao carregar jogos.');
+                    setGames([]);
+                }
+            }
+        }
+        load();
+        return () => { aborted = true; };
+    }, []);
     return (
         <section className="min-h-screen pt-8 px-4">
             <header>
@@ -71,6 +110,20 @@ function Jogos() {
                                         </div>
                                     </div>
                                 ))}
+                                {destaques.length === 0 && (
+                                    <div className="w-full aspect-video flex items-center justify-center text-white/80 p-8">
+                                        {error ? (
+                                            <div className="text-center">
+                                                <p className="text-sm md:text-base">{error}</p>
+                                                <p className="text-xs mt-1">Tente novamente em alguns segundos.</p>
+                                            </div>
+                                        ) : (
+                                            <div className="text-center">
+                                                <p className="text-sm md:text-base">Nenhum destaque disponível.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -78,18 +131,22 @@ function Jogos() {
             </header>
             <aside>
                 <div className="max-w-[1440px] px-4 mb-6 flex flex-col md:flex-row items-center gap-4 relative mx-[13%]">
-                    <input type="text" placeholder="Pesquisar por nome..." value={search} onChange={e => setSearch(e.target.value)} className="p-3 rounded-lg text-black bg-slate-200 border border-gray-300 flex-1 " />
+                    <div className="w-full flex-1">
+                        <label htmlFor="jogos-search" className="sr-only">Pesquisar jogos</label>
+                        <input id="jogos-search" aria-label="Pesquisar jogos" type="text" placeholder="Pesquisar por nome..." value={search} onChange={e => setSearch(e.target.value)} className="p-3 rounded-lg text-black bg-slate-200 border border-gray-300 flex-1 w-full" />
+                    </div>
                     <div className="relative">
                         <button onClick={() => setDropdownOpen(!dropdownOpen)} className="p-1 rounded-lg  hover:bg-pink-600/30 border border-gray-300 dark:border-gray-600 flex items-center gap-2 hover:scale-105 transition" aria-label="Abrir filtro de categorias" aria-haspopup="true" aria-expanded={dropdownOpen}>
                             <BsFilterRight size={41} />
                         </button>
                         {dropdownOpen && (
                             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg p-2 z-50">
-                                <input type="text" placeholder="Pesquisar categorias..." value={categorySearch} onChange={e => setCategorySearch(e.target.value)} className="w-full p-2 mb-2 rounded-lg text-black border border-gray-300 dark:border-gray-600 " />
+                                <label htmlFor="categoria-search" className="sr-only">Pesquisar categorias</label>
+                                <input id="categoria-search" aria-label="Pesquisar categorias" type="text" placeholder="Pesquisar categorias..." value={categorySearch} onChange={e => setCategorySearch(e.target.value)} className="w-full p-2 mb-2 rounded-lg text-black border border-gray-300 dark:border-gray-600 " />
                                 <div className="flex flex-col gap-1 max-h-48 overflow-y-auto">
                                     {filteredCategories.map(cat => (
                                         <label key={cat} className="flex items-center gap-2 cursor-pointer" onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); setSelectedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]); } }}>
-                                            <input type="checkbox" checked={selectedCategories.includes(cat)} onChange={() => setSelectedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])} className="accent-pink-600 w-4 h-4 rounded-sm border border-pink-600 cursor-pointer" aria-checked={selectedCategories.includes(cat)} />
+                                            <input aria-label={`Selecionar categoria ${cat}`} type="checkbox" checked={selectedCategories.includes(cat)} onChange={() => setSelectedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])} className="accent-pink-600 w-4 h-4 rounded-sm border border-pink-600 cursor-pointer" aria-checked={selectedCategories.includes(cat)} />
                                             <span className="text-gray-800 dark:text-white">{cat}</span>
                                         </label>
                                     ))}

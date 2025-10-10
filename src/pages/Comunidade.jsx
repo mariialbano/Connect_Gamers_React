@@ -12,15 +12,11 @@ const gradients = [
     'from-red-400 to-purple-500',
     'from-yellow-400 to-orange-500'
 ];
-function colorFor(userId) {
-    if (!userId) return gradients[0];
-    let sum = 0; for (let i = 0; i < userId.length; i++) sum += userId.charCodeAt(i);
+function colorFor(id) {
+    if (!id) return gradients[0];
+    let sum = 0; for (let i = 0; i < id.length; i++) sum += id.charCodeAt(i);
     return gradients[sum % gradients.length];
 }
-
-// (formatRemaining removido - não utilizado)
-
-// BlockBanner removido: agora aviso é overlay dentro do componente MessageInput
 
 export default function Comunidade() {
     const { theme } = useTheme();
@@ -45,7 +41,7 @@ export default function Comunidade() {
                 if (abort) return;
                 // construir mapa usuario -> nome
                 const map = {};
-                data.forEach(u=>{ if(u.usuario) map[u.usuario] = u.nome || u.usuario; });
+                data.forEach(u => { if (u.usuario) map[u.usuario] = u.nome || u.usuario; });
                 setUserMap(map);
                 const user = data.find(u => u.usuario === usuarioLogado || u.nome === usuarioLogado);
                 setCurrentUser(user || { usuario: usuarioLogado, nome: usuarioLogado, id: 'temp-' + usuarioLogado });
@@ -64,69 +60,79 @@ export default function Comunidade() {
         } catch (e) { /* noop */ }
     }, []);
 
+    const resolveTimestamp = useCallback((message) => {
+        if (!message) return Date.now();
+        const parsed = message.time ? Date.parse(message.time) : NaN;
+        if (Number.isFinite(parsed)) return parsed;
+        const numericId = Number(message.messageId);
+        if (Number.isFinite(numericId)) return numericId;
+        return Date.now();
+    }, []);
+
     const fetchMessages = useCallback(async (ch) => {
         try {
             const res = await fetch(`${API_BASE}/api/chat/messages/${encodeURIComponent(ch)}`);
             if (!res.ok) return;
             const data = await res.json();
             const mapped = data.map(m => {
-                const ts = m.timestamp || Date.parse(m.time) || Number(m.id) || Date.now();
+                const ts = resolveTimestamp(m);
                 // Se o campo username for um login, substituir por nome amigável se existir
                 const displayName = userMap[m.username] || m.username;
+                const senderId = m.userId ? m.userId : m.id;
                 return {
-                    id: m.id,
+                    messageId: m.messageId || m.id,
+                    id: senderId,
                     username: displayName,
-                    userId: m.userId,
                     text: m.text,
                     time: new Date(ts).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-                    color: colorFor(m.userId),
-                    currentUser: currentUser && m.userId === currentUser.id
+                    color: colorFor(senderId),
+                    currentUser: currentUser && senderId === currentUser.id
                 };
             });
             setMessages(mapped);
         } catch (e) { /* noop */ }
-    }, [currentUser, userMap]);
+    }, [currentUser, resolveTimestamp, userMap]);
 
     // Inicial
     useEffect(() => { fetchChannels(); }, [fetchChannels]);
     useEffect(() => { fetchMessages(channel); }, [channel, fetchMessages]);
 
     // Poll de bloqueio
-    useEffect(()=>{
-        let interval; let abort=false;
-        async function check(){
-            if(!currentUser?.id) return;
-            try{
+    useEffect(() => {
+        let interval; let abort = false;
+        async function check() {
+            if (!currentUser?.id) return;
+            try {
                 const res = await fetch(`${API_BASE}/api/chat/block-status/${currentUser.id}`);
-                if(!res.ok) return;
+                if (!res.ok) return;
                 const data = await res.json();
-                if(abort) return;
-                if(data.blocked){
-                    setBlockInfo({ blocked:true, remainingMs:data.remainingMs, blockUntil:data.blockUntil });
+                if (abort) return;
+                if (data.blocked) {
+                    setBlockInfo({ blocked: true, remainingMs: data.remainingMs, blockUntil: data.blockUntil });
                 } else {
                     setBlockInfo(null);
                 }
-            }catch{/* ignore */}
+            } catch {/* ignore */ }
         }
-        if(currentUser?.id){
+        if (currentUser?.id) {
             check();
             interval = setInterval(check, 10000); // a cada 10s
         }
-        return ()=>{ abort=true; if(interval) clearInterval(interval); };
+        return () => { abort = true; if (interval) clearInterval(interval); };
     }, [currentUser]);
 
     // Contagem regressiva local
-    useEffect(()=>{
-        if(!blockInfo?.blocked) return;
-        const t = setInterval(()=>{
-            setBlockInfo(info=>{
-                if(!info?.blocked) return info;
+    useEffect(() => {
+        if (!blockInfo?.blocked) return;
+        const t = setInterval(() => {
+            setBlockInfo(info => {
+                if (!info?.blocked) return info;
                 const remaining = Math.max(info.blockUntil - Date.now(), 0);
-                if(remaining<=0) return null;
+                if (remaining <= 0) return null;
                 return { ...info, remainingMs: remaining };
             });
         }, 1000);
-        return ()=> clearInterval(t);
+        return () => clearInterval(t);
     }, [blockInfo?.blocked]);
 
     useEffect(() => {
@@ -141,7 +147,7 @@ export default function Comunidade() {
         setModError(null);
         try {
             const body = {
-                userId: currentUser.id,
+                id: currentUser.id,
                 // Prioriza nome, só cai para usuario se não houver nome
                 username: currentUser.nome || currentUser.usuario || 'Usuário',
                 text: msgText
@@ -153,12 +159,12 @@ export default function Comunidade() {
             });
             if (!res.ok) {
                 if (res.status === 423) { // bloqueado
-                    let data = {}; try { data = await res.json(); } catch {}
-                    const remaining = Math.max((data.blockUntil||0) - Date.now(), 0);
-                    setBlockInfo({ blocked:true, blockUntil:data.blockUntil, remainingMs:remaining });
+                    let data = {}; try { data = await res.json(); } catch { }
+                    const remaining = Math.max((data.blockUntil || 0) - Date.now(), 0);
+                    setBlockInfo({ blocked: true, blockUntil: data.blockUntil, remainingMs: remaining });
                     return;
                 } else if (res.status === 400) {
-                    let data = {}; try { data = await res.json(); } catch {}
+                    let data = {}; try { data = await res.json(); } catch { }
                     setModError({ message: data.error || 'Mensagem recusada', reasons: data.reasons || [], severity: data.severity });
                     return; // não prossegue
                 }
@@ -166,12 +172,12 @@ export default function Comunidade() {
             }
             const saved = await res.json();
             setMessages(prev => [...prev, {
+                messageId: saved.messageId || saved.id,
                 id: saved.id,
                 username: userMap[saved.username] || saved.username,
-                userId: saved.userId,
                 text: saved.text,
-                time: new Date(saved.timestamp || Date.parse(saved.time) || Number(saved.id) || Date.now()).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-                color: colorFor(saved.userId),
+                time: new Date(resolveTimestamp(saved)).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                color: colorFor(saved.id),
                 currentUser: true
             }]);
             fetchChannels();
@@ -228,7 +234,7 @@ export default function Comunidade() {
                             )}
                             <ChatWindow channel={channel} messages={messages} hideScrollbar />
                             <div className={`px-4 pt-2 pb-3 transition-colors ${theme === 'dark' ? 'bg-gray-900/70 border-gray-800 rounded-b-2xl' : 'bg-white/80 border-gray-300 rounded-b-2xl'} backdrop-blur-sm`}>
-                                <MessageInput onSend={handleSend} blockInfo={blockInfo?.blocked ? { remainingMs:blockInfo.remainingMs } : null} />
+                                <MessageInput onSend={handleSend} blockInfo={blockInfo?.blocked ? { remainingMs: blockInfo.remainingMs } : null} />
                             </div>
                         </div>
                     </div>

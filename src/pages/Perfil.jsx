@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { API_BASE } from '../services/apiBase';
-import { getItem } from '../services/api';
+import { getItem, postItem } from '../services/api';
 
 // Avatar
 function AvatarSection({ profileImage, siteAvatars, showAvatarList, onToggleList, onSelectAvatar }) {
@@ -84,7 +85,7 @@ function NameEditSection({ nomeUsuario, editandoNome, novoNome, setNovoNome, set
         </div>
       )}
       <p className="mt-1 text-md text-gray-700 dark:text-gray-400">{localStorage.getItem('usuarioLogado')}</p>
-  <div className="inline-block text-sm md:text-base bg-pink-600/15 text-pink-800 dark:text-pink-300 px-4 py-2 rounded-full font-semibold mt-4 tracking-wide">Ranking: Ouro</div>
+      <div className="inline-block text-sm md:text-base bg-pink-600/15 text-pink-800 dark:text-pink-300 px-4 py-2 rounded-full font-semibold mt-4 tracking-wide">Ranking: Ouro</div>
     </div>
   );
 }
@@ -95,12 +96,12 @@ function EventsSection({ usuarioLogado }) {
   const [eventos, setEventos] = useState({});
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
-  const [origemEventos,setOrigemEventos] = useState('eventos');
+  const [origemEventos, setOrigemEventos] = useState('eventos');
   const [mapUsuarios, setMapUsuarios] = useState({});
 
   useEffect(() => {
     async function fetchData() {
-      if(!usuarioLogado){ return; }
+      if (!usuarioLogado) { return; }
       setLoading(true); setErro(null);
       try {
         const squads = await getItem('squads');
@@ -108,7 +109,7 @@ function EventsSection({ usuarioLogado }) {
         let usuarios = [];
         try { usuarios = await getItem('usuarios'); } catch { usuarios = []; }
         const mapa = {};
-        (usuarios||[]).forEach(u => {
+        (usuarios || []).forEach(u => {
           if (u && u.usuario) {
             mapa[u.usuario.toLowerCase()] = (u.nome && u.nome.trim()) || u.usuario;
           }
@@ -118,24 +119,24 @@ function EventsSection({ usuarioLogado }) {
         try {
           eventosData = await getItem('eventos');
           setOrigemEventos('eventos');
-        } catch(evErr){
+        } catch (evErr) {
           console.warn('Falha ao obter /api/eventos, tentando /api/games fallback', evErr);
           try {
             const games = await getItem('games');
             const rebuilt = {};
-            (games||[]).forEach(g=>{ if(Array.isArray(g.events)) rebuilt[g.name] = g.events; });
+            (games || []).forEach(g => { if (Array.isArray(g.events)) rebuilt[g.name] = g.events; });
             eventosData = rebuilt;
             setOrigemEventos('games-fallback');
-          } catch(gErr){
+          } catch (gErr) {
             console.error('Também falhou /api/games fallback', gErr);
             eventosData = {};
           }
         }
         setEventos(eventosData || {});
         const userLower = usuarioLogado.toLowerCase();
-        const squadsDoUsuario = (squads||[]).filter(sq => Array.isArray(sq.integrantes) && sq.integrantes.some(n => (n||'').toLowerCase().trim() === userLower));
+        const squadsDoUsuario = (squads || []).filter(sq => Array.isArray(sq.integrantes) && sq.integrantes.some(n => (n || '').toLowerCase().trim() === userLower));
         setMeusSquads(squadsDoUsuario);
-        if(!Object.keys(eventosData||{}).length){
+        if (!Object.keys(eventosData || {}).length) {
           setErro('Nenhum evento disponível no momento.');
         }
       } catch (e) {
@@ -147,16 +148,16 @@ function EventsSection({ usuarioLogado }) {
     fetchData();
   }, [usuarioLogado]);
 
-  const todosEventos = Array.isArray(eventos) ? eventos : Object.values(eventos||{}).flat();
+  const todosEventos = Array.isArray(eventos) ? eventos : Object.values(eventos || {}).flat();
 
   return (
     <section className="mb-12">
       <h2 className="text-2xl font-bold mb-6 pb-2 border-b-2 border-pink-800 flex justify-center items-center text-black dark:text-gray-100">
         <i className="fas fa-calendar-alt mr-3 text-pink-800 dark:text-pink-400" /> Meus Eventos
       </h2>
-  {loading && <div className="text-center text-gray-500">Carregando eventos...</div>}
+      {loading && <div className="text-center text-gray-500">Carregando eventos...</div>}
       {erro && <div className="text-center text-red-500">{erro}</div>}
-  {!loading && !erro && origemEventos==='games-fallback' && <div className="text-center text-xs text-gray-500 mb-4">(Usando lista de eventos reconstruída a partir dos jogos)</div>}
+      {!loading && !erro && origemEventos === 'games-fallback' && <div className="text-center text-xs text-gray-500 mb-4">(Usando lista de eventos reconstruída a partir dos jogos)</div>}
       {!loading && !erro && meusSquads.length === 0 && <div className="text-center text-gray-500">Você ainda não está inscrito em nenhum evento.</div>}
       <div className="grid gap-5 md:grid-cols-2">
         {meusSquads.map(squad => {
@@ -172,7 +173,7 @@ function EventsSection({ usuarioLogado }) {
               <p className="text-xs text-gray-500 dark:text-gray-300 mb-2">Nível: {squad.nivel}</p>
               <div className="flex flex-wrap gap-2 mt-2">
                 {squad.integrantes.slice(0, 8).map((usuarioRaw, idx) => {
-                  const key = (usuarioRaw||'').toLowerCase().trim();
+                  const key = (usuarioRaw || '').toLowerCase().trim();
                   const display = mapUsuarios[key] || usuarioRaw || '—';
                   return (
                     <span key={idx} className="text-xs bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-2 py-1 rounded-full" title={usuarioRaw}>{display}</span>
@@ -189,8 +190,11 @@ function EventsSection({ usuarioLogado }) {
 
 // Alterar Senha
 function PasswordSection({ showPasswordSection, setShowPasswordSection, currentPassword, setCurrentPassword, newPassword, setNewPassword, confirmPassword, setConfirmPassword, onSubmitPassword }) {
-  const passwordPattern = '(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}';
-  const passwordTitle = 'A senha deve ter pelo menos 8 caracteres, incluindo letras, números e um símbolo';
+  const [mostrarAtual, setMostrarAtual] = useState(false);
+  const [mostrarNova, setMostrarNova] = useState(false);
+  const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
+  const passwordPattern = '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}';
+  const passwordTitle = 'A nova senha deve ter ao menos 8 caracteres, com letras maiúsculas, minúsculas, números e símbolos';
   return (
     <section className="mb-8">
       <button
@@ -208,16 +212,46 @@ function PasswordSection({ showPasswordSection, setShowPasswordSection, currentP
           <form onSubmit={onSubmitPassword} className="p-8">
             <div className="mb-5">
               <label className="block mb-3 font-semibold text-black dark:text-white">Senha Atual</label>
-              <input type="password" name="currentPassword" id="currentPassword" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="Digite sua senha atual" autoComplete="current-password" className="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgb(253,77,121)] bg-[#f3f4f6] border border-pink-300 text-black dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-white/65" />
+              <div className="relative">
+                <input type={mostrarAtual ? 'text' : 'password'} name="currentPassword" id="currentPassword" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="Digite sua senha atual" autoComplete="current-password" className="w-full p-3 pr-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgb(253,77,121)] bg-[#f3f4f6] border border-pink-300 text-black dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-white/65" />
+                <button
+                  type="button"
+                  onClick={() => setMostrarAtual(v => !v)}
+                  className="absolute inset-y-0 right-3 flex items-center text-xl text-gray-500 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100"
+                  aria-label={mostrarAtual ? 'Ocultar senha atual' : 'Mostrar senha atual'}
+                >
+                  {mostrarAtual ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
             <div className="mb-5">
               <label className="block mb-3 font-semibold text-black dark:text-white">Nova Senha</label>
-              <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgb(253,77,121)] bg-[#f3f4f6] border border-pink-300 text-black dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-white/65" placeholder="Digite a nova senha" required pattern={passwordPattern} title={passwordTitle} />
-              <small className="text-gray-600 dark:text-gray-200">A senha deve ter pelo menos 8 caracteres, incluindo letras, números e um símbolo</small>
+              <div className="relative">
+                <input type={mostrarNova ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full p-3 pr-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgb(253,77,121)] bg-[#f3f4f6] border border-pink-300 text-black dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-white/65" placeholder="Digite a nova senha" required pattern={passwordPattern} title={passwordTitle} />
+                <button
+                  type="button"
+                  onClick={() => setMostrarNova(v => !v)}
+                  className="absolute inset-y-0 right-3 flex items-center text-xl text-gray-500 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100"
+                  aria-label={mostrarNova ? 'Ocultar nova senha' : 'Mostrar nova senha'}
+                >
+                  {mostrarNova ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+              <small className="text-gray-600 dark:text-gray-200">Use pelo menos 8 caracteres, misturando letras maiúsculas, minúsculas, números e símbolos</small>
             </div>
             <div className="mb-6">
               <label className="block mb-3 font-semibold text-black dark:text-white">Confirmar Nova Senha</label>
-              <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgb(253,77,121)] bg-[#f3f4f6] border border-pink-300 text-black dark:bg-gray-600 dark:border-gray-500 dark:text-white  dark:placeholder-white/65" placeholder="Confirme a nova senha" required pattern={passwordPattern} title={passwordTitle} />
+              <div className="relative">
+                <input type={mostrarConfirmacao ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="w-full p-3 pr-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgb(253,77,121)] bg-[#f3f4f6] border border-pink-300 text-black dark:bg-gray-600 dark:border-gray-500 dark:text-white  dark:placeholder-white/65" placeholder="Confirme a nova senha" required pattern={passwordPattern} title={passwordTitle} />
+                <button
+                  type="button"
+                  onClick={() => setMostrarConfirmacao(v => !v)}
+                  className="absolute inset-y-0 right-3 flex items-center text-xl text-gray-500 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100"
+                  aria-label={mostrarConfirmacao ? 'Ocultar confirmação da senha' : 'Mostrar confirmação da senha'}
+                >
+                  {mostrarConfirmacao ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
             <button type="submit" className="w-full bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white py-3 px-4 rounded-lg font-bold transition-all shadow-md hover:shadow-lg">Atualizar Senha</button>
           </form>
@@ -258,11 +292,11 @@ const Profile = () => {
     })();
   }, []);
 
-  const passwordRegex = /(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 
   const handlePasswordSubmit = async e => {
     e.preventDefault();
-    if (!passwordRegex.test(newPassword)) return alert('A nova senha deve ter pelo menos 8 caracteres, incluindo letras, números e um símbolo.');
+    if (!passwordRegex.test(newPassword)) return alert('A nova senha deve ter ao menos 8 caracteres, com letras maiúsculas, minúsculas, números e símbolos.');
     if (newPassword !== confirmPassword) return alert('As senhas não coincidem!');
     try {
       const usuarioLogado = localStorage.getItem('usuarioLogado');
@@ -270,8 +304,14 @@ const Profile = () => {
       const usuarios = await getItem('usuarios');
       const usuario = usuarios.find(u => u.usuario === usuarioLogado);
       if (!usuario) return alert('Usuário não encontrado.');
-      if (usuario.senha !== currentPassword) return alert('Senha atual incorreta!');
-  const response = await fetch(`${API_BASE}/api/usuarios/${usuario.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ senha: newPassword }) });
+
+      try {
+        await postItem('usuarios/login', { usuario: usuario.usuario, senha: currentPassword });
+      } catch (err) {
+        return alert('Senha atual incorreta!');
+      }
+
+      const response = await fetch(`${API_BASE}/api/usuarios/${usuario.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ senha: newPassword }) });
       if (!response.ok) throw new Error('Erro ao atualizar senha.');
       alert('Senha alterada com sucesso!');
       setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); setShowPasswordSection(false);
@@ -286,7 +326,7 @@ const Profile = () => {
       const usuarios = await getItem('usuarios');
       const usuario = usuarios.find(u => u.usuario === usuarioLogado);
       if (!usuario) return;
-  const response = await fetch(`${API_BASE}/api/usuarios/${usuario.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: novoNome }) });
+      const response = await fetch(`${API_BASE}/api/usuarios/${usuario.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: novoNome }) });
       if (!response.ok) throw new Error('Falha ao atualizar nome');
       setNomeUsuario(novoNome); setEditandoNome(false);
     } catch (e) { console.error('Erro ao atualizar nome', e); alert('Não foi possível atualizar o nome.'); }
@@ -307,7 +347,7 @@ const Profile = () => {
           editandoNome={editandoNome}
           novoNome={novoNome}
           setNovoNome={setNovoNome}
-            setEditandoNome={setEditandoNome}
+          setEditandoNome={setEditandoNome}
           onSalvarNome={handleSalvarNome}
         />
         <div className="max-w-2xl mx-auto">
