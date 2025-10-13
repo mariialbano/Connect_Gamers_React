@@ -319,7 +319,7 @@ export default function Dashboard() {
                 const denom = n * sumX2 - sumX * sumX;
                 const slope = denom === 0 ? 0 : (n * sumXY - sumX * sumY) / denom;
                 const intercept = (sumY - slope * sumX) / n;
-                const nextX = (n - 1) + periodDays; // fim do próximo período
+                const nextX = (n - 1) + periodDays;
                 nextPeriod = Math.max(0, Math.round(slope * nextX + intercept));
                 trend = slope > 0 ? 'crescimento' : slope < 0 ? 'declínio' : 'estável';
             }
@@ -329,35 +329,48 @@ export default function Dashboard() {
             const avgPerDay = totalAdds / periodDays;
             const avgPerPeriod = Math.max(0, avgPerDay);
 
-            // taxa de crescimento
-            let growthRate = null;
-            if (periodDays >= 2) {
-                const mid = Math.floor(periodDays / 2);
-                const secondHalfDays = periodDays - mid;
-                let sum1 = 0, sum2 = 0;
+            // taxa de crescimento (comparando tendência do período)
+            let growthRate = null; 
+            if (cumulative.length >= 4) {
+                const mid = Math.floor(cumulative.length / 2);
                 
+                let sum1 = 0;
                 for (let i = 0; i < mid; i++) {
-                    const key = dayKeys[i];
-                    sum1 += (addsByDay[key] || 0);
+                    sum1 += cumulative[i];
                 }
-                for (let i = mid; i < periodDays; i++) {
-                    const key = dayKeys[i];
-                    sum2 += (addsByDay[key] || 0);
-                }
-                
-                // Calcular médias diárias de cada metade
                 const avg1 = sum1 / mid;
-                const avg2 = sum2 / secondHalfDays;
                 
-                // Calcular taxa de crescimento entre médias
+                let sum2 = 0;
+                for (let i = mid; i < cumulative.length; i++) {
+                    sum2 += cumulative[i];
+                }
+                const avg2 = sum2 / (cumulative.length - mid);
+                
                 if (avg1 > 0) {
                     growthRate = ((avg2 - avg1) / avg1) * 100;
-                } else if (avg2 > 0) {
-                    // Se não há registros na 1ª metade mas há na 2ª, marcar como crescimento infinito/máximo
-                    growthRate = null; // Será exibido como "—" ou texto específico
+                    growthRate = Math.max(-100, Math.min(500, growthRate));
+                } else if (avg2 > avg1) {
+                    growthRate = 100;
                 } else {
                     growthRate = 0;
                 }
+            } else if (cumulative.length >= 2) {
+                const startValue = cumulative[0];
+                const endValue = cumulative[cumulative.length - 1];
+                
+                if (startValue > 0 && endValue !== startValue) {
+                    growthRate = ((endValue - startValue) / startValue) * 100;
+                    growthRate = Math.max(-100, Math.min(200, growthRate));
+                } else if (endValue > startValue) {
+                    growthRate = 100;
+                } else if (endValue === startValue) {
+                    growthRate = 0; // Estagnação
+                } else {
+                    growthRate = 0;
+                }
+            } else {
+                // Sem dados suficientes para calcular
+                growthRate = 0;
             }
 
             return { nextPeriod, nextMonth: nextPeriod, avgPerPeriod, growthRate, trend };
@@ -368,56 +381,7 @@ export default function Dashboard() {
         return { users: usersPred, squads: squadsPred };
     }, [usuarios, squads, globalRange, customStart, customEnd]);
 
-    const insights = useMemo(() => {
-        const lista = [];
 
-        if (predictiveWindow?.users) {
-            const nextUsers = Number(predictiveWindow.users.nextPeriod || predictiveWindow.users.nextMonth || 0);
-            const trend = predictiveWindow.users.trend || 'estável';
-            const avg = predictiveWindow.users.avgPerPeriod;
-            const avgFmt = Number.isFinite(avg) ? Number(avg.toFixed?.(1) ?? avg).toFixed(1) : '—';
-            lista.push({
-                type: 'prediction',
-                title: 'Projeção de Crescimento',
-                text: `Análise preditiva indica ${numberFormatter.format(nextUsers)} usuários no próximo período, com tendência ${trend}. Média por período: ${avgFmt} usuário(s).`,
-                icon: '📈'
-            });
-        }
-
-        lista.push({
-            type: 'retention',
-            title: 'Retenção da Comunidade',
-            text: `Retenção média de ${retentionAverage}% nas últimas quatro semanas. ${parseFloat(retentionAverage) >= 70 ? 'Excelente! Continue investindo em engajamento.' : 'Implemente campanhas de reativação para melhorar a retenção.'}`,
-            icon: '🎯'
-        });
-
-        lista.push({
-            type: 'engagement',
-            title: 'Engajamento Recente',
-            text: analytics.recentes > 0
-                ? `${analytics.recentes} perfis ativos nos últimos 30 dias (${((analytics.recentes / Math.max(analytics.totalUsuarios, 1)) * 100).toFixed(1)}% da base). Boa adesão às novidades!`
-                : 'Nenhuma atividade recente detectada. Incentive campanhas de retorno para reativar a comunidade.',
-            icon: '⚡'
-        });
-
-        lista.push({
-            type: 'team',
-            title: 'Organização da Comunidade',
-            text: analytics.totalOrganizadores > 0
-                ? `${analytics.totalOrganizadores} organizador(es) ativos apoiando ${analytics.totalUsuarios} usuários.`
-                : 'Considere nomear organizadores para apoiar a operação e eventos.',
-            icon: '👥'
-        });
-
-        lista.push({
-            type: 'esg',
-            title: 'Impacto Digital Sustentável',
-            text: `Plataforma otimizada para ${analytics.totalUsuarios} usuários. Dashboard consome ~${(analytics.totalUsuarios * 0.15).toFixed(2)}KB de dados por carregamento, mantendo eficiência energética.`,
-            icon: '🌱'
-        });
-
-        return lista;
-    }, [analytics, retentionAverage, predictiveWindow]);
 
     const gameDistribution = useMemo(() => {
         const mapDays = { '7d': 7, '30d': 30, '60d': 60, '6m': 180, '1y': 365 };
@@ -789,21 +753,6 @@ export default function Dashboard() {
                                 <div className="bg-white dark:bg-gray-900/60 rounded-xl p-5 border border-pink-100 dark:border-gray-700 flex-1 flex flex-col justify-center">
                                     <PieChartEvents data={gameDistribution} />
                                 </div>
-                            </div>
-                        </div>
-
-                        <div className="mt-8 pt-8 border-t border-pink-200 dark:border-gray-700">
-                            <h3 className="text-sm font-bold text-pink-700 dark:text-pink-400 uppercase tracking-wider mb-4">Insights Automáticos</h3>
-                            <div className="grid md:grid-cols-2 gap-4" aria-label="Insights gerados automaticamente">
-                                {insights.map((item, idx) => (
-                                    <div key={idx} className="flex gap-3 p-4 rounded-lg bg-white dark:bg-gray-900/60 border border-pink-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
-                                        <div className="text-xl flex-shrink-0" aria-hidden="true">{item.icon}</div>
-                                        <div className="space-y-1 min-w-0">
-                                            <h4 className="text-xs font-bold text-pink-700 dark:text-pink-300">{item.title}</h4>
-                                            <p className="text-[11px] leading-relaxed text-gray-600 dark:text-gray-300">{item.text}</p>
-                                        </div>
-                                    </div>
-                                ))}
                             </div>
                         </div>
                     </section>
