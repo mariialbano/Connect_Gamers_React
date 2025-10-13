@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div className="flex justify-center py-10 px-4">
       <div className="bg-[#d9dbe2] dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-4xl text-black dark:text-white relative">
-  <div className="absolute top-0 right-0 w-20 h-20 bg-pink-600 rounded-full opacity-20 -mt-10 -mr-10"></div>
+        <div className="absolute top-0 right-0 w-20 h-20 bg-pink-600 rounded-full opacity-20 -mt-10 -mr-10"></div>
 
         <h2 className="text-4xl font-bold mb-6 text-black dark:text-white">
           NOSSO <br /> <span className="text-pink-800 dark:text-pink-400">OBJETIVO</span>

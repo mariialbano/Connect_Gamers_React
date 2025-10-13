@@ -39,3 +39,6 @@
 {"time":"2025-10-10T18:49:30.188Z","ip":"::ffff:127.0.0.1","method":"GET","url":"/api/games","reason":"rate_limited"}
 {"time":"2025-10-10T18:49:30.628Z","ip":"::ffff:127.0.0.1","method":"GET","url":"/api/games","reason":"rate_limited"}
 {"time":"2025-10-10T18:49:30.629Z","ip":"::ffff:127.0.0.1","method":"GET","url":"/api/games","reason":"rate_limited"}
+{"time":"2025-10-13T17:47:43.857Z","ip":"::1","method":"GET","url":"/api/social/status/admin","reason":"rate_limited"}
+{"time":"2025-10-13T17:47:45.335Z","ip":"::1","method":"GET","url":"/api/usuarios","reason":"rate_limited"}
+{"time":"2025-10-13T17:47:45.337Z","ip":"::1","method":"GET","url":"/api/usuarios","reason":"rate_limited"}

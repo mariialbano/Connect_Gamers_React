@@ -38,6 +38,18 @@
       "nivel": "Competitivo",
       "dataCadastro": "2025-10-08T23:28:10.377Z",
       "id": "1759966090381"
+    },
+    {
+      "nomeSquad": "CarSoccer",
+      "integrantes": [
+        "Danilo",
+        "Mariana"
+      ],
+      "jogo": "Rocket League",
+      "eventoId": 4,
+      "nivel": "Intermediário",
+      "dataCadastro": "2025-10-10T19:48:50.222Z",
+      "id": "1760125730235"
     }
   ],
   "usuarios": [
@@ -47,8 +59,8 @@
       "senha": "$2b$10$VXSz6reRoz3XfoMw3wurjuJuSAyA5RqhqDsKri3oeRfm8DA2gkjSa",
       "id": "admin",
       "cargo": "admin",
-      "createdAt": "2025-10-07T19:11:14.452Z",
-      "Data": "2025-10-08T20:35:54.598Z"
+      "Data": "2025-10-13T17:53:34.335Z",
+      "createdAt": "2025-10-13T17:53:34.335Z"
     },
     {
       "nome": "Ana Julia",
@@ -56,7 +68,6 @@
       "senha": "$2b$10$oLDCz4HS8g5qgbkPqfeaceR5SgeRE.SRROoCuZQK5m.1ri3Lnln2e",
       "id": "1759865232559",
       "cargo": "user",
-      "createdAt": "2025-10-07T19:27:12.559Z",
       "Data": "2025-10-07T19:27:36.431Z"
     },
     {
@@ -65,7 +76,6 @@
       "senha": "$2b$10$m9fia6z4Y4DymIqt3d4FX.gB88qd9LIEnvgDNqKOu4DtdD3d8qydm",
       "id": "1759865296354",
       "cargo": "organizador",
-      "createdAt": "2025-10-07T19:28:16.354Z",
       "Data": "2025-10-07T19:28:16.354Z"
     },
     {
@@ -74,7 +84,6 @@
       "senha": "$2b$10$8I5QFPwK13lvGn8w6qO49.by1aaPS5SF5tQ.YXR.yKNuP8ayKlfli",
       "id": "1759865562222",
       "cargo": "user",
-      "createdAt": "2025-10-07T19:32:42.222Z",
       "Data": "2025-10-07T19:32:42.222Z"
     },
     {
@@ -83,7 +92,6 @@
       "senha": "$2b$10$pez0ShBIp.DyWTE0wo6NweOcEbp.j7nqZxUb5GVyPLE/dH2bcnfG.",
       "id": "1759865360978",
       "cargo": "user",
-      "createdAt": "2025-10-07T19:29:20.978Z",
       "Data": "2025-10-07T19:29:20.978Z"
     },
     {
@@ -92,7 +100,6 @@
       "senha": "$2b$10$jCiZPnceugzGYr8CtOugtOiEha9zic7O8t1gwWJGhsQ7bKM6mJDAu",
       "id": "1759866873862",
       "cargo": "user",
-      "createdAt": "2025-10-07T19:54:33.862Z",
       "Data": "2025-10-07T19:54:33.862Z"
     },
     {
@@ -101,8 +108,15 @@
       "senha": "$2b$10$VNQPf9fEI145IQVIL.CbA.G9JD77lfA0vo69J0j70.EL2.Obt42M.",
       "cargo": "user",
       "id": "1760040963896",
-      "createdAt": "2025-10-09T20:16:03.896Z",
       "Data": "2025-10-09T20:16:03.896Z"
+    },
+    {
+      "nome": "TESTE",
+      "usuario": "teste",
+      "senha": "$2b$10$YOkWwQ6l71yUsHJ2NGBSFOEJAeWun9baRFhFSDRqu/Vam.aJvsnAW",
+      "cargo": "user",
+      "id": "1760125748733",
+      "Data": "2025-10-10T19:49:08.733Z"
     }
   ],
   "jogos": [
@@ -498,7 +512,7 @@
       "senderId": "1759865296354",
       "receiverId": "1759866873862",
       "status": "aceito",
-      "createdAt": "2025-10-10T17:13:51.824Z"
+      "Data": "2025-10-10T17:13:51.824Z"
     }
   ],
   "friendships": [
@@ -585,6 +599,16 @@
       "members": [
         "1759866873862",
         "1759865232559"
+      ],
+      "messages": []
+    },
+    {
+      "id": "1760125730235-g",
+      "squadId": "1760125730235",
+      "name": "CarSoccer",
+      "members": [
+        "1759865296354",
+        "1759865360978"
       ],
       "messages": []
     }

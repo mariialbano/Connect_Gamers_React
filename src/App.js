@@ -11,6 +11,7 @@ import Perfil from './pages/Perfil';
 import Comunidade from './pages/Comunidade';
 import Amigos from './pages/Amigos';
 import Dashboard from './pages/Dashboard';
+import ESG from './pages/ESG';
 import { useTheme } from './theme/ThemeContext';
 
 function App() {
@@ -73,6 +74,7 @@ function App() {
             <Route path="/comunidade" element={<RequireAuth><Comunidade /></RequireAuth>} />
             <Route path="/amigos" element={<RequireAuth><Amigos /></RequireAuth>} />
             <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
+            <Route path="/esg" element={<ESG />} />
           </Routes>
         </main>
         <Footer />
