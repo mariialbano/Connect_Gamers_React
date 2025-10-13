@@ -206,7 +206,6 @@ router.post('/', async (req, res) => {
         db.usuarios.push(novoUsuario);
         writeDB(db);
     const { senha: _, ...semSenha } = novoUsuario;
-    appendLog('account_creation.log', { time: new Date().toISOString(), ip: req.ip, userId: semSenha.id, usuario: semSenha.usuario, cargo: semSenha.cargo, createdAt: semSenha.createdAt });
     res.status(201).json({ ...semSenha, nivelAcesso: semSenha.cargo || 'user' });
     } catch (err) {
         console.error('Erro ao criar usuário:', err);
@@ -223,7 +222,6 @@ router.patch('/:id', async (req, res) => {
 
     const atualizacoes = { ...(req.body || {}) };
     delete atualizacoes.nivelAcesso;
-    // aceitar 'cargo' e 'nivelAcesso' mas normalizar para 'cargo'
     if (Object.prototype.hasOwnProperty.call(atualizacoes, 'nivelAcesso')) {
         atualizacoes.cargo = atualizacoes.nivelAcesso;
         delete atualizacoes.nivelAcesso;
