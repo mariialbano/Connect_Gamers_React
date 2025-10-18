@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
-const bcrypt = require('bcrypt');
 const usersRouter = require('./routes/users');
 const squadsRouter = require('./routes/squads');
 const gamesRouter = require('./routes/games');
@@ -13,8 +12,8 @@ const chatRouter = require('./routes/chat');
 const faqRouter = require('./routes/faq');
 const socialRouter = require('./routes/social');
 const rateLimit = require('express-rate-limit');
+const DatabaseService = require('./services/databaseService');
 
-const dbPath = path.join(__dirname, '../db.json');
 const logsDir = path.join(__dirname, '../logs');
 
 function ensureLogsDir() {
@@ -49,98 +48,6 @@ function migrateRootLogs() {
     }
 }
 
-function ensureAdminUser() {
-    const ADMIN_USERNAME = (process.env.ADMIN_DEFAULT_USER || 'admin').trim();
-    const ADMIN_PASSWORD = (process.env.ADMIN_DEFAULT_PASS || 'admin').trim();
-    const ADMIN_NAME = (process.env.ADMIN_DEFAULT_NAME || 'Administrador').trim();
-
-    if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
-        console.warn();
-        return;
-    }
-
-    let db;
-    try {
-        const raw = fs.readFileSync(dbPath, 'utf-8');
-        db = JSON.parse(raw);
-    } catch (err) {
-        db = { usuarios: [] };
-    }
-
-    db.usuarios = Array.isArray(db.usuarios) ? db.usuarios : [];
-
-    const now = new Date().toISOString();
-    const adminUser = db.usuarios.find((u) => String(u.usuario || '').toLowerCase() === ADMIN_USERNAME.toLowerCase());
-    let changed = false;
-
-    if (!adminUser) {
-        const hash = bcrypt.hashSync(ADMIN_PASSWORD, 10);
-        db.usuarios.push({
-            id: Date.now().toString(),
-            nome: ADMIN_NAME,
-            usuario: ADMIN_USERNAME,
-            senha: hash,
-            cargo: 'admin',
-            createdAt: now,
-            Data: now,
-            mustChangePassword: true
-        });
-        changed = true;
-        console.log(`Usuário administrador '${ADMIN_USERNAME}' criado automaticamente.`);
-    } else {
-        if (!adminUser.id) {
-            adminUser.id = Date.now().toString();
-            changed = true;
-        }
-        if (!adminUser.nome) {
-            adminUser.nome = ADMIN_NAME;
-            changed = true;
-        }
-        if (adminUser.usuario !== ADMIN_USERNAME) {
-            adminUser.usuario = ADMIN_USERNAME;
-            changed = true;
-        }
-        if ((adminUser.cargo || adminUser.nivelAcesso || '').toLowerCase() !== 'admin') {
-            adminUser.cargo = 'admin';
-            changed = true;
-        }
-        const senhaAtual = String(adminUser.senha || '');
-        if (!senhaAtual.startsWith('$2')) {
-            adminUser.senha = bcrypt.hashSync(ADMIN_PASSWORD, 10);
-            adminUser.mustChangePassword = true;
-            changed = true;
-            console.log(`Senha do administrador '${ADMIN_USERNAME}' padronizada e protegida com hash.`);
-        }
-        if ('role' in adminUser) {
-            delete adminUser.role;
-            changed = true;
-        }
-        if ('updatedAt' in adminUser) {
-            delete adminUser.updatedAt;
-            changed = true;
-        }
-        if (!adminUser.createdAt) {
-            adminUser.createdAt = now;
-            changed = true;
-        }
-        if (!adminUser.Data) {
-            adminUser.Data = now;
-            changed = true;
-        } else if (changed) {
-            adminUser.Data = now;
-        }
-    }
-
-    if (changed) {
-        try {
-            fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
-        } catch (err) {
-            console.error('Falha ao gravar db.json ao garantir admin:', err);
-        }
-    }
-}
-
-ensureAdminUser();
 ensureLogsDir();
 migrateRootLogs();
 

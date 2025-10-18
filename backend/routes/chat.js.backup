@@ -119,120 +119,106 @@ router.post('/messages/:channel', async (req, res) => {
         }
     }
 
-    try {
-        // Se o canal for de um jogo (id de jogo), restringe envio a admin/organizador
-        const games = await DatabaseService.getGames();
-        const isGameChannel = games.some(j => String(j.id) === String(channel));
-        let senderRole = null;
-        
-        if (isGameChannel) {
-            const sender = await DatabaseService.getUserById(senderId);
-            const role = String((sender?.cargo || 'user')).toLowerCase();
-            if (role !== 'admin' && role !== 'organizador') {
-                return res.status(403).json({ error: 'Apenas organizadores e admins podem enviar mensagens neste chat.' });
-            }
-            senderRole = role;
+    const db = readDB();
+    ensureStructures(db);
+    // Se o canal for de um jogo (id de jogo), restringe envio a admin/organizador
+    const isGameChannel = Array.isArray(db.jogos) && db.jogos.some(j => String(j.id) === String(channel));
+    if (isGameChannel) {
+        const sender = (db.usuarios || []).find(u => String(u.id) === String(senderId));
+        const role = String((sender?.cargo || sender?.nivelAcesso || 'user')).toLowerCase();
+        if (role !== 'admin' && role !== 'organizador') {
+            return res.status(403).json({ error: 'Apenas organizadores e admins podem enviar mensagens neste chat.' });
         }
-
-        const now = Date.now();
-        const message = await DatabaseService.createChannelMessage(channel, {
-            messageId: now.toString(),
-            userId: senderId,
-            username,
-            text: moderation.filteredText,
-            role: senderRole,
-            avatar,
-            reactions: {}
-        });
-
-        logMessage({ type: 'channel', channel, message });
-        res.status(201).json(message);
-    } catch (error) {
-        console.error('Erro ao enviar mensagem:', error);
-        res.status(500).json({ error: 'Erro ao enviar mensagem' });
+        // role válido para mensagens de canal de jogo
+        req._senderRole = role;
     }
+    if (!db.chatChannels[channel]) db.chatChannels[channel] = [];
+    const now = Date.now();
+    const message = {
+        messageId: now.toString(),
+        id: senderId,
+        username,
+        text: moderation.filteredText,
+        time: new Date(now).toISOString()
+    };
+    // inclui cargo/role quando disponível
+    if (req._senderRole) message.role = req._senderRole;
+    if (avatar) message.avatar = avatar;
+    // Inicializa reações como mapa emoji -> [userIds]
+    message.reactions = {};
+    db.chatChannels[channel].push(message);
+    writeDB(db);
+    logMessage({ type: 'channel', channel, message });
+    res.status(201).json(message);
 });
 
 // Limpar mensagens de um canal (somente admin/organizador)
-router.post('/messages/:channel/clear', async (req, res) => {
+router.post('/messages/:channel/clear', (req, res) => {
     const { channel } = req.params;
     const { id: actorId } = req.body || {};
     if (!actorId) return res.status(400).json({ error: 'id do solicitante é obrigatório' });
-    
-    try {
-        const actor = await DatabaseService.getUserById(actorId);
-        const role = String((actor?.cargo || 'user')).toLowerCase();
-        if (role !== 'admin' && role !== 'organizador') {
-            return res.status(403).json({ error: 'Apenas organizadores e admins podem limpar o chat.' });
-        }
-        
-        await DatabaseService.clearChannelMessages(channel);
-        res.json({ ok: true, cleared: channel });
-    } catch (error) {
-        console.error('Erro ao limpar canal:', error);
-        res.status(500).json({ error: 'Erro ao limpar canal' });
+    const db = readDB(); ensureStructures(db);
+    const actor = (db.usuarios || []).find(u => String(u.id) === String(actorId));
+    const role = String((actor?.cargo || actor?.nivelAcesso || 'user')).toLowerCase();
+    if (role !== 'admin' && role !== 'organizador') {
+        return res.status(403).json({ error: 'Apenas organizadores e admins podem limpar o chat.' });
     }
+    if (!db.chatChannels[channel]) db.chatChannels[channel] = [];
+    db.chatChannels[channel] = [];
+    writeDB(db);
+    // removed chat_requests log
+    res.json({ ok: true, cleared: channel });
 });
 
 // Reagir a uma mensagem com emoji (toggle)
-router.post('/messages/:channel/:messageId/react', async (req, res) => {
+router.post('/messages/:channel/:messageId/react', (req, res) => {
     const { channel, messageId } = req.params;
     const { userId, emoji } = req.body || {};
     if (!userId || !emoji) return res.status(400).json({ error: 'userId e emoji são obrigatórios' });
-    
-    try {
-        // Obter mensagem atual
-        const messages = await DatabaseService.getChannelMessages(channel);
-        const msg = messages.find(m => String(m.message_id) === String(messageId));
-        if (!msg) return res.status(404).json({ error: 'Mensagem não encontrada' });
-        
-        // Processar reações
-        const reactions = msg.reactions || {};
-        const key = String(emoji);
-        const set = new Set(Array.isArray(reactions[key]) ? reactions[key].map(String) : []);
-        const uid = String(userId);
-        
-        if (set.has(uid)) {
-            set.delete(uid);
-        } else {
-            set.add(uid);
-        }
-        
-        reactions[key] = Array.from(set);
-        
-        // Atualizar no banco
-        await DatabaseService.updateMessageReactions(channel, messageId, reactions);
-        res.json({ ok: true, messageId, reactions });
-    } catch (error) {
-        console.error('Erro ao reagir mensagem:', error);
-        res.status(500).json({ error: 'Erro ao reagir mensagem' });
+    const db = readDB(); ensureStructures(db);
+    if (!db.chatChannels[channel]) db.chatChannels[channel] = [];
+    const msg = db.chatChannels[channel].find(m => String(m.messageId) === String(messageId));
+    if (!msg) return res.status(404).json({ error: 'Mensagem não encontrada' });
+    if (!msg.reactions || typeof msg.reactions !== 'object') msg.reactions = {};
+    const key = String(emoji);
+    const set = new Set(Array.isArray(msg.reactions[key]) ? msg.reactions[key].map(String) : []);
+    const uid = String(userId);
+    if (set.has(uid)) {
+        set.delete(uid);
+    } else {
+        set.add(uid);
     }
+    msg.reactions[key] = Array.from(set);
+    writeDB(db);
+    // removed chat_requests log
+    res.json({ ok: true, messageId, reactions: msg.reactions });
 });
 
 // Chat privado
-router.get('/private/:userA/:userB', async (req, res) => {
-    try {
-        const { userA, userB } = req.params;
-        const chat = await DatabaseService.getPrivateChat(userA, userB);
-        res.json(chat.messages || []);
-    } catch (error) {
-        console.error('Erro ao obter chat privado:', error);
-        res.status(500).json({ error: 'Erro ao obter chat privado' });
+router.get('/private/:userA/:userB', (req, res) => {
+    const { userA, userB } = req.params;
+    const db = readDB();
+    ensureStructures(db);
+    const keySet = new Set([userA, userB]);
+    let convo = db.privateChats.find(c => c.users.length === 2 && c.users.every(u => keySet.has(u)));
+    if (!convo) {
+        convo = { users: [userA, userB], messages: [] };
+        db.privateChats.push(convo);
+        writeDB(db);
     }
+    res.json(convo.messages);
 });
 
-// Enviar mensagem privada
+// Enviar mensagem
 router.post('/private/:userA/:userB', async (req, res) => {
     const { userA, userB } = req.params;
     const { id, fromUserId: legacyFromId, text, username } = req.body;
     const senderId = id || legacyFromId;
     if (!text || !senderId) return res.status(400).json({ error: 'id e text são obrigatórios' });
-    
     const block = isBlocked(senderId);
     if (block.blocked) {
         return res.status(423).json({ error: 'Usuário bloqueado temporariamente', blockUntil: block.blockUntil });
     }
-    
     const moderation = await aiModerate(text);
     if (!moderation.allowed) {
         const penalty = applyPenalty(senderId, 3);
@@ -241,47 +227,39 @@ router.post('/private/:userA/:userB', async (req, res) => {
     if (moderation.severity === 2) {
         applyPenalty(senderId, 2);
     }
-    
-    try {
-        const now = Date.now();
-        const message = await DatabaseService.createPrivateMessage(userA, userB, {
-            messageId: now.toString(),
-            userId: senderId,
-            username,
-            text: moderation.filteredText
-        });
-        
-        logMessage({ type: 'private', users: [userA, userB], message });
-        res.status(201).json(message);
-    } catch (error) {
-        console.error('Erro ao enviar mensagem privada:', error);
-        res.status(500).json({ error: 'Erro ao enviar mensagem privada' });
+    const db = readDB();
+    ensureStructures(db);
+    const keySet = new Set([userA, userB]);
+    let convo = db.privateChats.find(c => c.users.length === 2 && c.users.every(u => keySet.has(u)));
+    if (!convo) {
+        convo = { users: [userA, userB], messages: [] };
+        db.privateChats.push(convo);
     }
+    const now = Date.now();
+    const message = { messageId: now.toString(), id: senderId, username, text: moderation.filteredText, time: new Date(now).toISOString() };
+    convo.messages.push(message);
+    writeDB(db);
+    logMessage({ type: 'private', users: [userA, userB], message });
+    res.status(201).json(message);
 });
 
+module.exports = router;
+
 // Lista grupos do usuário
-router.get('/groups', async (req, res) => {
-    try {
-        const { userId } = req.query;
-        if (!userId) return res.json([]);
-        
-        const groups = await DatabaseService.getUserGroups(userId);
-        res.json(groups);
-    } catch (error) {
-        console.error('Erro ao obter grupos:', error);
-        res.status(500).json({ error: 'Erro ao obter grupos' });
-    }
+router.get('/groups', (req, res) => {
+    const { userId } = req.query;
+    const db = readDB(); ensureStructures(db);
+    if (!userId) return res.json([]);
+    const groups = (db.groupChats || []).filter(g => g.members.includes(userId)).map(g => ({ id: g.id, name: g.name, squadId: g.squadId, members: g.members }));
+    res.json(groups);
 });
 
 // Mensagens de um grupo
-router.get('/group/:id/messages', async (req, res) => {
-    try {
-        const messages = await DatabaseService.getGroupMessages(req.params.id);
-        res.json(messages);
-    } catch (error) {
-        console.error('Erro ao obter mensagens do grupo:', error);
-        res.status(500).json({ error: 'Erro ao obter mensagens do grupo' });
-    }
+router.get('/group/:id/messages', (req, res) => {
+    const db = readDB(); ensureStructures(db);
+    const g = (db.groupChats || []).find(g => g.id === req.params.id);
+    if (!g) return res.status(404).json({ error: 'Grupo não encontrado' });
+    res.json(g.messages || []);
 });
 
 // Enviar mensagem para grupo
@@ -289,12 +267,10 @@ router.post('/group/:id/messages', async (req, res) => {
     const { id, fromUserId: legacyFromId, username, text } = req.body || {};
     const senderId = id || legacyFromId;
     if (!senderId || !text) return res.status(400).json({ error: 'id e text são obrigatórios' });
-    
     const block = isBlocked(senderId);
     if (block.blocked) {
         return res.status(423).json({ error: 'Usuário bloqueado temporariamente', blockUntil: block.blockUntil });
     }
-    
     const moderation = await aiModerate(text);
     if (!moderation.allowed) {
         const penalty = applyPenalty(senderId, 3);
@@ -303,42 +279,29 @@ router.post('/group/:id/messages', async (req, res) => {
     if (moderation.severity === 2) {
         applyPenalty(senderId, 2);
     }
-    
-    try {
-        // Verificar se o usuário é membro do grupo
-        const groups = await DatabaseService.getUserGroups(senderId);
-        const group = groups.find(g => g.id === req.params.id);
-        if (!group) return res.status(403).json({ error: 'Não participante do grupo' });
-        
-        const now = Date.now();
-        const message = await DatabaseService.createGroupMessage(req.params.id, {
-            messageId: now.toString(),
-            userId: senderId,
-            username,
-            text: moderation.filteredText
-        });
-        
-        logMessage({ type: 'group', groupId: req.params.id, message });
-        res.status(201).json(message);
-    } catch (error) {
-        console.error('Erro ao enviar mensagem do grupo:', error);
-        res.status(500).json({ error: 'Erro ao enviar mensagem do grupo' });
-    }
+    const db = readDB(); ensureStructures(db);
+    const g = (db.groupChats || []).find(g => g.id === req.params.id);
+    if (!g) return res.status(404).json({ error: 'Grupo não encontrado' });
+    if (!g.members.includes(senderId)) return res.status(403).json({ error: 'Não participante do grupo' });
+    const now = Date.now();
+    const message = { messageId: now.toString(), id: senderId, username, text: moderation.filteredText, time: new Date(now).toISOString() };
+    g.messages.push(message);
+    writeDB(db);
+    logMessage({ type: 'group', groupId: g.id, squadId: g.squadId, message });
+    res.status(201).json(message);
 });
 
 // Estado de bloqueio de um usuário (para UI exibir aviso)
-router.get('/block-status/:userId', async (req, res) => {
+router.get('/block-status/:userId', (req, res) => {
     const { userId } = req.params;
     if (!userId) return res.status(400).json({ error: 'userId obrigatório' });
-    
     try {
-        const moderationData = await DatabaseService.getUserModerationData(userId);
+        // Lê DB direto para expor histórico de infrações básicas ao cliente (somente metadados).
+        const db = readDB();
         let history = [];
-        if (moderationData) {
-            const infractions = JSON.parse(moderationData.infractions || '[]');
-            history = infractions.slice(-5).map(i => ({ severity: i.severity, timestamp: i.timestamp }));
+        if (db.moderation && db.moderation.users && db.moderation.users[userId]) {
+            history = (db.moderation.users[userId].infractions || []).slice(-5).map(i => ({ severity: i.severity, timestamp: i.timestamp }));
         }
-        
         const block = isBlocked(userId);
         if (block.blocked) {
             const remainingMs = Math.max(block.blockUntil - Date.now(), 0);
@@ -371,5 +334,3 @@ router.post('/clear-user-history/:userId', (req, res) => {
         res.status(500).json({ error: 'Falha ao limpar histórico do usuário' });
     }
 });
-
-module.exports = router;

@@ -1,0 +1,74 @@
+services:
+  # ==========================================
+  # BANCO DE DADOS POSTGRESQL
+  # ==========================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: connect_gamers_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-connect_gamers}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-connectgamers}
+    ports:
+      - "5432:5432"
+    volumes:
+      # Persiste os dados do banco mesmo se o container for removido
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - connect_gamers_network
+
+  # ==========================================
+  # BACKEND NODE.JS + EXPRESS
+  # ==========================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: connect_gamers_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Variáveis de ambiente do backend
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-connect_gamers}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-connectgamers}
+      PORT: 5000
+      NODE_ENV: ${NODE_ENV:-development}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      LOG_DEDUP_MS: ${LOG_DEDUP_MS:-0}
+    ports:
+      - "5000:5000"
+    volumes:
+      # Monta o código em modo desenvolvimento (hot reload)
+      - ./backend:/app
+      - /app/node_modules
+      # Persiste os logs
+      - ./logs:/app/../logs
+    networks:
+      - connect_gamers_network
+    command: sh -c "node scripts/initDatabase.js && node server.js"
+
+# ==========================================
+# VOLUMES (para persistência de dados)
+# ==========================================
+volumes:
+  postgres_data:
+    driver: local
+
+# ==========================================
+# NETWORKS (para comunicação entre containers)
+# ==========================================
+networks:
+  connect_gamers_network:
+    driver: bridge
+
