@@ -10,7 +10,22 @@ export const postItem = async (endpoint, data) => {
   });
 
   if (!response.ok) {
-    throw new Error("Erro ao enviar dados para " + endpoint);
+    let errorMessage = "Erro ao enviar dados para " + endpoint;
+    try {
+      const errorData = await response.json();
+      if (errorData.error) {
+        errorMessage = errorData.error;
+        if (errorData.mensagem) {
+          errorMessage += " - " + errorData.mensagem;
+        }
+        if (errorData.usuariosInvalidos) {
+          errorMessage += " - Usuários inválidos: " + errorData.usuariosInvalidos.join(', ');
+        }
+      }
+    } catch (parseError) {
+      // Se não conseguir fazer parse do JSON, usar mensagem padrão
+    }
+    throw new Error(errorMessage);
   }
 
   return response.json();

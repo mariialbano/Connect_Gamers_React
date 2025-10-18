@@ -48,3 +48,8 @@
 {"time":"2025-10-18T16:31:36.151Z","ip":"::ffff:172.18.0.1","usuario":"SuperAdmin","ok":false,"reason":"wrong_password","userId":"1760804066141"}
 {"time":"2025-10-18T16:42:09.130Z","ip":"::ffff:172.18.0.1","usuario":"SuperAdmin","userId":"superadmin","cargo":"admin","ok":true}
 {"time":"2025-10-18T16:44:55.783Z","ip":"::ffff:172.18.0.1","usuario":"mariialbano","userId":"1760805882350","cargo":"user","ok":true}
+{"time":"2025-10-18T17:22:09.655Z","ip":"::ffff:172.18.0.1","usuario":"SuperAdmin","userId":"superadmin","cargo":"admin","ok":true}
+{"time":"2025-10-18T17:55:45.478Z","ip":"::ffff:172.18.0.1","usuario":"mariialbano","userId":"1760805882350","cargo":"user","ok":true}
+{"time":"2025-10-18T17:56:38.536Z","ip":"::ffff:172.18.0.1","usuario":"mariialbano","userId":"1760805882350","cargo":"user","ok":true}
+{"time":"2025-10-18T17:56:52.766Z","ip":"::ffff:172.18.0.1","usuario":"mariialbano","ok":false,"reason":"wrong_password","userId":"1760805882350"}
+{"time":"2025-10-18T17:56:56.626Z","ip":"::ffff:172.18.0.1","usuario":"mariialbano","userId":"1760805882350","cargo":"user","ok":true}

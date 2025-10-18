@@ -605,12 +605,24 @@ class DatabaseService {
     }
 
     static async updateFeedbackSummary(summaryData) {
-        const { total, categories, lastUpdate, lastFeedbacks } = summaryData;
-        const result = await pool.query(
-            'INSERT INTO feedback_summary (total, categories, last_update, last_feedbacks, created_at, updated_at) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) ON CONFLICT DO UPDATE SET total = $1, categories = $2, last_update = $3, last_feedbacks = $4, updated_at = CURRENT_TIMESTAMP RETURNING *',
-            [total, JSON.stringify(categories), lastUpdate, JSON.stringify(lastFeedbacks)]
+        const { total, categories, lastUpdate, last } = summaryData;
+        
+        // Primeiro, tentar atualizar o registro existente
+        const updateResult = await pool.query(
+            'UPDATE feedback_summary SET total = $1, categories = $2, last_update = $3, last_feedbacks = $4, updated_at = CURRENT_TIMESTAMP RETURNING *',
+            [total, JSON.stringify(categories), lastUpdate, JSON.stringify(last)]
         );
-        return result.rows[0];
+        
+        // Se não há registro para atualizar, criar um novo
+        if (updateResult.rows.length === 0) {
+            const insertResult = await pool.query(
+                'INSERT INTO feedback_summary (total, categories, last_update, last_feedbacks, created_at, updated_at) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING *',
+                [total, JSON.stringify(categories), lastUpdate, JSON.stringify(last)]
+            );
+            return insertResult.rows[0];
+        }
+        
+        return updateResult.rows[0];
     }
 }
 

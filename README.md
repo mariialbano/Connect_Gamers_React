@@ -205,17 +205,11 @@ O projeto cria automaticamente um usuário administrador:
 
 ## 🗄️ Consultando o Banco de Dados via Terminal
 
-### **Scripts Automáticos:**
+### **Script Automático:**
 
-**Linux/Mac:**
+**Windows (Git Bash no terminal):**
 ```bash
-chmod +x consultar-banco.sh
-./consultar-banco.sh
-```
-
-**Windows (PowerShell):**
-```powershell
-.\consultar-banco.ps1
+bash consultar-banco.sh
 ```
 
 ### **Comandos Úteis:**

@@ -28,16 +28,23 @@ router.post('/', async (req, res) => {
 
     // Verificar se os usuários existem
     const usuariosValidos = [];
+    const usuariosInvalidos = [];
+    
     for (const integrante of integrantes) {
       const user = await DatabaseService.getUserByUsername(integrante.trim());
       if (!user) {
-        return res.status(400).json({
-          error: 'Usuário não foi encontrado.',
-          mensagem: 'Um ou mais usuários informados não existem no sistema.',
-          usuariosInvalidos: [integrante]
-        });
+        usuariosInvalidos.push(integrante.trim());
+      } else {
+        usuariosValidos.push(user);
       }
-      usuariosValidos.push(user);
+    }
+    
+    if (usuariosInvalidos.length > 0) {
+      return res.status(400).json({
+        error: 'Usuários não encontrados.',
+        mensagem: 'Os seguintes usuários não existem no sistema:',
+        usuariosInvalidos: usuariosInvalidos
+      });
     }
 
     const novoSquad = await DatabaseService.createSquad({

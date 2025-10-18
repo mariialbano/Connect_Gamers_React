@@ -72,6 +72,7 @@ router.post('/feedback', async (req, res) => {
         await DatabaseService.updateFeedbackSummary(newSummary);
         return res.status(201).json({ ok: true, id });
     } catch (e) { 
+        console.error('Erro no feedback:', e);
         return res.status(500).json({ error: 'falha inesperada' }); 
     }
 });

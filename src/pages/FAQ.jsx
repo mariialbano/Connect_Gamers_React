@@ -27,16 +27,24 @@ const FAQ = () => {
     }
     setSending(true);
     try {
-  const resp = await fetch(`${API_BASE}/api/faq/feedback`, {
+      // Obter informações do usuário logado
+      const usuarioLogado = localStorage.getItem('usuarioLogado');
+      const feedbackData = { 
+        text: feedback, 
+        rating,
+        ...(usuarioLogado && { username: usuarioLogado })
+      };
+
+      const resp = await fetch(`${API_BASE}/api/faq/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: feedback, rating })
+        body: JSON.stringify(feedbackData)
       });
       if (!resp.ok) {
         const data = await resp.json().catch(()=>({}));
         throw new Error(data.error || 'Falha ao enviar');
       }
-  setSuccess('Enviado! Obrigado pelo feedback.');
+      setSuccess('Enviado! Obrigado pelo feedback.');
       setFeedback('');
       setRating(0);
     } catch (err) {

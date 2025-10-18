@@ -29,7 +29,7 @@ while true; do
     echo "1️⃣  Ver todos os usuários"
     echo "2️⃣  Ver usuário SuperAdmin"
     echo "3️⃣  Ver todos os squads"
-    echo "4️⃣  Ver mensagens recentes do chat"
+    echo "4️⃣  Ver mensagens dos chats da Comunidade"
     echo "5️⃣  Ver usuários online"
     echo "6️⃣  Ver solicitações de amizade"
     echo "7️⃣  Ver jogos cadastrados"
