@@ -1,133 +1,271 @@
-import React, { useState } from "react";
+import { useState, useEffect } from 'react';
+import { Coins, Zap, TrendingUp, Gift, Shield, Clock, ArrowRight } from 'lucide-react';
 
-export default function Pontos() {
-    const [saldo, setSaldo] = useState(75);
-    const [mensagem, setMensagem] = useState("");
-    const [mostrarMensagem, setMostrarMensagem] = useState(false);
-    const [historico, setHistorico] = useState([]);
+export default function PointsPage() {
+    const [balance, setBalance] = useState(1500);
+    const [conversionRate] = useState(100); // 100 pontos = R$ 1,00
 
-    // Valor de conversão dos pontos para reais
-    const valorPorPonto = 0.01;
-    const saldoEmReais = (saldo * valorPorPonto).toFixed(2);
-
-    // Pacotes
-    const pacotes = [
-        { id: 1, nome: "Pacote Iniciante", pontos: 1000, bonus: 50, preco: "R$9,99" },
-        { id: 2, nome: "Pacote Intermediário", pontos: 5000, bonus: 500, preco: "R$24,90" },
-        { id: 3, nome: "Pacote Elite", pontos: 10000, bonus: 1500, preco: "R$49,90" },
+    const packages = [
+        {
+            name: "Pacote Iniciante",
+            points: 1000,
+            bonus: 50,
+            originalPrice: 10.00,
+            finalPrice: 10.00,
+            popular: false
+        },
+        {
+            name: "Pacote Intermediário",
+            points: 5000,
+            bonus: 500,
+            originalPrice: 50.00,
+            finalPrice: 45.00,
+            popular: true
+        },
+        {
+            name: "Pacote Elite",
+            points: 10000,
+            bonus: 1500,
+            originalPrice: 100.00,
+            finalPrice: 85.00,
+            popular: false
+        }
     ];
 
-    // Função de compra
-    const comprarPacote = (pacote) => {
-        const total = pacote.pontos + pacote.bonus;
-        const dataCompra = new Date().toLocaleString("pt-BR");
-
-        setSaldo((prev) => prev + total);
-        setMensagem(`Compra realizada com sucesso! +${total.toLocaleString()} pontos.`);
-        setMostrarMensagem(true);
-
-        setHistorico((prev) => [
-            ...prev,
-            {
-                id: prev.length + 1,
-                nome: pacote.nome,
-                pontos: total,
-                preco: pacote.preco,
-                data: dataCompra,
-            },
-        ]);
-
-        setTimeout(() => setMostrarMensagem(false), 3000);
+    const calculateBRL = (points) => {
+        return (points / conversionRate).toFixed(2);
     };
 
     return (
-        <div className="min-h-screen bg-[#2a2f3b] text-white py-12 px-6">
-            <div className="max-w-5xl mx-auto text-center">
-                {/* Título e descrição */}
-                <h1 className="text-3xl font-bold mb-2 text-pink-500">Compre seus Pontos</h1>
-                <p className="text-gray-300 mb-8">
-                    Adquira pontos para desbloquear benefícios exclusivos e turbinar sua experiência gamer.
-                </p>
+        <div className="flex justify-center py-10 px-4">
+            <div className="w-full max-w-6xl space-y-8">
 
-                {/* Saldo atual */}
-                <div className="bg-[#1c1f26] rounded-2xl p-6 mb-10 shadow-lg">
-                    <h2 className="text-xl font-semibold mb-2">Seu Saldo Atual</h2>
-                    <p className="text-2xl font-bold text-pink-500">{saldo.toLocaleString()} pontos</p>
-                    <p className="text-gray-400 text-sm">
-                        Equivalente a <span className="text-pink-400 font-semibold">R${saldoEmReais}</span>
+                {/* Header */}
+                <div className="text-center">
+                    <div className="inline-flex items-center gap-3 mb-4">
+                        <div className="bg-gradient-to-r from-pink-400 to-purple-500 rounded-xl p-3">
+                            <Coins className="w-8 h-8 text-white" />
+                        </div>
+                        <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100">
+                            Purchase Game <span className="text-pink-400 dark:text-pink-400">Points</span>
+                        </h1>
+                    </div>
+                    <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                        Enhance your gaming experience. Compre pontos e desbloqueie vantagens exclusivas!
                     </p>
                 </div>
 
-                {/* Mensagem de sucesso */}
-                {mostrarMensagem && (
-                    <div className="bg-pink-600 text-white px-6 py-3 rounded-xl shadow-lg text-sm font-semibold inline-block mb-6">
-                        {mensagem}
+                {/* Seu Saldo Atual */}
+                <section className="bg-gradient-to-r from-pink-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 shadow-lg border border-pink-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                                Seu Saldo Atual
+                            </h2>
+                            <p className="text-gray-600 dark:text-gray-400 mb-4">
+                                Visualize seu saldo de pontos aqui! Mantenha o controle dos seus pontos e saiba quando recarregar.
+                            </p>
+                            
+                            <div className="flex items-end gap-4">
+                                <div>
+                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                        <Zap className="w-4 h-4 text-yellow-500" />
+                                        Saldo Disponível
+                                    </div>
+                                    <div className="text-4xl font-bold text-gray-800 dark:text-gray-100 mt-1">
+                                        {balance.toLocaleString()}
+                                    </div>
+                                    <div className="text-lg text-gray-600 dark:text-gray-400 mt-1">
+                                        ≈ R$ {calculateBRL(balance)}
+                                    </div>
+                                </div>
+                                <div className="h-12 w-px bg-gray-300 dark:bg-gray-600"></div>
+                                <div>
+                                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                                        Taxa de Conversão
+                                    </div>
+                                    <div className="text-lg font-semibold text-gray-800 dark:text-gray-100 mt-1">
+                                        100 pts = R$ 1,00
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg">
+                                <Shield className="w-4 h-4" />
+                                <span className="text-sm font-medium">Saldo Seguro</span>
+                            </div>
+                        </div>
                     </div>
-                )}
+                </section>
 
-                {/* Pacotes */}
-                <h2 className="text-2xl font-semibold mb-6">Pacotes Disponíveis</h2>
-                <div className="grid md:grid-cols-3 gap-6">
-                    {pacotes.map((pacote) => (
-                        <div key={pacote.id} className="bg-[#1c1f26] rounded-2xl p-6 shadow-lg">
-                            <h3 className="text-lg font-semibold text-pink-400 mb-2">{pacote.nome}</h3>
-                            <p className="text-gray-300">💎 {pacote.pontos} pontos</p>
-                            <p className="text-gray-400 text-sm mb-3">+ {pacote.bonus} pontos bônus</p>
-                            <p className="text-xl font-bold text-pink-500 mb-4">{pacote.preco}</p>
+                {/* Pacotes de Pontos */}
+                <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+                    <div className="text-center mb-8">
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                            Pacotes de Pontos Disponíveis
+                        </h2>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            Escolha o pacote que melhor se adapta às suas necessidades
+                        </p>
+                    </div>
 
-                            <button
-                                onClick={() => comprarPacote(pacote)}
-                                className="bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded-xl w-full transition"
+                    <div className="grid md:grid-cols-3 gap-6">
+                        {packages.map((pkg, index) => (
+                            <div 
+                                key={index}
+                                className={`relative rounded-xl border-2 p-6 transition-all hover:scale-105 ${
+                                    pkg.popular 
+                                        ? 'border-pink-400 bg-gradient-to-b from-pink-50 to-white dark:from-gray-700 dark:to-gray-800' 
+                                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+                                }`}
                             >
-                                Comprar Agora
-                            </button>
-                        </div>
-                    ))}
-                </div>
+                                {pkg.popular && (
+                                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                                        <span className="bg-pink-400 text-white px-4 py-1 rounded-full text-sm font-medium">
+                                            Mais Popular
+                                        </span>
+                                    </div>
+                                )}
 
-                {/* Como funciona */}
-                <div className="mt-12 text-left max-w-3xl mx-auto">
-                    <h3 className="text-xl font-semibold text-pink-400 mb-3">Como Funciona</h3>
-                    <ol className="list-decimal list-inside text-gray-300 space-y-2">
-                        <li>Escolha o pacote de pontos que deseja comprar.</li>
-                        <li>Finalize a compra de forma rápida e segura.</li>
-                        <li>Receba seus pontos automaticamente na conta.</li>
-                        <li>Use-os para obter vantagens exclusivas dentro da plataforma.</li>
-                    </ol>
-                </div>
+                                <div className="text-center mb-6">
+                                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                                        {pkg.name}
+                                    </h3>
+                                    <div className="text-3xl font-bold text-pink-400 dark:text-pink-400 mb-1">
+                                        {(pkg.points + pkg.bonus).toLocaleString()} pts
+                                    </div>
+                                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                                        {pkg.points.toLocaleString()} + {pkg.bonus.toLocaleString()} bônus
+                                    </div>
+                                </div>
 
-                {/* Histórico */}
-                {historico.length > 0 && (
-                    <div className="mt-12 bg-[#1c1f26] rounded-2xl p-6 shadow-lg text-left max-w-4xl mx-auto">
-                        <h3 className="text-xl font-semibold text-pink-400 mb-4">Histórico de Compras</h3>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-gray-300 text-sm">
-                                <thead>
-                                    <tr className="border-b border-gray-700 text-pink-400">
-                                        <th className="py-2 text-left">Pacote</th>
-                                        <th className="py-2 text-left">Pontos</th>
-                                        <th className="py-2 text-left">Preço</th>
-                                        <th className="py-2 text-left">Data</th>
-                                    </tr>
-                                </thead>
+                                <div className="space-y-3 mb-6">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-gray-600 dark:text-gray-400">Valor:</span>
+                                        <span className="font-semibold text-gray-800 dark:text-gray-100">
+                                            R$ {pkg.finalPrice.toFixed(2)}
+                                        </span>
+                                    </div>
+                                    {pkg.originalPrice > pkg.finalPrice && (
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-600 dark:text-gray-400">Economia:</span>
+                                            <span className="font-semibold text-green-600 dark:text-green-400">
+                                                R$ {(pkg.originalPrice - pkg.finalPrice).toFixed(2)}
+                                            </span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-gray-600 dark:text-gray-400">Custo por 100 pts:</span>
+                                        <span className="font-semibold text-gray-800 dark:text-gray-100">
+                                            R$ {((pkg.finalPrice / (pkg.points + pkg.bonus)) * 100).toFixed(2)}
+                                        </span>
+                                    </div>
+                                </div>
 
-                                <tbody>
-                                    {historico.map((item) => (
-                                        <tr key={item.id} className="border-b border-gray-800">
-                                            <td className="py-2">{item.nome}</td>
-                                            <td className="py-2">{item.pontos.toLocaleString()}</td>
-                                            <td className="py-2">{item.preco}</td>
-                                            <td className="py-2">{item.data}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                <button className="w-full bg-pink-500 hover:bg-pink-600 text-white py-3 px-6 rounded-lg transition-colors font-semibold flex items-center justify-center gap-2">
+                                    <Coins className="w-5 h-5" />
+                                    Comprar Agora
+                                    <ArrowRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        ))}
                     </div>
-                )}
+                </section>
+
+                {/* Como Funciona */}
+                <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+                    <div className="text-center mb-8">
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                            Como Funciona?
+                        </h2>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            Nosso sistema de pontos é simples e vantajoso
+                        </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-4 gap-6">
+                        {[
+                            {
+                                icon: <Coins className="w-8 h-8" />,
+                                title: "Escolha seu pacote",
+                                description: "Selecione o pacote de pontos que melhor se adapta às suas necessidades"
+                            },
+                            {
+                                icon: <Shield className="w-8 h-8" />,
+                                title: "Finalize a compra",
+                                description: "Realize o pagamento de forma segura e rápida"
+                            },
+                            {
+                                icon: <Zap className="w-8 h-8" />,
+                                title: "Receba seus pontos",
+                                description: "Os pontos serão creditados automaticamente em sua conta"
+                            },
+                            {
+                                icon: <Gift className="w-8 h-8" />,
+                                title: "Aproveite!",
+                                description: "Utilize seus pontos para desbloquear conteúdos exclusivos"
+                            }
+                        ].map((step, index) => (
+                            <div key={index} className="text-center">
+                                <div className="bg-gradient-to-r from-pink-400 to-purple-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 text-white">
+                                    {step.icon}
+                                </div>
+                                <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-2">
+                                    {step.title}
+                                </h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-300">
+                                    {step.description}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Próximos Passos */}
+                <section className="bg-gradient-to-r from-blue-50 to-green-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 shadow-lg border border-blue-200 dark:border-gray-700">
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4 text-center">
+                        Próximos Passos
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
+                        Agora que você já sabe como adquirir e usar seus pontos, explore as opções disponíveis e turbine sua experiência game!
+                    </p>
+
+                    <div className="grid md:grid-cols-3 gap-6">
+                        {[
+                            {
+                                icon: <TrendingUp className="w-6 h-6" />,
+                                title: "Verifique seu saldo",
+                                description: "Mantenha-se atualizado sobre seus pontos"
+                            },
+                            {
+                                icon: <Gift className="w-6 h-6" />,
+                                title: "Explore os benefícios",
+                                description: "Descubra onde seus pontos podem te levar"
+                            },
+                            {
+                                icon: <Clock className="w-6 h-6" />,
+                                title: "Fique por dentro",
+                                description: "Acompanhe nossas promoções e eventos especiais"
+                            }
+                        ].map((item, index) => (
+                            <div key={index} className="text-center p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                <div className="text-pink-400 dark:text-pink-400 mb-2 flex justify-center">
+                                    {item.icon}
+                                </div>
+                                <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-2">
+                                    {item.title}
+                                </h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-300">
+                                    {item.description}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
             </div>
         </div>
     );
 }
-
 
