@@ -13,10 +13,7 @@ import Amigos from './pages/Amigos';
 import Dashboard from './pages/Dashboard';
 import ESG from './pages/ESG';
 import { useTheme } from './theme/ThemeContext';
-import Pontos from './theme/ThemeContext/Pontos';
-import PointsPreview from './pages/PointsPreview';
-
-
+import Pontos from './pages/Pontos';
 
 function App() {
   const { theme } = useTheme();
@@ -80,7 +77,6 @@ function App() {
             <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
             <Route path="/esg" element={<ESG />} />
             <Route path="/pontos" element={<Pontos />} />
-            <Route path= "/pointspreview" element={<PointsPreview />} />
           </Routes>
         </main>
         <Footer />
