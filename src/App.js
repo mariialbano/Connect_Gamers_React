@@ -12,6 +12,7 @@ import Comunidade from './pages/Comunidade';
 import Amigos from './pages/Amigos';
 import Dashboard from './pages/Dashboard';
 import ESG from './pages/ESG';
+import Pontos from './pages/Pontos';
 import { useTheme } from './theme/ThemeContext';
 
 function App() {
@@ -75,6 +76,7 @@ function App() {
             <Route path="/amigos" element={<RequireAuth><Amigos /></RequireAuth>} />
             <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
             <Route path="/esg" element={<ESG />} />
+            <Route path="/pontos" element={RequireAuth(<Pontos />)} />
           </Routes>
         </main>
         <Footer />
