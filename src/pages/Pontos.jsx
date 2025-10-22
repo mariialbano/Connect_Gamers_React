@@ -10,9 +10,9 @@ export default function Pontos() {
     const valorPorPonto = 0.01;
     const saldoEmReais = (saldo * valorPorPonto).toFixed(2);
 
-    // Pacotes disponíveis
+    // Pacotes
     const pacotes = [
-        { id: 1, nome: "Pacote Iniciante", pontos: 1000, bonus: 50, preco: "R$9,90" },
+        { id: 1, nome: "Pacote Iniciante", pontos: 1000, bonus: 50, preco: "R$9,99" },
         { id: 2, nome: "Pacote Intermediário", pontos: 5000, bonus: 500, preco: "R$24,90" },
         { id: 3, nome: "Pacote Elite", pontos: 10000, bonus: 1500, preco: "R$49,90" },
     ];
