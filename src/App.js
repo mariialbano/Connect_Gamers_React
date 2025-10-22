@@ -76,7 +76,7 @@ function App() {
             <Route path="/amigos" element={<RequireAuth><Amigos /></RequireAuth>} />
             <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
             <Route path="/esg" element={<ESG />} />
-            <Route path="/pontos" element={RequireAuth(<Pontos />)} />
+            <Route path="/pontos" element={<Pontos />} />
           </Routes>
         </main>
         <Footer />
