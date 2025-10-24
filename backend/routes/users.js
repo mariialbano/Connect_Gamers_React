@@ -24,30 +24,38 @@ function isStrongPassword(password) {
 
 // Rota de login
 router.post('/login', async (req, res) => {
+    console.log('🔐 [LOGIN] Requisição recebida:', { usuario: req.body?.usuario, temSenha: !!req.body?.senha });
     const { usuario, senha } = req.body || {};
     if (!usuario || !senha) {
+        console.log('❌ [LOGIN] Campos faltando');
         const ev = { time: new Date().toISOString(), ip: req.ip, usuario, ok: false, reason: 'missing_fields' };
         appendLog(unifiedLoginLogFile, ev);
         return res.status(400).json({ error: 'Usuário e senha são obrigatórios' });
     }
 
     try {
+        console.log('🔍 [LOGIN] Buscando usuário:', usuario.trim());
         const user = await DatabaseService.getUserByUsername(usuario.trim());
         if (!user) {
+            console.log('❌ [LOGIN] Usuário não encontrado:', usuario.trim());
             const ev = { time: new Date().toISOString(), ip: req.ip, usuario, ok: false, reason: 'user_not_found' };
             appendLog(unifiedLoginLogFile, ev);
             return res.status(401).json({ error: 'Usuário ou senha inválidos' });
         }
 
+        console.log('👤 [LOGIN] Usuário encontrado:', { id: user.id, usuario: user.usuario, cargo: user.cargo });
+        console.log('🔑 [LOGIN] Comparando senhas...');
         const senhaValida = await bcrypt.compare(senha, user.senha);
         if (!senhaValida) {
+            console.log('❌ [LOGIN] Senha inválida');
             const ev = { time: new Date().toISOString(), ip: req.ip, usuario, ok: false, reason: 'wrong_password', userId: user.id };
             appendLog(unifiedLoginLogFile, ev);
             return res.status(401).json({ error: 'Usuário ou senha inválidos' });
         }
 
+        console.log('✅ [LOGIN] Login bem-sucedido!');
         // retorna usuário sem a senha
-        const { senha: _, ...userSemSenha } = user;
+    const { senha: _, face_image: __, ...userSemSenha } = user;
         const okEv = { time: new Date().toISOString(), ip: req.ip, usuario: userSemSenha.usuario, userId: userSemSenha.id, cargo: userSemSenha.cargo, ok: true };
         appendLog(unifiedLoginLogFile, okEv);
         
@@ -64,8 +72,8 @@ router.post('/login', async (req, res) => {
 // Listar usuários
 router.get('/', async (req, res) => {
     try {
-        const users = await DatabaseService.getUsers();
-        res.json(users);
+    const users = await DatabaseService.getUsers();
+    res.json(users.map(({ senha, face_image, ...rest }) => rest));
     } catch (error) {
         console.error('Erro ao listar usuários:', error);
         res.status(500).json({ error: 'Erro ao listar usuários' });
@@ -75,9 +83,10 @@ router.get('/', async (req, res) => {
 // Obter usuário por ID
 router.get('/:id', async (req, res) => {
     try {
-        const user = await DatabaseService.getUserById(req.params.id);
-        if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
-        res.json(user);
+    const user = await DatabaseService.getUserById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+    const { senha, face_image, ...rest } = user;
+    res.json(rest);
     } catch (error) {
         console.error('Erro ao obter usuário:', error);
         res.status(500).json({ error: 'Erro ao obter usuário' });
@@ -112,7 +121,7 @@ router.post('/', async (req, res) => {
             avatar: resto.avatar
         });
 
-        const { senha: _, ...semSenha } = novoUsuario;
+    const { senha: _, face_image: __, ...semSenha } = novoUsuario;
         res.status(201).json({ ...semSenha, nivelAcesso: semSenha.cargo || 'user' });
     } catch (err) {
         console.error('Erro ao criar usuário:', err);
@@ -143,7 +152,7 @@ router.patch('/:id', async (req, res) => {
         }
 
         const usuarioAtualizado = await DatabaseService.updateUser(req.params.id, atualizacoes);
-        const { senha: _, ...semSenha } = usuarioAtualizado;
+    const { senha: _, face_image: __, ...semSenha } = usuarioAtualizado;
         res.json(semSenha);
     } catch (err) {
         console.error('Erro ao atualizar usuário:', err);

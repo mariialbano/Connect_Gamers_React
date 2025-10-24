@@ -1,3 +1,5 @@
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const pool = require('../config/database');
 
 async function createTables() {
@@ -15,9 +17,26 @@ async function createTables() {
                 senha VARCHAR(255) NOT NULL,
                 cargo VARCHAR(50) DEFAULT 'user',
                 avatar VARCHAR(500),
+                is_verified BOOLEAN DEFAULT FALSE,
+                face_data JSONB,
+                face_image BYTEA,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
+        `);
+
+        // Garantir colunas para armazenar dados faciais (caso banco já exista)
+        await client.query(`
+            ALTER TABLE usuarios
+            ADD COLUMN IF NOT EXISTS face_image BYTEA
+        `);
+        
+        // Adicionar colunas para Face++ API
+        await client.query(`
+            ALTER TABLE usuarios
+            ADD COLUMN IF NOT EXISTS face_token VARCHAR(255),
+            ADD COLUMN IF NOT EXISTS status_verificacao BOOLEAN DEFAULT FALSE,
+            ADD COLUMN IF NOT EXISTS data_verificacao TIMESTAMP
         `);
 
         // Tabela de jogos
@@ -184,6 +203,18 @@ async function createTables() {
                 friend_id VARCHAR(50) REFERENCES usuarios(id) ON DELETE CASCADE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE(user_id, friend_id)
+            )
+        `);
+
+        // Tabela de tokens de verificação facial
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS verification_tokens (
+                id SERIAL PRIMARY KEY,
+                token VARCHAR(255) UNIQUE NOT NULL,
+                user_id VARCHAR(50) REFERENCES usuarios(id) ON DELETE CASCADE,
+                expires_at TIMESTAMP NOT NULL,
+                used BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
 

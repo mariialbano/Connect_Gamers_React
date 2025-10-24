@@ -1,5 +1,6 @@
 const { Pool } = require('pg');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const pool = new Pool({
     host: process.env.DB_HOST || 'localhost',
@@ -19,7 +20,8 @@ pool.on('connect', () => {
 
 pool.on('error', (err) => {
     console.error('Erro inesperado no cliente PostgreSQL:', err);
-    process.exit(-1);
+    // Não fechar o servidor automaticamente
+    // process.exit(-1);
 });
 
 module.exports = pool;

@@ -11,6 +11,8 @@ const rankingsRouter = require('./routes/rankings');
 const chatRouter = require('./routes/chat');
 const faqRouter = require('./routes/faq');
 const socialRouter = require('./routes/social');
+const pontosRouter = require('./routes/pontos');
+const verificationRouter = require('./routes/verification');
 const rateLimit = require('express-rate-limit');
 const DatabaseService = require('./services/databaseService');
 
@@ -70,6 +72,16 @@ const BASE_PORT = parseInt(process.env.PORT, 10) || 5000;
 let currentPort = BASE_PORT;
 const LOG_DEDUP_MS = Math.max(parseInt(process.env.LOG_DEDUP_MS || '0', 10) || 0, 0);
 
+// HTTPS config (mkcert)
+const https = require('https');
+let sslKey, sslCert;
+try {
+    sslKey = fs.readFileSync(path.join(__dirname, '192.168.0.141+1-key.pem'));
+    sslCert = fs.readFileSync(path.join(__dirname, '192.168.0.141+1.pem'));
+} catch (e) {
+    console.error('Certificados SSL não encontrados. Gere com mkcert e coloque em backend/.', e.message);
+}
+
 const limiter = rateLimit({
     windowMs: 60 * 1000,
     max: 100,
@@ -104,6 +116,24 @@ app.use(express.json());
 
 app.use(limiter);
 
+// Rota para baixar o certificado no iPhone
+app.get('/ca.crt', (req, res) => {
+    try {
+        const certPath = path.join(__dirname, '../public/192.168.0.141+1.pem');
+        if (fs.existsSync(certPath)) {
+            res.download(certPath, '192.168.0.141.pem');
+        } else {
+            res.status(404).send('Certificado não encontrado');
+        }
+    } catch (error) {
+        console.error('Erro ao servir certificado:', error);
+        res.status(500).send('Erro ao baixar certificado');
+    }
+});
+
+// Servir arquivos estáticos do React (após build)
+app.use(express.static(path.join(__dirname, '../build')));
+
 app.use('/api/usuarios', usersRouter);
 app.use('/api/squads', squadsRouter);
 app.use('/api/games', gamesRouter);
@@ -112,39 +142,67 @@ app.use('/api/rankings', rankingsRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/faq', faqRouter);
 app.use('/api/social', socialRouter);
+app.use('/api/verification', verificationRouter);
+app.use('/api/pontos', pontosRouter);
 
+// Rota raiz
 app.get('/', (req, res) => {
-    res.send('Você está no backend!');
+    const buildPath = path.join(__dirname, '../build/index.html');
+    if (fs.existsSync(buildPath)) {
+        res.sendFile(buildPath);
+    } else {
+        res.send('Backend rodando! Execute "npm run build" no frontend para servir a aplicação React.');
+    }
+});
+
+// Rota catch-all para React Router (SPA) - deve ser a última rota não-API
+app.use((req, res, next) => {
+    // Se a rota começa com /api, deixa o Express retornar 404 naturalmente
+    if (req.path.startsWith('/api')) {
+        return next();
+    }
+    
+    const buildPath = path.join(__dirname, '../build/index.html');
+    if (fs.existsSync(buildPath)) {
+        // Serve o index.html para todas as rotas de aplicação (React Router)
+        res.sendFile(buildPath);
+    } else {
+        res.status(404).send('Aplicação não foi construída. Execute: npm run build');
+    }
 });
 
 function start(port) {
-    const server = app.listen(port, () => {
-        console.log(`Servidor está rodando em http://localhost:${port}`);
-        try {
-            const boot = {
-                time: new Date().toISOString(),
-                ip: '::1',
-                method: 'SERVER',
-                url: '/server-started',
-                status: 0,
-                durationMs: 0,
-                ua: `node ${process.version}`,
-                port
-            };
-        } catch (e) { }
-    });
-    server.on('error', (err) => {
-        if (err.code === 'EADDRINUSE') {
-            if (port < BASE_PORT + 20) {
-                console.warn(`Porta ${port} ocupada. Tentando ${port + 1}...`);
-                start(port + 1);
+    if (sslKey && sslCert) {
+        const server = https.createServer({ key: sslKey, cert: sslCert }, app).listen(port, () => {
+            console.log(`Servidor HTTPS rodando em https://192.168.0.141:${port}`);
+            try {
+                const boot = {
+                    time: new Date().toISOString(),
+                    ip: '::1',
+                    method: 'SERVER',
+                    url: '/server-started',
+                    status: 0,
+                    durationMs: 0,
+                    ua: `node ${process.version}`,
+                    port
+                };
+            } catch (e) { }
+        });
+        server.on('error', (err) => {
+            if (err.code === 'EADDRINUSE') {
+                if (port < BASE_PORT + 20) {
+                    console.warn(`Porta ${port} ocupada. Tentando ${port + 1}...`);
+                    start(port + 1);
+                } else {
+                    console.error('Não foi possível encontrar porta livre (tentadas +20).');
+                }
             } else {
-                console.error('Não foi possível encontrar porta livre (tentadas +20).');
+                console.error('Erro ao iniciar servidor HTTPS:', err);
             }
-        } else {
-            console.error('Erro ao iniciar servidor:', err);
-        }
-    });
+        });
+    } else {
+        console.error('Certificados SSL não encontrados. Backend rodando apenas em HTTP NÃO é seguro para câmera no iOS/Safari.');
+    }
 }
 
 start(currentPort);

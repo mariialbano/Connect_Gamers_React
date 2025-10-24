@@ -12,9 +12,11 @@ import Comunidade from './pages/Comunidade';
 import Amigos from './pages/Amigos';
 import Dashboard from './pages/Dashboard';
 import ESG from './pages/ESG';
-import { useTheme } from './theme/ThemeContext';
+import FacialVerificationPro from './pages/FacialVerificationPro';
 import Pontos from './pages/Pontos';
 import GamePoints from './pages/GamePoints';
+import Resgates from './pages/Resgates';
+import { useTheme } from './theme/ThemeContext';
 
 function App() {
   const { theme } = useTheme();
@@ -72,13 +74,15 @@ function App() {
             <Route path="/jogos" element={<Jogos />} />
             <Route path="/jogos/:gameId" element={<JogoDetalhe />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/perfil" element={<Perfil />} />
+            <Route path="/perfil" element={<RequireAuth><Perfil /></RequireAuth>} />
             <Route path="/comunidade" element={<RequireAuth><Comunidade /></RequireAuth>} />
             <Route path="/amigos" element={<RequireAuth><Amigos /></RequireAuth>} />
+            <Route path="/pontos" element={<RequireAuth><Pontos /></RequireAuth>} />
             <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
             <Route path="/esg" element={<ESG />} />
-            <Route path="/pontos" element={<Pontos />} />
             <Route path="/gamepoints" element={<RequireAuth><GamePoints /></RequireAuth>} />
+            <Route path="/resgates" element={<RequireAuth><Resgates /></RequireAuth>} />
+            <Route path="/verify/:token" element={<FacialVerificationPro />} />
           </Routes>
         </main>
         <Footer />

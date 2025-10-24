@@ -35,7 +35,7 @@ bash setup.sh
 
 O script vai:
 - ✅ Verificar se Docker está instalado
-- ✅ Criar arquivo `.env` automaticamente
+- ✅ Criara rquivo `.env` automaticamente
 - ✅ Iniciar containers Docker (backend + PostgreSQL)
 - ✅ Instalar dependências do frontend
 - ✅ Mostrar status e comandos úteis
@@ -48,8 +48,8 @@ npm start
 ```
 
 **4. Acesse a aplicação**
-- Frontend: [http://localhost:3000](http://localhost:3000)
-- Backend: [http://localhost:5000](http://localhost:5000)
+- Frontend: [https://localhost:3000](https://localhost:3000) ou [https://192.168.0.141:3000](https://192.168.0.141:3000)
+- Backend: [https://localhost:5000](https://localhost:5000) ou [https://192.168.0.141:5000](https://192.168.0.141:5000)
 
 ---
 
@@ -170,8 +170,8 @@ npm run dev
 ```
 
 **7. Acesse a aplicação**
-- Frontend: [http://localhost:3000](http://localhost:3000)
-- Backend: [http://localhost:5000](http://localhost:5000)
+- Frontend: [https://localhost:3000](https://localhost:3000) ou [https://192.168.0.141:3000](https://192.168.0.141:3000)
+- Backend: [https://localhost:5000](https://localhost:5000) ou [https://192.168.0.141:5000](https://192.168.0.141:5000)
 
 ---
 
@@ -284,6 +284,44 @@ docker exec -it connect_gamers_backend bash
 # Entrar no container do PostgreSQL
 docker exec -it connect_gamers_db psql -U postgres -d connect_gamers
 ```
+
+---
+
+## 🔐 Verificação Facial (Novo!)
+
+O Connect Gamers agora suporta verificação de identidade via reconhecimento facial!
+
+### **Como funciona:**
+1. **Cadastro normal** - usuário cria conta sem verificação
+2. **Perfil do usuário** - botão "Verifique sua conta" aparece
+3. **QR Code** - sistema gera QR code único que expira em 5 minutos
+4. **Celular** - usuário escaneia QR e tira foto do rosto
+5. **Azure Face API** - processa e verifica a identidade
+6. **Conta verificada** - usuário fica com selo de verificação
+
+### **Configuração necessária:**
+Para habilitar a verificação facial, você precisa configurar a Azure Face API:
+
+1. **Leia o guia completo:** [`FACIAL_VERIFICATION_SETUP.md`](FACIAL_VERIFICATION_SETUP.md)
+2. **Crie recurso Azure Face** (gratuito - 20.000 verificações/mês)
+3. **Configure no .env:**
+   ```env
+   AZURE_FACE_ENDPOINT=https://your-resource.cognitiveservices.azure.com/
+   AZURE_FACE_SUBSCRIPTION_KEY=your_api_key_here
+   ```
+
+### **Recursos implementados:**
+- ✅ Geração de QR Code único por usuário
+- ✅ Página móvel responsiva para captura
+- ✅ Suporte à câmera ou upload de foto
+- ✅ Integração completa com Azure Face API
+- ✅ Validação de qualidade da imagem
+- ✅ Verificação de rosto único na foto
+- ✅ Comparação biométrica segura
+- ✅ Expiração automática de tokens
+- ✅ Status de verificação no perfil
+
+**Opcional:** O projeto funciona normalmente mesmo sem configurar a verificação facial.
 
 ---
 

@@ -66,23 +66,21 @@ export default function Login() {
     }
 
     if (modo === "login") {
-      if (!usuarioExiste) {
-        alert("Usuário não encontrado. Verifique ou cadastre-se primeiro.");
-        return;
-      }
-
       try {
+        console.log('🔐 Tentando login com:', { usuario: usuarioBusca, senhaLength: senha.length });
         // Chama a rota de login no backend que faz a verificação com bcrypt
-        const logged = await postItem('usuarios/login', { usuario, senha });
+        const logged = await postItem('usuarios/login', { usuario: usuarioBusca, senha });
+        console.log('✅ Login bem-sucedido:', logged);
         // Se retornou OK, salva info e navega
         const nivelAcesso = (logged.cargo || logged.nivelAcesso || 'user').toLowerCase();
-        localStorage.setItem('usuarioLogado', logged.usuario || usuario);
+        localStorage.setItem('usuarioLogado', logged.usuario || usuarioBusca);
         localStorage.setItem('usuarioId', logged.id);
         localStorage.setItem('usuarioNivelAcesso', nivelAcesso);
         localStorage.setItem('isAdmin', String(nivelAcesso === 'admin'));
         alert('Login realizado com sucesso!');
         navigate(from || '/perfil');
       } catch (err) {
+        console.error('❌ Erro no login:', err);
         alert('Usuário ou senha inválidos.');
       }
     }

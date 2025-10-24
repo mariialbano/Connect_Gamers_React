@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaQrcode, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { API_BASE } from '../services/apiBase';
 import { getItem, postItem } from '../services/api';
 
@@ -188,6 +188,231 @@ function EventsSection({ usuarioLogado }) {
   );
 }
 
+// Verificação Facial
+function FacialVerificationSection({ usuarioId }) {
+  const [verificationStatus, setVerificationStatus] = useState({ isVerified: false, hasFaceData: false });
+  const [showQRCode, setShowQRCode] = useState(false);
+  const [qrCode, setQrCode] = useState('');
+  const [verificationUrl, setVerificationUrl] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const usuarioLogado = typeof window !== 'undefined' ? localStorage.getItem('usuarioLogado') : null;
+  const qrTimeoutRef = React.useRef();
+
+  useEffect(() => {
+    if (usuarioId) {
+      console.log('FacialVerificationSection: Verificando status para usuário:', usuarioId);
+      checkVerificationStatus();
+    } else if (usuarioLogado) {
+      console.log('FacialVerificationSection: usuarioId ausente, mas temos username:', usuarioLogado, '— status só será checado após verificação.');
+    } else {
+      console.log('FacialVerificationSection: Aguardando credenciais (usuarioId/usuarioLogado)...');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usuarioId, usuarioLogado]);
+
+  const checkVerificationStatus = async () => {
+    if (!usuarioId) {
+      console.log('checkVerificationStatus: usuarioId não disponível');
+      return;
+    }
+    
+    try {
+      console.log('Verificando status de verificação para:', usuarioId);
+      const response = await fetch(`${API_BASE}/api/verification/status/${usuarioId}`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Status de verificação obtido:', data);
+        setVerificationStatus(data);
+      } else {
+        console.error('Erro ao verificar status:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Erro ao verificar status:', error);
+    }
+  };
+
+  const generateQRCode = async () => {
+    if (qrTimeoutRef.current) {
+      clearTimeout(qrTimeoutRef.current);
+      qrTimeoutRef.current = null;
+    }
+    if (!usuarioId && !usuarioLogado) {
+      console.log('Erro: credenciais não definidas. usuarioId:', usuarioId, 'usuarioLogado:', usuarioLogado);
+      setError('Não foi possível identificar o usuário. Faça login novamente.');
+      return;
+    }
+    
+    console.log('Gerando QR Code para:', { usuarioId, usuarioLogado });
+    setLoading(true);
+    setError('');
+    
+    try {
+      console.log('Fazendo requisição para:', `${API_BASE}/api/verification/generate-qr`);
+      const response = await fetch(`${API_BASE}/api/verification/generate-qr`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: usuarioId || undefined, username: usuarioLogado || undefined })
+      });
+
+      console.log('Resposta da API:', response.status, response.statusText);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('QR Code gerado com sucesso:', data);
+        // Exibe modal dentro da mesma aba (sem abrir nova janela)
+        setQrCode(data.qrCode);
+        setVerificationUrl(data.verificationUrl || '');
+        setShowQRCode(true);
+        
+        // Auto-refresh status após 5 minutos
+        qrTimeoutRef.current = setTimeout(() => {
+          setShowQRCode(false);
+          checkVerificationStatus();
+          qrTimeoutRef.current = null;
+        }, 5 * 60 * 1000);
+      } else {
+        const errorData = await response.json();
+        console.error('Erro da API:', errorData);
+        if (response.status === 404) {
+          setError('Usuário não encontrado. Faça login novamente e tente gerar o QR Code.');
+        } else {
+          setError(errorData.error || 'Erro ao gerar QR Code');
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao gerar QR Code:', error);
+      setError('Erro ao conectar com o servidor');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <section className="mb-8">
+      <div className="bg-white dark:bg-gray-700 rounded-xl p-6 border border-pink-200 dark:border-gray-600 shadow">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-bold text-black dark:text-white flex items-center">
+            <FaCheckCircle className={`mr-3 ${verificationStatus.isVerified ? 'text-green-500' : 'text-gray-400'}`} />
+            Verificação Facial
+          </h3>
+          {verificationStatus.isVerified && (
+            <span className="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full dark:bg-green-900 dark:text-green-300">
+              Verificado
+            </span>
+          )}
+        </div>
+
+        {!usuarioId && !usuarioLogado ? (
+          <div className="text-center py-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-800 mx-auto mb-3"></div>
+            <p className="text-gray-600 dark:text-gray-300">
+              Carregando dados do usuário...
+            </p>
+          </div>
+        ) : verificationStatus.isVerified ? (
+          <div className="text-center py-4">
+            <FaCheckCircle className="text-green-500 text-4xl mx-auto mb-3" />
+            <p className="text-gray-600 dark:text-gray-300">
+              Sua conta está verificada! A verificação facial foi concluída com sucesso.
+            </p>
+          </div>
+        ) : (
+          <div>
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-4">
+              <div className="flex items-start">
+                <FaExclamationTriangle className="text-yellow-600 dark:text-yellow-400 mr-3 mt-1" />
+                <div>
+                  <h4 className="text-yellow-800 dark:text-yellow-300 font-semibold mb-1">
+                    Conta não verificada
+                  </h4>
+                  <p className="text-yellow-700 dark:text-yellow-400 text-sm">
+                    Verifique sua identidade usando reconhecimento facial para aumentar a segurança da sua conta.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4">
+                <p className="text-red-700 dark:text-red-400 text-sm">{error}</p>
+              </div>
+            )}
+
+            <button
+              onClick={generateQRCode}
+              disabled={loading}
+              className="w-full bg-pink-800 hover:bg-pink-900 disabled:bg-pink-400 text-white py-3 px-4 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center"
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Gerando QR Code...
+                </>
+              ) : (
+                <>
+                  <FaQrcode className="mr-2" />
+                  Verifique sua conta
+                </>
+              )}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {showQRCode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="relative w-full max-w-md rounded-2xl bg-white dark:bg-gray-800 border border-pink-200 dark:border-gray-700 shadow-2xl">
+            <button
+              type="button"
+              aria-label="Fechar"
+              className="absolute right-3 top-3 text-gray-600 hover:text-black dark:text-gray-300 dark:hover:text-white"
+              onClick={() => {
+                setShowQRCode(false);
+                if (qrTimeoutRef.current) {
+                  clearTimeout(qrTimeoutRef.current);
+                  qrTimeoutRef.current = null;
+                }
+              }}
+            >
+              ✕
+            </button>
+            <div className="p-6">
+              <h4 className="text-lg font-bold text-center text-black dark:text-white">Escaneie com o celular</h4>
+              <p className="text-sm text-center text-gray-600 dark:text-gray-300 mt-1">Abra a câmera do seu celular e aponte para o QR Code.</p>
+              <div className="flex justify-center mt-4">
+                <img src={qrCode} alt="QR Code para verificação facial" className="border rounded-lg w-64 h-64 bg-white p-2" />
+              </div>
+              {verificationUrl && (
+                <p className="text-xs text-center text-emerald-700 dark:text-emerald-300 mt-3 break-words">
+                  Ou acesse: <span className="underline">{verificationUrl}</span>
+                </p>
+              )}
+              <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">Este código expira em 5 minutos.</p>
+              <div className="mt-4 flex justify-center">
+                <button
+                  onClick={() => {
+                    setShowQRCode(false);
+                    if (qrTimeoutRef.current) {
+                      clearTimeout(qrTimeoutRef.current);
+                      qrTimeoutRef.current = null;
+                    }
+                  }}
+                  className="text-pink-800 dark:text-pink-400 hover:underline text-sm"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 // Alterar Senha
 function PasswordSection({ showPasswordSection, setShowPasswordSection, currentPassword, setCurrentPassword, newPassword, setNewPassword, confirmPassword, setConfirmPassword, onSubmitPassword }) {
   const [mostrarAtual, setMostrarAtual] = useState(false);
@@ -271,6 +496,7 @@ const Profile = () => {
   const [nomeUsuario, setNomeUsuario] = useState('Nome do Usuário');
   const [editandoNome, setEditandoNome] = useState(false);
   const [novoNome, setNovoNome] = useState('');
+  const [usuarioId, setUsuarioId] = useState('');
 
   const siteAvatars = [
     '/assets/avatars/india-avatar.png',
@@ -284,11 +510,56 @@ const Profile = () => {
     (async () => {
       try {
         const usuarioLogado = localStorage.getItem('usuarioLogado');
-        if (!usuarioLogado) return;
+        const usuarioIdLocal = localStorage.getItem('usuarioId');
+        console.log('Perfil: usuarioLogado(localStorage)=', usuarioLogado, 'usuarioId(localStorage)=', usuarioIdLocal);
+
+        if (!usuarioLogado) {
+          console.error('Nenhum usuário logado encontrado no localStorage');
+          return;
+        }
+
+        // 1) Preferir o ID do localStorage (definido no login)
+        if (usuarioIdLocal) {
+          setUsuarioId(usuarioIdLocal);
+          console.log('Perfil: usando usuarioId do localStorage:', usuarioIdLocal);
+          try {
+            const resp = await fetch(`${API_BASE}/api/usuarios/${usuarioIdLocal}`);
+            if (resp.ok) {
+              const u = await resp.json();
+              setNomeUsuario(u?.nome || usuarioLogado);
+            }
+          } catch {}
+          return;
+        }
+
+        // 2) Fallback: buscar na lista de usuários pelo username
+        console.log('Fazendo requisição para obter usuários (fallback)...');
         const usuarios = await getItem('usuarios');
-        const usuario = usuarios.find(u => u.usuario === usuarioLogado);
-        if (usuario) setNomeUsuario(usuario.nome || 'Nome do Usuário');
-      } catch (e) { console.error('Erro ao buscar dados do usuário', e); }
+        console.log('Usuarios obtidos da API:', usuarios);
+
+        if (!usuarios || !Array.isArray(usuarios)) {
+          console.error('Dados de usuários inválidos:', usuarios);
+          return;
+        }
+
+        const usuario = usuarios.find(u => u && u.usuario === usuarioLogado);
+        console.log('Usuario encontrado (fallback):', usuario);
+
+        if (usuario) {
+          setNomeUsuario(usuario.nome || 'Nome do Usuário');
+          if (usuario.id) {
+            setUsuarioId(usuario.id);
+            console.log('UsuarioId definido como (fallback):', usuario.id);
+          } else {
+            console.error('Usuario encontrado mas sem ID:', usuario);
+          }
+        } else {
+          console.error('Usuario não encontrado na lista de usuários');
+          console.log('Usuários disponíveis:', usuarios.map(u => u?.usuario));
+        }
+      } catch (e) {
+        console.error('Erro ao buscar dados do usuário:', e);
+      }
     })();
   }, []);
 
@@ -351,6 +622,7 @@ const Profile = () => {
           onSalvarNome={handleSalvarNome}
         />
         <div className="max-w-2xl mx-auto">
+          <FacialVerificationSection usuarioId={usuarioId} />
           <EventsSection usuarioLogado={localStorage.getItem('usuarioLogado')} />
           <PasswordSection
             showPasswordSection={showPasswordSection}

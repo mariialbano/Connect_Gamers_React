@@ -7,11 +7,11 @@ services:
     container_name: connect_gamers_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME:-connect_gamers}
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-connectgamers}
+      POSTGRES_DB: connect_gamers
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: connectgamers
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       # Persiste os dados do banco mesmo se o container for removido
       - postgres_data:/var/lib/postgresql/data
@@ -71,4 +71,3 @@ volumes:
 networks:
   connect_gamers_network:
     driver: bridge
-

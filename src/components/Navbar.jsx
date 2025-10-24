@@ -7,7 +7,6 @@ export default function Navbar() {
   const [profileDropdown, setProfileDropdown] = useState(false);
   const [hoverChevron, setHoverChevron] = useState(false);
   const [hoverMenu, setHoverMenu] = useState(false);
-  const [showPointsPreview, setShowPointsPreview] = useState(false);
   const navigate = useNavigate();
   const { theme, toggleTheme, fontSize, changeFontSize } = useTheme();
   const usuarioLogado = localStorage.getItem("usuarioLogado");
@@ -87,55 +86,7 @@ export default function Navbar() {
                 </span>
               </Link>
 
-              {/* POINTS PREVIEW */}
-              <div 
-                className="relative"
-                onMouseEnter={() => setShowPointsPreview(true)}
-                onMouseLeave={() => setShowPointsPreview(false)}
-              >
-                <button className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md flex items-center gap-1">
-                  <Coins size={18} />
-                  <span className="relative">
-                    Pontos
-                    <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
-                  </span>
-                </button>
-
-                {showPointsPreview && (
-                  <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-3 z-50">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="bg-pink-400 rounded p-1">
-                        <Coins className="w-4 h-4 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-gray-800 dark:text-gray-100 text-sm">Seus Pontos</h3>
-                      </div>
-                    </div>
-
-                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-3">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-xs text-gray-600 dark:text-gray-400">Saldo</span>
-                        <Zap className="w-3 h-3 text-yellow-500" />
-                      </div>
-                      <div className="text-lg font-bold text-gray-800 dark:text-gray-100">
-                        1.500
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        ≈ R$ 15,00
-                      </div>
-                    </div>
-
-                    <Link 
-                      to="/pontos"
-                      className="block w-full bg-pink-500 hover:bg-pink-600 text-white text-center py-2 rounded-lg transition-colors text-sm font-medium"
-                      onClick={() => setShowPointsPreview(false)}
-                    >
-                      Comprar Pontos
-                    </Link>
-                  </div>
-                )}
-              </div>
-              {/* FIM DO POINTS PREVIEW */}
+              {/* FIM DO POINTS PREVIEW - REMOVIDO DA NAVBAR PRINCIPAL */}
 
               <Link to="/faq" className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md">
                 <span className="relative">
@@ -177,7 +128,6 @@ export default function Navbar() {
               <div className="relative inline-flex items-center">
                 <div className="relative">
                   <button
-                    onClick={() => setProfileDropdown((open) => !open)}
                     onMouseEnter={() => setHoverChevron(true)}
                     onMouseLeave={() => setHoverChevron(false)}
                     className="ml-1 flex items-center transition-colors text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-600"
@@ -203,6 +153,41 @@ export default function Navbar() {
                   >
                   {usuarioLogado && (
                     <>
+                      {/* Card de Pontos no Dropdown */}
+                      <div 
+                        onClick={() => {
+                          navigate("/pontos");
+                          setProfileDropdown(false);
+                        }}
+                        className="px-4 py-3 cursor-pointer hover:bg-pink-600/10 dark:hover:bg-pink-600/10"
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="bg-pink-400 rounded p-1">
+                            <Coins className="w-4 h-4 text-white" />
+                          </div>
+                          <h3 className="font-bold text-gray-800 dark:text-gray-100 text-sm">Seus Pontos</h3>
+                        </div>
+
+                        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-xs text-gray-600 dark:text-gray-400">Saldo</span>
+                            <Zap className="w-3 h-3 text-yellow-500" />
+                          </div>
+                          <div className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                            1.500
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            ≈ R$ 15,00
+                          </div>
+                        </div>
+
+                        <button
+                          className="w-full mt-2 bg-pink-500 hover:bg-pink-600 text-white text-center py-2 rounded-lg transition-colors text-xs font-medium"
+                        >
+                          Comprar Pontos
+                        </button>
+                      </div>
+
                       <button
                         onClick={() => {
                           navigate("/perfil");
