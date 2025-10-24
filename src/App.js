@@ -14,6 +14,7 @@ import Dashboard from './pages/Dashboard';
 import ESG from './pages/ESG';
 import { useTheme } from './theme/ThemeContext';
 import Pontos from './pages/Pontos';
+import GamePoints from './pages/GamePoints';
 
 function App() {
   const { theme } = useTheme();
@@ -77,6 +78,7 @@ function App() {
             <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
             <Route path="/esg" element={<ESG />} />
             <Route path="/pontos" element={<Pontos />} />
+            <Route path="/gamepoints" element={<RequireAuth><GamePoints /></RequireAuth>} />
           </Routes>
         </main>
         <Footer />
