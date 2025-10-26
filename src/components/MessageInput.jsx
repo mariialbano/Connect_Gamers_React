@@ -53,7 +53,7 @@ export default function MessageInput({ onSend, blockInfo }) {
 
     const blocked = !!blockInfo;
     return (
-        <div className="relative bg-white border-t border-gray-200 dark:bg-gray-900 dark:border-gray-800 p-4 transition-colors">
+        <div className="relative p-4 transition-colors">
             {blocked && (
                 <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-lg bg-gray-900/80 backdrop-blur-sm text-center px-6">
                     <p className="text-sm md:text-base font-semibold text-amber-200">Você está temporariamente bloqueado</p>
@@ -67,7 +67,7 @@ export default function MessageInput({ onSend, blockInfo }) {
                     onKeyDown={handleKey}
                     placeholder="Digite sua mensagem..."
                     disabled={blocked}
-                    className="flex-1 h-12 resize-none rounded-lg bg-gray-100 border border-gray-300 text-sm text-gray-900 placeholder-gray-500 px-4 py-3 focus:outline-none focus:border-gray-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:border-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="flex-1 h-12 resize-none rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-sm text-white placeholder-white/60 px-4 py-3 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                     aria-label="Campo de mensagem"
                     aria-describedby="msgHint"
                 />

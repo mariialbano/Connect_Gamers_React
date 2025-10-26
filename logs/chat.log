@@ -95,3 +95,4 @@
 {"type":"channel","channel":"Valorant","message":{"messageId":"1","id":"1","username":"Luis","text":"oii","time":"2025-10-18T17:51:31.977Z"}}
 {"type":"group","groupId":"1760809800620-g","message":{"messageId":"1","id":"1","username":"Luis","text":"que horas vamos jogar?","time":"2025-10-18T17:51:51.156Z"}}
 {"type":"channel","channel":"CS2","message":{"messageId":"2","id":"2","username":"Luis","text":"❤️","time":"2025-10-18T17:53:19.124Z"}}
+{"type":"channel","channel":"valorant","message":{"messageId":"3","id":"3","username":"SuperAdmin","text":"oiii","time":"2025-10-26T18:17:19.241Z","role":"admin"}}

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { postItem, getItem } from "../services/api";
 import { useTheme } from "../theme/ThemeContext";
+import LayoutWrapper from "../components/LayoutWrapper";
+import { Card, Button, Badge } from "../components/ui";
 
 export default function Cadastro() {
   const [jogoSelecionado, setJogoSelecionado] = useState("");
@@ -104,20 +106,26 @@ export default function Cadastro() {
   };
 
   return (
-    <div className="flex justify-center py-20">
-      <div className={
-        theme === "dark"
-          ? "bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-xl text-white"
-          : "bg-[#d9dbe2] p-8 rounded-xl shadow-lg w-full max-w-xl text-black"
-      }>
+    <LayoutWrapper variant="default" className="flex items-center justify-center py-20">
+      <Card variant="glass" className="p-8 w-full max-w-xl text-neutral-900 dark:text-neutral-100">
+        {/* Header com branding */}
+        <div className="text-center mb-8">
+          <Badge variant="primary" size="lg" className="mb-4">
+            🏆 Cadastre seu Squad
+          </Badge>
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Forme sua equipe vencedora!
+          </h1>
+          <p className="text-white/80">
+            Cadastre seu squad e participe dos maiores torneios de gaming do Brasil
+          </p>
+        </div>
+
         {!localStorage.getItem('usuarioLogado') && (
-          <div className="mb-6 p-3 rounded-md text-sm font-medium bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300 border border-pink-300 dark:border-pink-700">
-            Faça login para continuar o cadastro.
-          </div>
+          <Badge variant="warning" size="sm" className="mb-6 w-full justify-center">
+            Faça login para continuar o cadastro
+          </Badge>
         )}
-  <h1 className="text-3xl font-bold text-center text-black dark:text-white mb-8">
-          Cadastre seu Squad!
-        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6" aria-labelledby="form-squad-title">
           <h2 id="form-squad-title" className="sr-only">Formulário de cadastro de squad</h2>
@@ -131,11 +139,7 @@ export default function Cadastro() {
               placeholder="Nome do Squad"
               value={nomeSquad}
               onChange={(e) => setNomeSquad(e.target.value)}
-              className={
-                theme === "dark"
-                  ? "w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400"
-                  : "w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black placeholder-gray-500"
-              }
+              className="w-full px-4 py-2 rounded-md bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 border border-neutral-200 dark:border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               aria-required="true"
             />
           </div>
@@ -225,8 +229,8 @@ export default function Cadastro() {
                     title={index === 0 ? "Este é o seu usuário" : "Nome do integrante"}
                     className={
                       theme === "dark"
-                        ? `px-4 py-2 rounded-md bg-gray-700 text-white ${index===0 ? 'opacity-80 cursor-not-allowed' : ''}`
-                        : `px-4 py-2 rounded-md bg-[#f3f4f6] text-black ${index===0 ? 'opacity-80 cursor-not-allowed' : ''}`
+                        ? `px-4 py-2 rounded-md bg-neutral-800 text-neutral-100 ${index===0 ? 'opacity-80 cursor-not-allowed' : ''} border border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent`
+                        : `px-4 py-2 rounded-md bg-neutral-50 text-neutral-900 ${index===0 ? 'opacity-80 cursor-not-allowed' : ''} border border-neutral-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent`
                     }
                   />
                 </div>
@@ -245,7 +249,7 @@ export default function Cadastro() {
             <button
               type="button"
               onClick={adicionarIntegrante}
-              className={`text-pink-800 dark:text-pink-300 hover:underline mt-2 ${integrantes.length >= 5 ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`text-primary-600 dark:text-primary-400 hover:underline mt-2 ${integrantes.length >= 5 ? "opacity-50 cursor-not-allowed" : ""}`}
               disabled={integrantes.length >= 5}
               aria-label="Adicionar novo integrante"
             >
@@ -253,14 +257,16 @@ export default function Cadastro() {
             </button>
           </div>
 
-          <button
+          <Button
             type="submit"
-            className="w-full bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+            variant="accent"
+            size="lg"
+            className="w-full shadow-glow"
           >
-            Cadastrar Squad
-          </button>
+            ▶ Cadastrar Squad
+          </Button>
         </form>
-      </div>
-    </div>
+      </Card>
+    </LayoutWrapper>
   );
 }

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getItem, postItem } from "../services/api";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import LayoutWrapper from "../components/LayoutWrapper";
+import { Card, Button, Badge } from "../components/ui";
 
 export default function Login() {
   const [modo, setModo] = useState("login");
@@ -98,28 +100,50 @@ export default function Login() {
   };
 
   return (
-    <div className="flex justify-center py-10 px-4">
-      <div className="bg-[#d9dbe2] dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md text-black dark:text-white">
+    <LayoutWrapper variant="login" className="flex items-center justify-center py-10 px-4">
+      <Card variant="glass" className="p-8 w-full max-w-md text-neutral-900 dark:text-neutral-100">
+        {/* Header com branding */}
+        <div className="text-center mb-8">
+          <Badge variant="primary" size="lg" className="mb-4">
+            🎮 Connect Gamers
+          </Badge>
+          <h1 className="text-3xl font-bold text-white mb-2">
+            {modo === "login" ? "Bem-vindo de volta!" : "Junte-se à comunidade!"}
+          </h1>
+          <p className="text-white/80">
+            {modo === "login" ? "Entre na sua conta para continuar" : "Crie sua conta e comece a jogar"}
+          </p>
+        </div>
+
         {authRequired && (
-          <div className="mb-6 p-3 rounded-md text-sm font-medium bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300 border border-pink-300 dark:border-pink-700">
-            Faça login para acessar esta página.
-          </div>
+          <Badge variant="warning" size="sm" className="mb-6 w-full justify-center">
+            Faça login para acessar esta página
+          </Badge>
         )}
         {adminRequired && (
-          <div className="mb-6 p-3 rounded-md text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-200 border border-indigo-300 dark:border-indigo-700">
-            Apenas o administrador pode entrar nesta área. Use o usuário <strong>admin</strong>.
-          </div>
+          <Badge variant="danger" size="sm" className="mb-6 w-full justify-center">
+            Apenas administradores podem acessar esta área
+          </Badge>
         )}
-        <div className="flex justify-around mb-6">
+        {/* Tabs de navegação */}
+        <div className="flex bg-white/10 dark:bg-neutral-800/30 rounded-lg p-1 mb-6">
           <button
             onClick={() => setModo("login")}
-            className={`px-4 py-2 font-bold transition-colors ${modo === "login" ? "text-pink-800 dark:text-pink-400 border-b-2 border-pink-800 dark:border-pink-400" : "text-gray-600 dark:text-gray-400 hover:text-pink-700 dark:hover:text-pink-300"}`}
+            className={`flex-1 px-4 py-2 font-semibold rounded-md transition-all ${
+              modo === "login" 
+                ? "bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 shadow-sm" 
+                : "text-white/70 hover:text-white hover:bg-white/10"
+            }`}
           >
             Login
           </button>
           <button
             onClick={() => setModo("cadastro")}
-            className={`px-4 py-2 font-bold transition-colors ${modo === "cadastro" ? "text-pink-800 dark:text-pink-400 border-b-2 border-pink-800 dark:border-pink-400" : "text-gray-600 dark:text-gray-400 hover:text-pink-700 dark:hover:text-pink-300"}`}
+            className={`flex-1 px-4 py-2 font-semibold rounded-md transition-all ${
+              modo === "cadastro" 
+                ? "bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 shadow-sm" 
+                : "text-white/70 hover:text-white hover:bg-white/10"
+            }`}
           >
             Cadastre-se
           </button>
@@ -129,7 +153,7 @@ export default function Login() {
 
           {modo === "cadastro" && (
             <div>
-              <label htmlFor="nome" className="block mb-1 text-black dark:text-white">Nome</label>
+              <label htmlFor="nome" className="block mb-1 text-neutral-900 dark:text-neutral-100">Nome</label>
               <input
                 type="text"
                 id="nome"
@@ -137,13 +161,13 @@ export default function Login() {
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
                 required
-                className="w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                className="w-full px-4 py-2 rounded-md bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 border border-neutral-200 dark:border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
             </div>
           )}
 
           <div>
-            <label htmlFor="usuario" className="block mb-1 text-black dark:text-white">Nome de usuário</label>
+            <label htmlFor="usuario" className="block mb-1 text-neutral-900 dark:text-neutral-100">Nome de usuário</label>
             <input
               type="text"
               id="usuario"
@@ -151,12 +175,12 @@ export default function Login() {
               value={usuario}
               onChange={(e) => setUsuario(e.target.value)}
               required
-              className="w-full px-4 py-2 rounded-md bg-[#f3f4f6] text-black placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+              className="w-full px-4 py-2 rounded-md bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 border border-neutral-200 dark:border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block mb-1 text-black dark:text-white">Senha</label>
+            <label htmlFor="password" className="block mb-1 text-neutral-900 dark:text-neutral-100">Senha</label>
             <div className="relative">
               <input
                 type={mostrarSenha ? 'text' : 'password'}
@@ -167,7 +191,7 @@ export default function Login() {
                 pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}"
                 title="A senha deve ter pelo menos 8 caracteres, com letras maiúsculas, minúsculas, números e símbolos"
                 required
-                className="w-full px-4 py-2 pr-12 rounded-md bg-[#f3f4f6] text-black placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                className="w-full px-4 py-2 pr-12 rounded-md bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 border border-neutral-200 dark:border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
               <button
                 type="button"
@@ -178,7 +202,7 @@ export default function Login() {
                 {mostrarSenha ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
-            <small className="text-gray-600 dark:text-gray-400">
+            <small className="text-neutral-600 dark:text-neutral-400">
               Use pelo menos 8 caracteres com letras maiúsculas, minúsculas, números e símbolos
             </small>
           </div>
@@ -190,9 +214,9 @@ export default function Login() {
               checked={seguranca}
               onChange={(e) => setSeguranca(e.target.checked)}
               required
-              className="checkbox-pink accent-pink-600 bg-white border-pink-500 dark:accent-pink-500 dark:bg-gray-800 dark:border-pink-600"
+              className="accent-primary-600 bg-white border-primary-500 dark:accent-primary-500 dark:bg-neutral-800 dark:border-primary-600"
             />
-            <label htmlFor="securityAwareness" className="text-sm text-black dark:text-gray-300">
+            <label htmlFor="securityAwareness" className="text-sm text-neutral-900 dark:text-neutral-100">
               Estou ciente das práticas de segurança do site
             </label>
           </div>
@@ -204,29 +228,31 @@ export default function Login() {
               checked={compartilharDados}
               onChange={(e) => setCompartilharDados(e.target.checked)}
               required
-              className="checkbox-pink accent-pink-600 bg-white border-pink-500 dark:accent-pink-500 dark:bg-gray-800 dark:border-pink-600"
+              className="accent-primary-600 bg-white border-primary-500 dark:accent-primary-500 dark:bg-neutral-800 dark:border-primary-600"
             />
-            <label htmlFor="dataSharing" className="text-sm text-black dark:text-gray-300">
+            <label htmlFor="dataSharing" className="text-sm text-neutral-900 dark:text-neutral-100">
               Concordo em compartilhar meus dados
             </label>
           </div>
 
-          <button
+          <Button
             type="submit"
-            className="w-full bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+            variant="accent"
+            size="lg"
+            className="w-full shadow-glow"
           >
-            {modo === "login" ? "Entrar" : "Cadastrar"}
-          </button>
+            {modo === "login" ? "▶ Entrar" : "▶ Cadastrar"}
+          </Button>
           {modo === "login" && (
             <p
               onClick={handleEsqueciSenha}
-              className="text-pink-400 dark:text-pink-400 mt-2 cursor-pointer text-sm hover:underline text-center"
+              className="text-primary-400 dark:text-primary-400 mt-2 cursor-pointer text-sm hover:underline text-center"
             >
               Esqueci minha senha
             </p>
           )}
         </form>
-      </div>
-    </div>
+      </Card>
+    </LayoutWrapper>
   );
 }

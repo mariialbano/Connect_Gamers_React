@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { API_BASE } from '../services/apiBase';
+import LayoutWrapper from '../components/LayoutWrapper';
+import { Card, Button, Badge } from '../components/ui';
 
 const FAQ = () => {
   const [rating, setRating] = useState(0);
@@ -55,61 +57,78 @@ const FAQ = () => {
   };
 
   return (
-    <div className="my-28 flex items-center justify-center p-8">
-      <div className="w-full max-w-2xl h-auto bg-[#d9dbe2] dark:bg-gray-800/80 p-6 rounded-lg shadow-lg flex flex-col gap-6">
-        <div className="flex-1 flex flex-col">
-          <h2 className="text-3xl font-bold mb-4 text-center md:text-left text-black dark:text-white">
-            Seu Feedback é importante para nós!
-          </h2>
-        <form onSubmit={handleFeedbackSubmit} className="flex flex-col flex-1 space-y-3">
-          <div className="text-center">
-            <p className="mb-2 text-lg text-black dark:text-white/80">
-              Como você avalia sua experiência?
-            </p>
-            <div className="flex justify-center space-x-1 mb-7">
-              {[1, 2, 3, 4, 5].map((value) => (
-                <button
-                  type="button"
-                  key={value}
-                  className={`text-2xl cursor-pointer ${
-                    (hoverRating || rating) >= value
-                      ? 'text-yellow-400'
-                      : 'text-gray-600 dark:text-gray-300'
-                  }`}
-                  onClick={() => handleRatingChange(value)}
-                  onMouseOver={() => handleMouseOver(value)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  ★
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <textarea 
-            className="w-full p-2 border border-gray-500 rounded focus:border-gray-500/80 focus:ring-1 focus:ring-gray-500/80 outline-none bg-gray-200 text-black dark:bg-gray-700 dark:text-white"
-            placeholder="Deixe seu comentário..."
-            aria-label="Campo para comentário ou feedback"
-            value={feedback}
-            onChange={(e) => setFeedback(e.target.value)}
-            rows={4}
-          ></textarea>
-
-          <button 
-            type="submit" 
-            disabled={sending}
-            className="w-full bg-pink-800 hover:bg-pink-900 disabled:opacity-60 disabled:cursor-not-allowed active:bg-pink-950 text-white py-2 px-4 rounded transition mt-0"
-            aria-label="Enviar feedback"
-          >
-            {sending ? 'Enviando...' : 'Enviar Feedback'}
-          </button>
-
-          {error && <div className="text-red-600 text-sm" role="alert">{error}</div>}
-          {success && <div className="text-sm font-medium text-green-700 bg-green-100 dark:bg-green-900/40 dark:text-green-300 px-3 py-2 rounded" role="status">{success}</div>}
-        </form>
+    <LayoutWrapper variant="faq" className="flex items-center justify-center p-8">
+      <div className="w-full max-w-2xl">
+        {/* Header Section */}
+        <div className="text-center mb-12">
+          <Badge variant="primary" size="lg" className="mb-4">
+            💬 Feedback & Suporte
+          </Badge>
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+            Sua opinião <span className="bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">importa</span>
+          </h1>
+          <p className="text-xl text-white/80 max-w-3xl mx-auto">
+            Ajude-nos a melhorar a plataforma compartilhando sua experiência
+          </p>
         </div>
+
+        <Card variant="glass" className="p-8">
+          <div className="flex-1 flex flex-col">
+            <h2 className="text-3xl font-bold mb-4 text-center md:text-left text-neutral-900 dark:text-neutral-100">
+              Seu Feedback é importante para nós!
+            </h2>
+            <form onSubmit={handleFeedbackSubmit} className="flex flex-col flex-1 space-y-3">
+              <div className="text-center">
+                <p className="mb-2 text-lg text-neutral-900 dark:text-neutral-100">
+                  Como você avalia sua experiência?
+                </p>
+                <div className="flex justify-center space-x-1 mb-7">
+                  {[1, 2, 3, 4, 5].map((value) => (
+                    <button
+                      type="button"
+                      key={value}
+                      className={`text-2xl cursor-pointer ${
+                        (hoverRating || rating) >= value
+                          ? 'text-yellow-400'
+                          : 'text-neutral-600 dark:text-neutral-400'
+                      }`}
+                      onClick={() => handleRatingChange(value)}
+                      onMouseOver={() => handleMouseOver(value)}
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <textarea 
+                className="w-full p-2 border border-neutral-300 dark:border-neutral-600 rounded focus:border-primary-500 dark:focus:border-primary-400 focus:ring-1 focus:ring-primary-500 dark:focus:ring-primary-400 outline-none bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400"
+                placeholder="Deixe seu comentário..."
+                aria-label="Campo para comentário ou feedback"
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                rows={4}
+              ></textarea>
+
+              <Button 
+                type="submit" 
+                variant="accent"
+                size="lg"
+                disabled={sending}
+                className="w-full shadow-glow"
+                aria-label="Enviar feedback"
+              >
+                {sending ? 'Enviando...' : '▶ Enviar Feedback'}
+              </Button>
+
+              {error && <div className="text-red-600 text-sm" role="alert">{error}</div>}
+              {success && <div className="text-sm font-medium text-green-700 bg-green-100 dark:bg-green-900/40 dark:text-green-300 px-3 py-2 rounded" role="status">{success}</div>}
+            </form>
+          </div>
+        </Card>
       </div>
-    </div>
+    </LayoutWrapper>
   );
 };
 

@@ -3,6 +3,8 @@ import { API_BASE } from '../services/apiBase';
 import { useTheme } from '../theme/ThemeContext';
 import MessageInput from '../components/MessageInput';
 import ChatWindow from '../components/ChatWindow';
+import LayoutWrapper from '../components/LayoutWrapper';
+import { Card, Badge } from '../components/ui';
 
 const gradients = [
     'from-green-400 to-blue-500',
@@ -189,14 +191,25 @@ export default function Comunidade() {
     const headerBarClass = `border-b px-4 py-3 flex items-center justify-between ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'}`;
 
     return (
-        <div className="min-h-screen w-full">
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className={`flex h-[calc(100vh-10rem)] rounded-2xl shadow-lg overflow-hidden border transition-colors ${theme === 'dark'
-                    ? 'bg-gray-900/70 border-gray-800'
-                    : 'bg-gray-100/80 border-gray-300 backdrop-blur-sm'}`}>
+        <LayoutWrapper variant="community" className="py-8">
+            <div className="max-w-7xl mx-auto px-4">
+                {/* Header Section */}
+                <div className="text-center mb-12">
+                    <Badge variant="primary" size="lg" className="mb-4">
+                        💬 Comunidade Gaming
+                    </Badge>
+                    <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+                        Conecte-se com <span className="bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">gamers</span>
+                    </h1>
+                    <p className="text-xl text-white/80 max-w-3xl mx-auto">
+                        Participe de conversas, faça amigos e compartilhe sua paixão pelo gaming
+                    </p>
+                </div>
+
+                <Card variant="glass" className="h-[calc(100vh-20rem)] flex overflow-hidden">
                     {/* Lista de canais */}
-                    <aside className={`w-60 hidden md:flex md:flex-col p-4 border-r transition-colors ${theme === 'dark' ? 'border-gray-800' : 'border-gray-300'} rounded-l-2xl`}>
-                        <h2 className="text-base md:text-lg font-bold mb-3 ml-4" id="canalHeading">Canais</h2>
+                    <aside className="w-60 hidden md:flex md:flex-col p-4 border-r border-white/20 flex-shrink-0">
+                        <h2 className="text-base md:text-lg font-bold mb-3 ml-4 text-white" id="canalHeading">Canais</h2>
                         <div role="navigation" aria-labelledby="canalHeading" className="flex flex-col gap-2 pr-1">
                             {channels.map(c => {
                                 const active = channel === c.name;
@@ -204,11 +217,11 @@ export default function Comunidade() {
                                     <button
                                         key={c.name}
                                         onClick={() => setChannel(c.name)}
-                                        className={`text-left ml-2 pl-4 pr-4 py-2 rounded-lg transition font-medium text-xs ring-1 ring-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 ${active
-                                            ? 'bg-pink-800 text-white shadow'
-                                            : theme === 'dark'
-                                                ? 'bg-gray-800/70 hover:bg-gray-800 text-gray-200'
-                                                : 'bg-white hover:bg-white/90 text-gray-800 border border-gray-200'}`}
+                                        className={`text-left ml-2 pl-4 pr-4 py-2 rounded-lg transition font-medium text-xs ring-1 ring-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 ${
+                                            active
+                                                ? 'bg-pink-800 text-white shadow'
+                                                : 'bg-white/10 hover:bg-white/20 text-white/80 hover:text-white'
+                                        }`}
                                         aria-current={active ? 'page' : undefined}
                                     >
                                         {c.name}
@@ -218,11 +231,11 @@ export default function Comunidade() {
                         </div>
                     </aside>
                     {/* Chat principal */}
-                    <div className="flex-1 flex flex-col rounded-r-2xl min-h-0">
-                        <div className={`${headerBarClass} transition-colors ${theme === 'dark' ? 'bg-gray-900/60' : 'bg-white/70'} backdrop-blur-sm rounded-tr-2xl`}>
-                            <h1 className="text-xl font-semibold">#{channel}</h1>
+                    <div className="flex-1 flex flex-col min-h-0">
+                        <div className="border-b border-white/20 px-4 py-3 flex items-center justify-between bg-white/10 backdrop-blur-sm">
+                            <h1 className="text-xl font-semibold text-white">#{channel}</h1>
                         </div>
-                        <div className={`flex-1 flex flex-col min-h-0 ${theme === 'dark' ? 'bg-gradient-to-b from-gray-900/40 to-gray-900/80' : 'bg-gradient-to-b from-white/60 to-white/90'} transition-colors`}>
+                        <div className="flex-1 flex flex-col min-h-0 bg-gradient-to-b from-white/5 to-white/10 overflow-hidden">
                             {modError && (
                                 <div className="mx-4 mb-2 p-3 rounded-lg text-sm bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700">
                                     <p className="font-semibold">{modError.message}</p>
@@ -233,13 +246,13 @@ export default function Comunidade() {
                                 </div>
                             )}
                             <ChatWindow channel={channel} messages={messages} hideScrollbar />
-                            <div className={`px-4 pt-2 pb-3 transition-colors ${theme === 'dark' ? 'bg-gray-900/70 border-gray-800 rounded-b-2xl' : 'bg-white/80 border-gray-300 rounded-b-2xl'} backdrop-blur-sm`}>
+                            <div className="flex-shrink-0">
                                 <MessageInput onSend={handleSend} blockInfo={blockInfo?.blocked ? { remainingMs: blockInfo.remainingMs } : null} />
                             </div>
                         </div>
                     </div>
-                </div>
+                </Card>
             </div>
-        </div>
+        </LayoutWrapper>
     );
 }
