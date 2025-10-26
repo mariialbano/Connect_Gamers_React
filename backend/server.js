@@ -76,10 +76,12 @@ const LOG_DEDUP_MS = Math.max(parseInt(process.env.LOG_DEDUP_MS || '0', 10) || 0
 const https = require('https');
 let sslKey, sslCert;
 try {
-    sslKey = fs.readFileSync(path.join(__dirname, '192.168.0.141+1-key.pem'));
-    sslCert = fs.readFileSync(path.join(__dirname, '192.168.0.141+1.pem'));
+    // Usar IP do .env ou fallback para IP hardcoded
+    const serverIP = process.env.SERVER_IP || '192.168.0.141';
+    sslKey = fs.readFileSync(path.join(__dirname, `${serverIP}+1-key.pem`));
+    sslCert = fs.readFileSync(path.join(__dirname, `${serverIP}+1.pem`));
 } catch (e) {
-    console.error('Certificados SSL não encontrados. Gere com mkcert e coloque em backend/.', e.message);
+    console.error('Certificados SSL não encontrados. Execute: .\setup-ssl.ps1', e.message);
 }
 
 const limiter = rateLimit({
@@ -119,9 +121,10 @@ app.use(limiter);
 // Rota para baixar o certificado no iPhone
 app.get('/ca.crt', (req, res) => {
     try {
-        const certPath = path.join(__dirname, '../public/192.168.0.141+1.pem');
+        const serverIP = process.env.SERVER_IP || '192.168.0.141';
+        const certPath = path.join(__dirname, `../public/${serverIP}+1.pem`);
         if (fs.existsSync(certPath)) {
-            res.download(certPath, '192.168.0.141.pem');
+            res.download(certPath, `${serverIP}.pem`);
         } else {
             res.status(404).send('Certificado não encontrado');
         }
@@ -133,6 +136,16 @@ app.get('/ca.crt', (req, res) => {
 
 // Servir arquivos estáticos do React (após build)
 app.use(express.static(path.join(__dirname, '../build')));
+
+// Rota para servir o template de verificação facial
+app.get('/faceid/:token', (req, res) => {
+    const templatePath = path.join(__dirname, 'templates', 'faceid.html');
+    if (fs.existsSync(templatePath)) {
+        res.sendFile(templatePath);
+    } else {
+        res.status(404).send('Template de verificação facial não encontrado');
+    }
+});
 
 app.use('/api/usuarios', usersRouter);
 app.use('/api/squads', squadsRouter);
@@ -173,8 +186,9 @@ app.use((req, res, next) => {
 
 function start(port) {
     if (sslKey && sslCert) {
-        const server = https.createServer({ key: sslKey, cert: sslCert }, app).listen(port, () => {
-            console.log(`Servidor HTTPS rodando em https://192.168.0.141:${port}`);
+        const serverIP = process.env.SERVER_IP || 'localhost';
+        const server = https.createServer({ key: sslKey, cert: sslCert }, app).listen(port, '0.0.0.0', () => {
+            console.log(`Servidor HTTPS rodando em https://${serverIP}:${port}`);
             try {
                 const boot = {
                     time: new Date().toISOString(),

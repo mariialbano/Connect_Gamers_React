@@ -1,7 +1,12 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+require('dotenv').config();
 const app = express();
+
+const serverIP = process.env.REACT_APP_API_URL ? 
+  process.env.REACT_APP_API_URL.match(/https:\/\/([^:]+):/)?.[1] : 
+  '192.168.0.141';
 
 app.use(express.static(path.join(__dirname, '../build')));
 
@@ -17,7 +22,7 @@ app.get('/api/verify', (req, res) => {
 });
 
 app.get('/ca.crt', (req, res) => {
-  res.download(path.join(__dirname, '../public/192.168.0.141+1.pem'));
+  res.download(path.join(__dirname, `../public/${serverIP}+1.pem`));
 });
 
 app.get('*', (req, res) => {

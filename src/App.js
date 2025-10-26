@@ -12,7 +12,7 @@ import Comunidade from './pages/Comunidade';
 import Amigos from './pages/Amigos';
 import Dashboard from './pages/Dashboard';
 import ESG from './pages/ESG';
-import FacialVerificationPro from './pages/FacialVerificationPro';
+import FacialVerification from './pages/FacialVerification';
 import Pontos from './pages/Pontos';
 import GamePoints from './pages/GamePoints';
 import Resgates from './pages/Resgates';
@@ -82,7 +82,7 @@ function App() {
             <Route path="/esg" element={<ESG />} />
             <Route path="/gamepoints" element={<RequireAuth><GamePoints /></RequireAuth>} />
             <Route path="/resgates" element={<RequireAuth><Resgates /></RequireAuth>} />
-            <Route path="/verify/:token" element={<FacialVerificationPro />} />
+            <Route path="/verify/:token" element={<FacialVerification />} />
           </Routes>
         </main>
         <Footer />

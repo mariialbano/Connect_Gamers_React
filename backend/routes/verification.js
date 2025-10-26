@@ -113,12 +113,9 @@ router.post('/generate-qr', async (req, res) => {
             );
         }
 
-        // Gerar QR Code usando a origem da requisição (suporta acesso via IP da LAN)
+        // Gerar QR Code apontando para o backend na porta 5000 (faceid.html)
         const origin = `${req.protocol}://${req.get('host')}`;
-        // O frontend está servido pelo backend (build estático), então usa a mesma origem
-        // FRONTEND_URL pode ser usado para sobrescrever se necessário (ex: ngrok URL pública)
-        const frontendBase = process.env.FRONTEND_URL || origin;
-        const verificationUrl = `${frontendBase}/verify/${token}`;
+        const verificationUrl = `${origin}/faceid/${token}`;
         const qrCodeDataUrl = await QRCode.toDataURL(verificationUrl);
 
         res.json({

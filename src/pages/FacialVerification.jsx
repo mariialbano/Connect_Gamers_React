@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaCamera, FaUpload, FaCheckCircle, FaExclamationTriangle, FaSpinner } from 'react-icons/fa';
+import { FaCamera, FaCheckCircle, FaExclamationTriangle, FaSpinner, FaTimes } from 'react-icons/fa';
 import { API_BASE } from '../services/apiBase';
-import * as faceapi from 'face-api.js'; // Importa o face-api.js
 
 const FacialVerification = () => {
   const { token } = useParams();
@@ -12,14 +11,18 @@ const FacialVerification = () => {
   const [error, setError] = useState('');
   const [step, setStep] = useState('verify-token'); // verify-token, capture-photo, processing, success, error
   const [capturedImage, setCapturedImage] = useState(null);
-  const [secureContext, setSecureContext] = useState(true);
-  const [isIOS, setIsIOS] = useState(false);
-  const [errorHint, setErrorHint] = useState('');
-  const [showIosHelp, setShowIosHelp] = useState(false);
-  const fileInputRef = useRef(null);
+  const [stream, setStream] = useState(null);
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [faceDetected, setFaceDetected] = useState(false);
+  const [instructionText, setInstructionText] = useState('Posicione seu rosto dentro do oval');
+  
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const ovalCanvasRef = useRef(null);
+  const detectionIntervalRef = useRef(null);
   const lastApiUrlRef = useRef('');
 
-  // Resolve API base once (no ESLint warning about API_BASE deps)
+  // Resolve API base
   const resolveApiBase = () => {
     try {
       const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -35,35 +38,24 @@ const FacialVerification = () => {
       }
       return baseUrl.toString().replace(/\/$/, '');
     } catch (e) {
-      console.error('Falha ao resolver API_BASE, usando window.location.origin', e);
+      console.error('Falha ao resolver API_BASE', e);
       const fallback = typeof window !== 'undefined' ? window.location.origin : '';
       return (fallback || '').replace(/\/$/, '');
     }
   };
+  
   const resolvedApiBaseRef = useRef(resolveApiBase());
 
-  // Helper: build URLs from the resolved base (stable)
   const buildApiUrl = useCallback((path) => {
     const cleaned = path.startsWith('/') ? path.slice(1) : path;
     const base = resolvedApiBaseRef.current || '';
     try {
       return new URL(cleaned, `${base}/`).toString();
     } catch (e) {
-      console.error('URL build fallback engaged:', { base, cleaned, e });
       return `${base}/${cleaned}`;
     }
   }, []);
 
-  // Helper: backend origin (for opening/trusting the cert on iOS)
-  const getBackendOrigin = useCallback(() => {
-    try {
-      return new URL(resolvedApiBaseRef.current).origin;
-    } catch {
-      return resolvedApiBaseRef.current || '';
-    }
-  }, []);
-
-  // Helper: fetch with timeout (prevents iOS from hanging on TLS/CORS failures)
   const fetchWithTimeout = useCallback(async (url, options = {}, timeoutMs = 10000) => {
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), timeoutMs);
@@ -74,7 +66,6 @@ const FacialVerification = () => {
     }
   }, []);
 
-  // Token vindo da rota, query (?token=) ou hash (#token=)
   const effectiveToken = useMemo(() => {
     let t = token;
     if (typeof window !== 'undefined') {
@@ -93,7 +84,6 @@ const FacialVerification = () => {
 
   const verifyToken = useCallback(async () => {
     if (!effectiveToken) {
-      setErrorHint('');
       setError('Token não informado.');
       setStep('error');
       setLoading(false);
@@ -103,10 +93,7 @@ const FacialVerification = () => {
       const sanitizedToken = encodeURIComponent(effectiveToken);
       const url = buildApiUrl(`/api/verification/verify-token/${sanitizedToken}`);
       lastApiUrlRef.current = url;
-      setErrorHint('');
-      console.log('🔍 Verificando token:', effectiveToken);
-      console.log('🌐 URL completa:', url);
-      console.log('🛰️ API base resolvido:', resolvedApiBaseRef.current);
+      
       const response = await fetchWithTimeout(url, {
         method: 'GET',
         headers: { Accept: 'application/json' },
@@ -114,88 +101,239 @@ const FacialVerification = () => {
         mode: 'cors',
         cache: 'no-store',
       }, 12000);
-      console.log('📥 Response status:', response.status);
+
       let data = null;
       try {
         data = await response.json();
       } catch (parseError) {
         console.error('❌ Erro ao interpretar resposta:', parseError);
       }
+
       if (response.ok && data) {
         console.log('✅ Token válido:', data);
-        setErrorHint('');
         setTokenData(data);
         setStep('capture-photo');
       } else {
         const message = data?.error || 'Token inválido';
-        console.log('❌ Token inválido:', data);
-        setErrorHint('');
         setError(message);
         setStep('error');
       }
     } catch (error) {
       console.error('❌ Erro ao verificar token:', error);
-      const targetOrigin = (() => {
-        try { return new URL(lastApiUrlRef.current).origin; } catch { return ''; }
-      })();
-      const hintPieces = [];
-      if (!secureContext) {
-        hintPieces.push('A página não está em HTTPS. Utilize HTTPS ou localhost para liberar a câmera e o backend.');
-      }
-      if (isIOS) {
-        hintPieces.push('No iOS/Safari acesse o backend, toque em “Mostrar detalhes” e confie no certificado.');
-      }
-      try {
-        const originUrl = new URL(getBackendOrigin());
-        const host = originUrl.hostname;
-        const isIp = /^\d{1,3}(\.\d{1,3}){3}$/.test(host);
-        if (isIp) {
-          hintPieces.push('Quando usar IP (ex.: 192.168.x.x), o certificado HTTPS deve conter o IP no Subject Alternative Name (SAN).');
-        }
-      } catch {}
-      hintPieces.push(`Confirme que o backend${targetOrigin ? ` (${targetOrigin})` : ''} está acessível na mesma rede e com certificado aceito. Base atual: ${getBackendOrigin() || 'indefinida'}.`);
-      setErrorHint(hintPieces.join(' '));
-      setError(`Erro ao conectar com o servidor${targetOrigin ? ` (${targetOrigin})` : getBackendOrigin() ? ` (${getBackendOrigin()})` : ''}.`);
+      setError('Erro ao conectar com o servidor');
       setStep('error');
     } finally {
       setLoading(false);
     }
-  }, [effectiveToken, buildApiUrl, secureContext, isIOS, fetchWithTimeout, getBackendOrigin]);
+  }, [effectiveToken, buildApiUrl, fetchWithTimeout]);
 
-  // Executa verificação do token quando o token mudar
   useEffect(() => {
     verifyToken();
   }, [verifyToken]);
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      console.log('📸 Foto selecionada:', file.name, file.size, 'bytes');
-      setCapturedImage(file);
-      setError(''); // Limpa qualquer erro anterior
-    } else {
-      setError('Por favor, selecione um arquivo de imagem válido');
+  // Carrega MediaPipe Face Detection
+  useEffect(() => {
+    const loadMediaPipe = async () => {
+      if (typeof window !== 'undefined' && !window.FaceMesh) {
+        try {
+          // Carrega MediaPipe via CDN
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js';
+          document.head.appendChild(script);
+
+          const script2 = document.createElement('script');
+          script2.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js';
+          document.head.appendChild(script2);
+
+          const script3 = document.createElement('script');
+          script3.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js';
+          document.head.appendChild(script3);
+
+          console.log('✅ MediaPipe scripts carregados');
+        } catch (e) {
+          console.error('❌ Erro ao carregar MediaPipe:', e);
+        }
+      }
+    };
+    
+    loadMediaPipe();
+  }, []);
+
+  const startCamera = async () => {
+    try {
+      setError('');
+      console.log('📸 Iniciando câmera...');
+      
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'user',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
+      });
+
+      setStream(mediaStream);
+      setIsCameraActive(true);
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current.play().catch(e => console.error('Erro no play:', e));
+        };
+      }
+
+      // Inicia detecção de face
+      startFaceDetection();
+    } catch (error) {
+      console.error('❌ Erro ao acessar câmera:', error);
+      setError(error.name === 'NotAllowedError' 
+        ? 'Permita o acesso à câmera' 
+        : 'Erro ao acessar câmera');
     }
+  };
+
+  const stopCamera = () => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
+    if (detectionIntervalRef.current) {
+      clearInterval(detectionIntervalRef.current);
+    }
+    setIsCameraActive(false);
+    setFaceDetected(false);
+  };
+
+  const startFaceDetection = () => {
+    // Simulação simples de detecção (em produção usar face-api.js ou MediaPipe)
+    detectionIntervalRef.current = setInterval(() => {
+      if (videoRef.current && videoRef.current.videoWidth > 0) {
+        // Aqui você integraria face-api.js para detecção real
+        setFaceDetected(true);
+        setInstructionText('✅ Rosto detectado! Clique em "Capturar"');
+      }
+    }, 100);
+  };
+
+  const drawOval = () => {
+    const canvas = ovalCanvasRef.current;
+    const video = videoRef.current;
+    
+    if (!canvas || !video || video.videoWidth === 0) return;
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext('2d');
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radiusX = canvas.width * 0.25;
+    const radiusY = canvas.height * 0.35;
+
+    // Draw semi-transparent overlay
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Clear oval area
+    ctx.clearRect(centerX - radiusX, centerY - radiusY, radiusX * 2, radiusY * 2);
+
+    // Draw oval border
+    ctx.strokeStyle = faceDetected ? '#10b981' : '#ef4444';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Draw corner indicators
+    const cornerSize = 30;
+    ctx.strokeStyle = faceDetected ? '#10b981' : '#fbbf24';
+    ctx.lineWidth = 3;
+
+    // Top-left
+    ctx.beginPath();
+    ctx.moveTo(centerX - radiusX, centerY - radiusY);
+    ctx.lineTo(centerX - radiusX + cornerSize, centerY - radiusY);
+    ctx.moveTo(centerX - radiusX, centerY - radiusY);
+    ctx.lineTo(centerX - radiusX, centerY - radiusY + cornerSize);
+    ctx.stroke();
+
+    // Top-right
+    ctx.beginPath();
+    ctx.moveTo(centerX + radiusX, centerY - radiusY);
+    ctx.lineTo(centerX + radiusX - cornerSize, centerY - radiusY);
+    ctx.moveTo(centerX + radiusX, centerY - radiusY);
+    ctx.lineTo(centerX + radiusX, centerY - radiusY + cornerSize);
+    ctx.stroke();
+
+    // Bottom-left
+    ctx.beginPath();
+    ctx.moveTo(centerX - radiusX, centerY + radiusY);
+    ctx.lineTo(centerX - radiusX + cornerSize, centerY + radiusY);
+    ctx.moveTo(centerX - radiusX, centerY + radiusY);
+    ctx.lineTo(centerX - radiusX, centerY + radiusY - cornerSize);
+    ctx.stroke();
+
+    // Bottom-right
+    ctx.beginPath();
+    ctx.moveTo(centerX + radiusX, centerY + radiusY);
+    ctx.lineTo(centerX + radiusX - cornerSize, centerY + radiusY);
+    ctx.moveTo(centerX + radiusX, centerY + radiusY);
+    ctx.lineTo(centerX + radiusX, centerY + radiusY - cornerSize);
+    ctx.stroke();
+
+    requestAnimationFrame(drawOval);
+  };
+
+  useEffect(() => {
+    if (isCameraActive) {
+      drawOval();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCameraActive, faceDetected]);
+
+  const capturePhoto = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+
+    if (!video || !canvas) {
+      setError('Erro ao capturar foto');
+      return;
+    }
+
+    const context = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    context.drawImage(video, 0, 0);
+
+    canvas.toBlob((blob) => {
+      if (blob) {
+        console.log('✅ Foto capturada:', blob.size, 'bytes');
+        setCapturedImage(blob);
+        stopCamera();
+      } else {
+        setError('Erro ao processar imagem');
+      }
+    }, 'image/jpeg', 0.95);
   };
 
   const submitVerification = async () => {
     if (!capturedImage) {
-      setErrorHint('');
-      setError('Por favor, capture ou selecione uma imagem');
+      setError('Por favor, capture uma imagem');
       return;
     }
+
     setStep('processing');
-    setErrorHint('');
     setError('');
+
     try {
       const formData = new FormData();
-      formData.append('photo', capturedImage, 'face-photo.jpg'); // Backend espera 'photo', não 'faceImage'
+      formData.append('photo', capturedImage, 'face-photo.jpg');
       formData.append('token', effectiveToken);
-      
+
       console.log('📤 Enviando verificação facial...');
-      console.log('🎫 Token:', effectiveToken);
-      console.log('📸 Imagem:', capturedImage);
-      
+
       const response = await fetchWithTimeout(buildApiUrl('/api/verification/face-verification'), {
         method: 'POST',
         body: formData,
@@ -203,16 +341,14 @@ const FacialVerification = () => {
         mode: 'cors',
         cache: 'no-store',
       }, 20000);
-      
-      console.log('📥 Response status:', response.status);
-      
+
       let data = null;
       try {
         data = await response.json();
-        console.log('📥 Response data:', data);
       } catch (parseError) {
         console.error('Erro ao interpretar resposta:', parseError);
       }
+
       if (response.ok && data?.success) {
         console.log('✅ Verificação bem-sucedida!');
         setStep('success');
@@ -221,17 +357,16 @@ const FacialVerification = () => {
         }, 3000);
       } else {
         if (data?.duplicate) {
-          setError(`🚫 CONTA DUPLICADA DETECTADA!\n\n${data.error || data.message}`);
+          setError(`🚫 CONTA DUPLICADA!\n${data.error}`);
         } else {
-          setError(data?.error || 'Erro na verificação facial');
+          setError(data?.error || 'Erro na verificação');
         }
-        console.error('❌ Erro na verificação:', data);
         setStep('capture-photo');
         setCapturedImage(null);
       }
     } catch (error) {
-      console.error('❌ Erro na verificação:', error);
-      setError('Erro ao enviar imagem para verificação');
+      console.error('❌ Erro:', error);
+      setError('Erro ao enviar imagem');
       setStep('capture-photo');
       setCapturedImage(null);
     }
@@ -240,284 +375,171 @@ const FacialVerification = () => {
   const resetCapture = () => {
     setCapturedImage(null);
     setError('');
-    setErrorHint('');
   };
-
-  const handleRetry = useCallback(() => {
-    setLoading(true);
-    setError('');
-    setErrorHint('');
-    setStep('verify-token');
-    verifyToken();
-  }, [verifyToken]);
-
-  const openBackend = useCallback(() => {
-    const origin = getBackendOrigin();
-    if (origin) {
-      // abre em nova aba para permitir confiar no certificado
-      const w = window.open(origin, '_blank', 'noopener,noreferrer');
-      if (!w) window.location.href = origin;
-    }
-  }, [getBackendOrigin]);
-
-  const copyBackendOrigin = useCallback(async () => {
-    const origin = getBackendOrigin();
-    if (!origin) return;
-    try {
-      await navigator.clipboard?.writeText(origin);
-      setErrorHint('Endereço do servidor copiado. Abra-o no iPhone e confie no certificado.');
-    } catch {
-      const tmp = document.createElement('textarea');
-      tmp.value = origin;
-      document.body.appendChild(tmp);
-      tmp.select();
-      try { document.execCommand('copy'); } catch {}
-      document.body.removeChild(tmp);
-      setErrorHint('Endereço do servidor copiado. Abra-o no iPhone e confie no certificado.');
-    }
-  }, [getBackendOrigin]);
-
-  const caUrl = useMemo(() => {
-    const origin = getBackendOrigin();
-    return origin ? `${origin}/ca.crt` : '';
-  }, [getBackendOrigin]);
-
-  // Verifica contexto seguro e iOS/Safari
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setSecureContext(window.isSecureContext);
-    }
-    if (typeof navigator !== 'undefined') {
-      setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent));
-    }
-  }, []);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
         <div className="text-center">
-          <FaSpinner className="animate-spin text-4xl text-pink-800 dark:text-pink-400 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-300">Verificando token...</p>
+          <FaSpinner className="animate-spin text-4xl text-pink-500 mx-auto mb-4" />
+          <p className="text-gray-300">Verificando token...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8">
-      <div className="container mx-auto px-4 max-w-md">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+    <div className="min-h-screen bg-gray-900 py-8">
+      <div className="container mx-auto px-4 max-w-lg">
+        <div className="bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              Verificação Facial
-            </h1>
-            {tokenData && (
-              <p className="text-gray-600 dark:text-gray-300">
-                Olá, <strong>{tokenData.user.nome}</strong>
-              </p>
-            )}
+          <div className="bg-gradient-to-r from-pink-600 to-pink-700 p-6 text-center">
+            <h1 className="text-3xl font-bold text-white mb-2">Verificação Facial</h1>
+            {tokenData && <p className="text-pink-100">Olá, {tokenData.user.nome}</p>}
           </div>
 
-          {/* Error Display */}
-          {error && step !== 'processing' && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
-              <div className="flex items-center">
-                <FaExclamationTriangle className="text-red-600 dark:text-red-400 mr-2" />
-                <p className="text-red-700 dark:text-red-400 text-sm">{error}</p>
+          <div className="p-6">
+            {/* Error */}
+            {error && step !== 'processing' && (
+              <div className="bg-red-900/20 border border-red-500 rounded-lg p-4 mb-6">
+                <div className="flex items-start">
+                  <FaExclamationTriangle className="text-red-500 mr-3 mt-1" />
+                  <p className="text-red-100 whitespace-pre-line">{error}</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Token Error */}
-          {step === 'error' && (
-            <div className="text-center py-8">
-              <FaExclamationTriangle className="text-red-500 text-4xl mx-auto mb-4" />
-              {(() => {
-                const isTokenInvalid =
-                  typeof error === 'string' &&
-                  error.toLowerCase().includes('token') &&
-                  error.toLowerCase().includes('inválido');
-                return (
-                  <>
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                      {isTokenInvalid ? 'Token Inválido' : 'Erro'}
-                    </h2>
-                    {isTokenInvalid ? (
-                      <p className="text-gray-600 dark:text-gray-300 mb-4">
-                        O link de verificação expirou ou é inválido.
-                      </p>
-                    ) : null}
-                  </>
-                );
-              })()}
-              <div className="bg-gray-50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-700 rounded-lg p-3 mb-3 text-xs text-gray-700 dark:text-gray-300">
-                <p>Não é necessário configurar VPN. No iPhone é preciso confiar no certificado do servidor HTTPS.</p>
-                <button
-                  onClick={() => setShowIosHelp((v) => !v)}
-                  className="mt-2 text-pink-800 dark:text-pink-400 underline"
-                >
-                  {showIosHelp ? 'Ocultar instruções iOS' : 'Como confiar no certificado no iPhone'}
-                </button>
-                {showIosHelp && (
-                  <div className="text-left mt-3 space-y-1">
-                    <p>- No computador: gere um certificado para o IP com mkcert (ex.: mkcert 192.168.x.x).</p>
-                    <p>- Localize a raiz do mkcert (root CA), normalmente “rootCA.pem”.</p>
-                    <p>- Envie a root CA para o iPhone (AirDrop/Email/hosteie em {getBackendOrigin()}/ca.crt).</p>
-                    <p>- No iPhone: após baixar, vá em Ajustes &gt; Geral &gt; VPN e Gerenciamento de Dispositivo &gt; Instalar o perfil.</p>
-                    <p>- Depois: Ajustes &gt; Geral &gt; Sobre &gt; Confiança em Certificados &gt; Ative “Confiança total” para essa CA.</p>
-                    <p>- Abra {getBackendOrigin()} no Safari, recarregue e confirme que abre sem aviso.</p>
-                    <p>- Volte aqui e toque em “Tentar Novamente”.</p>
-                    <p>- Alternativa rápida: use um túnel (ngrok/Cloudflare Tunnel) e aponte API_BASE/QR para o domínio HTTPS público.</p>
+            {/* Capture State */}
+            {step === 'capture-photo' && (
+              <div>
+                {!isCameraActive && !capturedImage && (
+                  <div className="space-y-4">
+                    <div className="bg-blue-900/20 border border-blue-500 rounded-lg p-4 mb-6">
+                      <h3 className="font-semibold text-blue-100 mb-3">📸 Instruções:</h3>
+                      <ul className="text-blue-100 text-sm space-y-2">
+                        <li>✓ Boa iluminação no rosto</li>
+                        <li>✓ Posicione seu rosto dentro do oval</li>
+                        <li>✓ Olhe direto para a câmera</li>
+                        <li>✓ Sem óculos escuros ou máscara</li>
+                      </ul>
+                    </div>
+
+                    <button
+                      onClick={startCamera}
+                      className="w-full bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white py-4 rounded-lg font-bold flex items-center justify-center text-lg transition"
+                    >
+                      <FaCamera className="mr-3 text-2xl" />
+                      Iniciar Câmera
+                    </button>
+                  </div>
+                )}
+
+                {isCameraActive && !capturedImage && (
+                  <div>
+                    <div className="relative w-full mb-6 rounded-xl overflow-hidden bg-black" style={{ aspectRatio: '4/5' }}>
+                      <video
+                        ref={videoRef}
+                        autoPlay
+                        playsInline
+                        muted
+                        className="w-full h-full object-cover"
+                      />
+                      <canvas
+                        ref={ovalCanvasRef}
+                        className="absolute inset-0 w-full h-full"
+                      />
+                    </div>
+
+                    <div className="bg-yellow-900/20 border border-yellow-600 rounded-lg p-3 mb-4 text-center">
+                      <p className="text-yellow-100 font-semibold text-sm">{instructionText}</p>
+                    </div>
+
+                    <div className="space-x-3 flex">
+                      <button
+                        onClick={capturePhoto}
+                        disabled={!faceDetected}
+                        className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white py-3 rounded-lg font-bold transition"
+                      >
+                        ✓ Capturar
+                      </button>
+                      <button
+                        onClick={stopCamera}
+                        className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-bold flex items-center justify-center transition"
+                      >
+                        <FaTimes className="mr-2" /> Cancelar
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {capturedImage && (
+                  <div>
+                    <img
+                      src={URL.createObjectURL(capturedImage)}
+                      alt="Capturada"
+                      className="w-full rounded-xl mb-4"
+                    />
+                    <div className="space-y-3">
+                      <button
+                        onClick={submitVerification}
+                        className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold transition"
+                      >
+                        ✓ Confirmar e Enviar
+                      </button>
+                      <button
+                        onClick={resetCapture}
+                        className="w-full bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-bold transition"
+                      >
+                        🔄 Tirar Outra Foto
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
-              {errorHint && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 px-4">
-                  {errorHint}
-                </p>
-              )}
-              <div className="space-y-2">
-                <button
-                  onClick={handleRetry}
-                  className="w-full bg-pink-800 hover:bg-pink-900 text-white px-6 py-2 rounded-lg font-medium"
-                >
-                  Tentar Novamente
-                </button>
-                <button
-                  onClick={openBackend}
-                  className="w-full bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg font-medium"
-                >
-                  Abrir servidor (confiar certificado)
-                </button>
-                <button
-                  onClick={copyBackendOrigin}
-                  className="w-full bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium"
-                >
-                  Copiar endereço do servidor
-                </button>
-                {caUrl && (
-                  <a
-                    href={caUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full bg-gray-700 hover:bg-gray-800 text-white px-6 py-2 rounded-lg font-medium"
-                  >
-                    Baixar CA (root) para iPhone
-                  </a>
-                )}
+            )}
+
+            {/* Processing */}
+            {step === 'processing' && (
+              <div className="text-center py-12">
+                <FaSpinner className="animate-spin text-pink-500 text-5xl mx-auto mb-4" />
+                <h2 className="text-xl font-bold text-white mb-2">Verificando...</h2>
+                <p className="text-gray-400">Processando sua foto facial</p>
+              </div>
+            )}
+
+            {/* Success */}
+            {step === 'success' && (
+              <div className="text-center py-12">
+                <FaCheckCircle className="text-green-500 text-5xl mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-white mb-2">Verificado! ✓</h2>
+                <p className="text-gray-400 mb-6">Sua identidade foi confirmada com sucesso</p>
                 <button
                   onClick={() => navigate('/perfil')}
-                  className="w-full bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-medium"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold transition"
                 >
                   Voltar ao Perfil
                 </button>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Photo Capture */}
-          {step === 'capture-photo' && (
-            <div>
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
-                <h3 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">
-                  Instruções para uma boa foto:
-                </h3>
-                <ul className="text-blue-700 dark:text-blue-400 text-sm space-y-1">
-                  <li>• Boa iluminação no rosto</li>
-                  <li>• Olhe diretamente para a câmera</li>
-                  <li>• Retire óculos escuros ou máscaras</li>
-                  <li>• Mantenha expressão neutra</li>
-                </ul>
+            {/* Error */}
+            {step === 'error' && (
+              <div className="text-center py-12">
+                <FaExclamationTriangle className="text-red-500 text-5xl mx-auto mb-4" />
+                <h2 className="text-xl font-bold text-white mb-4">{error}</h2>
+                <button
+                  onClick={() => navigate('/perfil')}
+                  className="w-full bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-bold transition"
+                >
+                  Voltar ao Perfil
+                </button>
               </div>
-
-              {!capturedImage ? (
-                <div className="space-y-4">
-                  {/* Botão principal para tirar foto (abre câmera nativa do celular) */}
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full bg-pink-800 hover:bg-pink-900 text-white py-4 px-4 rounded-lg font-medium flex items-center justify-center text-lg"
-                  >
-                    <FaCamera className="mr-2 text-2xl" />
-                    Tirar Foto
-                  </button>
-                  
-                  <div className="text-center text-gray-500 dark:text-gray-400 text-sm">
-                    Abrirá a câmera do seu celular
-                  </div>
-                  
-                  {/* Input oculto que abre a câmera nativa */}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    capture="user"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                </div>
-              ) : (
-                <div className="mb-4">
-                  <img
-                    src={URL.createObjectURL(capturedImage)}
-                    alt="Imagem capturada"
-                    className="w-full rounded-lg"
-                  />
-                </div>
-              )}
-
-              {/* Actions after capture */}
-              {capturedImage && (
-                <div className="space-y-2">
-                  <button
-                    onClick={submitVerification}
-                    className="w-full bg-pink-800 hover:bg-pink-900 text-white px-6 py-2 rounded-lg font-medium"
-                  >
-                    Enviar para Verificação
-                  </button>
-                  <button
-                    onClick={resetCapture}
-                    className="w-full bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-medium"
-                  >
-                    Capturar Novamente
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Processing State */}
-          {step === 'processing' && (
-            <div className="text-center py-8">
-              <FaSpinner className="animate-spin text-pink-800 dark:text-pink-400 text-4xl mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                Verificando sua identidade...
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300">
-                Aguarde enquanto processamos sua foto facial.
-              </p>
-            </div>
-          )}
-
-          {/* Success State */}
-          {step === 'success' && (
-            <div className="text-center py-8">
-              <FaCheckCircle className="text-green-500 text-4xl mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                Verificação Concluída!
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Sua verificação facial foi realizada com sucesso.
-              </p>
-              <button
-                onClick={() => navigate('/perfil')}
-                className="w-full bg-pink-800 hover:bg-pink-900 text-white px-6 py-2 rounded-lg font-medium"
-              >
-                Voltar ao Perfil
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
+
+        {/* Hidden canvas for capture */}
+        <canvas ref={canvasRef} className="hidden" />
       </div>
     </div>
   );

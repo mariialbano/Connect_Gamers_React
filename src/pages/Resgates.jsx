@@ -9,7 +9,7 @@ const perksData = [
   { id: 5, cost: 300, description: '1 mês de premium' },
 ];
 
-const GIFT_IMAGE_PATH = '/assets/perk.png'; 
+const GIFT_IMAGE_PATH = '/assets/perk.png';
 
 const Resgates = () => {
   const [userBalance, setUserBalance] = useState(100);
@@ -32,38 +32,38 @@ const Resgates = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
+
         {perksData.map((perk) => {
           const hasEnoughPoints = userBalance >= perk.cost;
 
           return (
-            <div 
-              key={perk.id} 
+            <div
+              key={perk.id}
               className="bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden flex flex-col justify-between transition-transform duration-200 hover:-translate-y-1"
             >
               {/* Imagem e Conteúdo do Card */}
               <div className="p-6 flex flex-col items-center justify-center flex-grow">
                 {/* AQUI ESTÁ A IMAGEM */}
-                <img 
-                  src={GIFT_IMAGE_PATH} 
-                  alt="Ícone de presente de perk" 
-                  className="w-24 h-24 object-contain mb-4" 
+                <img
+                  src={GIFT_IMAGE_PATH}
+                  alt="Ícone de presente de perk"
+                  className="w-24 h-24 object-contain mb-4"
                 />
                 <p className="text-center text-gray-700 dark:text-gray-200 text-lg">
                   {perk.description}
                 </p>
               </div>
-              
+
               {/* Footer do Card */}
               <div className="bg-gray-800 dark:bg-black text-white p-6 flex flex-col">
                 <span className="text-sm font-bold mb-3">
-                   {perk.cost} pontos
+                  {perk.cost} pontos
                 </span>
-                
+
                 <button
                   className="w-full py-3 px-4 text-base font-bold text-white bg-pink-600 rounded-lg transition-colors hover:bg-pink-700 disabled:bg-gray-500 disabled:text-gray-300 disabled:cursor-not-allowed"
                   onClick={() => handleResgate(perk)}
-                  disabled={!hasEnoughPoints} 
+                  disabled={!hasEnoughPoints}
                 >
                   {hasEnoughPoints ? 'Resgatar' : 'Pontos Insuficientes'}
                 </button>

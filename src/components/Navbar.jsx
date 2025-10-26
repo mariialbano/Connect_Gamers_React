@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Users, LogOut, ChevronDown, LayoutDashboard, Coins, Zap } from 'lucide-react';
+import { User, Users, LogOut, ChevronDown, LayoutDashboard, Coins } from 'lucide-react';
 import { useTheme } from '../theme/ThemeContext';
 
 export default function Navbar() {
@@ -72,7 +72,7 @@ export default function Navbar() {
               <Link to="/resgates" className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md">
                 <span className="relative">
                   Resgates
-                   <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
+                  <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
                 </span>
               </Link>
               <Link
@@ -85,8 +85,6 @@ export default function Navbar() {
                   <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-pink-800 dark:bg-pink-400 transition-all duration-300 group-hover:w-full"></span>
                 </span>
               </Link>
-
-              {/* FIM DO POINTS PREVIEW - REMOVIDO DA NAVBAR PRINCIPAL */}
 
               <Link to="/faq" className="relative group transition-colors hover:text-pink-800 dark:hover:text-pink-400 font-medium px-1 rounded-md">
                 <span className="relative">
@@ -151,118 +149,126 @@ export default function Navbar() {
                     onMouseEnter={() => setHoverMenu(true)}
                     onMouseLeave={() => setHoverMenu(false)}
                   >
-                  {usuarioLogado && (
-                    <>
-                      {/* Card de Pontos no Dropdown */}
-                      <div 
-                        onClick={() => {
-                          navigate("/pontos");
-                          setProfileDropdown(false);
-                        }}
-                        className="px-4 py-3 cursor-pointer hover:bg-pink-600/10 dark:hover:bg-pink-600/10"
-                      >
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="bg-pink-400 rounded p-1">
-                            <Coins className="w-4 h-4 text-white" />
+                    {usuarioLogado && (
+                      <>
+                        {/* Card de Pontos no Dropdown */}
+                        <div className="px-4 py-3">
+                          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                            <div className="flex justify-between items-center mb-2">
+                              <div className="flex items-center gap-2">
+                                <Coins size={16} className="text-yellow-500" />
+                                <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">111.00</span>
+                              </div>
+                              <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">R$ 5.55</span>
+                            </div>
+                            
+                            <div className="flex gap-2 mt-3">
+                              <button 
+                                onClick={() => {
+                                  navigate("/gamepoints");
+                                  setProfileDropdown(false);
+                                }}
+                                className="flex-1 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-white text-center py-2 rounded-lg transition-colors text-xs font-medium flex items-center justify-center gap-1"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <circle cx="12" cy="12" r="10" strokeWidth="2"/>
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v8m0 0v-4"/>
+                                </svg>
+                                Sacar
+                              </button>
+                              <button 
+                                onClick={() => {
+                                  navigate("/pontos");
+                                  setProfileDropdown(false);
+                                }}
+                                className="flex-1 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-white text-center py-2 rounded-lg transition-colors text-xs font-medium flex items-center justify-center gap-1"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <circle cx="12" cy="12" r="10" strokeWidth="2"/>
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v8"/>
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h8"/>
+                                </svg>
+                                Comprar
+                              </button>
+                            </div>
                           </div>
-                          <h3 className="font-bold text-gray-800 dark:text-gray-100 text-sm">Seus Pontos</h3>
                         </div>
 
-                        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="text-xs text-gray-600 dark:text-gray-400">Saldo</span>
-                            <Zap className="w-3 h-3 text-yellow-500" />
-                          </div>
-                          <div className="text-lg font-bold text-gray-800 dark:text-gray-100">
-                            1.500
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            ≈ R$ 15,00
-                          </div>
-                        </div>
-
-                        <button
-                          className="w-full mt-2 bg-pink-500 hover:bg-pink-600 text-white text-center py-2 rounded-lg transition-colors text-xs font-medium"
-                        >
-                          Comprar Pontos
-                        </button>
-                      </div>
-
-                      <button
-                        onClick={() => {
-                          navigate("/perfil");
-                          setProfileDropdown(false);
-                        }}
-                        className="flex items-center gap-2 w-full text-left px-4 py-2 hover:rounded-lg hover:bg-pink-600/30 dark:hover:bg-pink-600/30 text-gray-900 dark:text-white"
-                      >
-                        <User size={18} /> Conta
-                      </button>
-                      {isAdmin && (
                         <button
                           onClick={() => {
-                            navigate('/dashboard');
+                            navigate("/perfil");
                             setProfileDropdown(false);
                           }}
                           className="flex items-center gap-2 w-full text-left px-4 py-2 hover:rounded-lg hover:bg-pink-600/30 dark:hover:bg-pink-600/30 text-gray-900 dark:text-white"
                         >
-                          <LayoutDashboard size={18} /> Dashboard
+                          <User size={18} /> Conta
                         </button>
-                      )}
-                    </>
-                  )}
-                  <button
-                    onClick={toggleTheme}
-                    className="flex items-center gap-2 w-full text-left px-4 py-2 hover:rounded-lg hover:bg-pink-600/30 dark:hover:bg-pink-600/30 text-gray-900 dark:text-white"
-                    aria-label="Alternar tema claro/escuro"
-                  >
-                    <span>{theme === 'dark' ? 'Tema Claro' : 'Tema Escuro'}</span>
-                    <span className="ml-auto">
-                      <span className={`relative inline-block w-10 h-5 align-middle select-none transition duration-200`}>
-                        <span
-                          className={`absolute left-0 top-0 w-10 h-5 rounded-full transition-colors duration-300 ${theme === 'dark' ? 'bg-pink-600' : 'bg-pink-600'}`}
-                        ></span>
-                        <span
-                          className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${theme === 'dark' ? 'translate-x-5' : ''}`}
-                        ></span>
-                      </span>
-                    </span>
-                  </button>
-                  {/* Controle de tamanho da fonte */}
-                  <div className="px-4 pt-2 pb-3 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2 font-semibold">Tamanho da Fonte</p>
-                    <div className="flex gap-2">
-                      {[
-                        { key: 'small', label: 'Pequena', short: 'A-' },
-                        { key: 'base', label: 'Normal', short: 'A' },
-                        { key: 'large', label: 'Grande', short: 'A+' },
-                      ].map(opt => (
-                        <button
-                          key={opt.key}
-                          type="button"
-                          onClick={() => changeFontSize(opt.key)}
-                          className={`flex-1 text-xs px-2 py-1 rounded-md border transition font-semibold
-                            ${fontSize === opt.key
-                              ? 'bg-pink-600 text-white border-pink-600 dark:bg-pink-600 dark:border-pink-600'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-pink-100 dark:hover:bg-gray-600'}`}
-                          aria-pressed={fontSize === opt.key}
-                          aria-label={`Fonte ${opt.label}`}
-                        >
-                          {opt.short}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  {usuarioLogado && (
+                        {isAdmin && (
+                          <button
+                            onClick={() => {
+                              navigate('/dashboard');
+                              setProfileDropdown(false);
+                            }}
+                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:rounded-lg hover:bg-pink-600/30 dark:hover:bg-pink-600/30 text-gray-900 dark:text-white"
+                          >
+                            <LayoutDashboard size={18} /> Dashboard
+                          </button>
+                        )}
+                      </>
+                    )}
                     <button
-                      onClick={() => {
-                        handleLogout();
-                        setProfileDropdown(false);
-                      }}
+                      onClick={toggleTheme}
                       className="flex items-center gap-2 w-full text-left px-4 py-2 hover:rounded-lg hover:bg-pink-600/30 dark:hover:bg-pink-600/30 text-gray-900 dark:text-white"
+                      aria-label="Alternar tema claro/escuro"
                     >
-                      <LogOut size={18} /> Sair
+                      <span>{theme === 'dark' ? 'Tema Claro' : 'Tema Escuro'}</span>
+                      <span className="ml-auto">
+                        <span className={`relative inline-block w-10 h-5 align-middle select-none transition duration-200`}>
+                          <span
+                            className={`absolute left-0 top-0 w-10 h-5 rounded-full transition-colors duration-300 ${theme === 'dark' ? 'bg-pink-600' : 'bg-pink-600'}`}
+                          ></span>
+                          <span
+                            className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${theme === 'dark' ? 'translate-x-5' : ''}`}
+                          ></span>
+                        </span>
+                      </span>
                     </button>
-                  )}
+                    {/* Controle de tamanho da fonte */}
+                    <div className="px-4 pt-2 pb-3 border-t border-gray-200 dark:border-gray-700">
+                      <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2 font-semibold">Tamanho da Fonte</p>
+                      <div className="flex gap-2">
+                        {[
+                          { key: 'small', label: 'Pequena', short: 'A-' },
+                          { key: 'base', label: 'Normal', short: 'A' },
+                          { key: 'large', label: 'Grande', short: 'A+' },
+                        ].map(opt => (
+                          <button
+                            key={opt.key}
+                            type="button"
+                            onClick={() => changeFontSize(opt.key)}
+                            className={`flex-1 text-xs px-2 py-1 rounded-md border transition font-semibold
+                            ${fontSize === opt.key
+                                ? 'bg-pink-600 text-white border-pink-600 dark:bg-pink-600 dark:border-pink-600'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-pink-100 dark:hover:bg-gray-600'}`}
+                            aria-pressed={fontSize === opt.key}
+                            aria-label={`Fonte ${opt.label}`}
+                          >
+                            {opt.short}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    {usuarioLogado && (
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setProfileDropdown(false);
+                        }}
+                        className="flex items-center gap-2 w-full text-left px-4 py-2 hover:rounded-lg hover:bg-pink-600/30 dark:hover:bg-pink-600/30 text-gray-900 dark:text-white"
+                      >
+                        <LogOut size={18} /> Sair
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -283,4 +289,3 @@ export default function Navbar() {
     </>
   );
 }
-

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Verificação Facial - Connect Gamers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-pink': '#ec4899',
+                        'brand-purple': '#a855f7',
+                    },
+                    boxShadow: {
+                        'soft-glow': '0 25px 60px rgba(15,23,42,0.45)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        #video {
+            transform: scaleX(-1);
+        }
+
+        .face-oval {
+            width: 200px;
+            height: 260px;
+            border: 4px solid #48bb78;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                border-color: #48bb78;
+                transform: scale(1);
+            }
+
+            50% {
+                border-color: #38a169;
+                transform: scale(1.02);
+            }
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen items-center justify-center bg-slate-950 p-6">
+        <div
+        class="w-full max-w-md overflow-hidden rounded-3xl bg-slate-900/80 border border-slate-800/60 shadow-soft-glow backdrop-blur">
+        <!-- Header -->
+        <div class="bg-pink-500 p-6 text-center">
+            <h1 class="text-2xl font-bold text-white">Verificação Facial</h1>
+            <p class="mt-2 text-sm text-white/90">Confirme sua identidade capturando uma foto</p>
+        </div>
+
+        <!-- Camera Container -->
+        <div class="p-6">
+            <div id="status" class="mb-4 hidden rounded-xl p-4 text-center font-semibold"></div>
+
+            <div class="relative mb-4 overflow-hidden rounded-2xl bg-slate-950">
+                <video id="video" autoplay playsinline class="w-full hidden" style="min-height: 400px;"></video>
+                <div id="playIcon" class="absolute inset-0 flex items-center justify-center bg-slate-950">
+                    <div class="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center">
+                        <svg class="w-10 h-10 text-slate-400 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
+                    </div>
+                </div>
+                <canvas id="canvas" class="hidden"></canvas>
+            </div>
+
+            <!-- Buttons -->
+            <button id="startCameraBtn"
+                class="w-full mb-3 rounded-xl bg-pink-600 px-6 py-4 text-base font-semibold text-white shadow-lg transition-all hover:bg-pink-700">
+                Iniciar câmera
+            </button>
+
+            <button id="captureBtn"
+                class="w-full mb-3 rounded-xl bg-slate-700 px-6 py-4 text-base font-semibold text-slate-400 shadow-lg cursor-not-allowed"
+                disabled>
+                Capturar foto
+            </button>
+
+            <button id="sendBtn"
+                class="w-full mb-3 rounded-xl bg-teal-600 px-6 py-4 text-base font-semibold text-white shadow-lg transition-all hover:bg-teal-700 hidden">
+                Enviar verificação
+            </button>
+
+            <button id="uploadBtn"
+                class="w-full mb-4 rounded-xl bg-slate-800 px-6 py-4 text-base font-semibold text-slate-300 shadow-lg transition-all hover:bg-slate-700">
+                Usar câmera do dispositivo
+            </button>
+            <input type="file" id="fileInput" accept="image/*" capture="user" class="hidden">
+
+            <!-- Instructions -->
+            <div class="rounded-xl bg-slate-800/50 p-4 border border-slate-700/50">
+                <p class="text-sm text-slate-300 text-center">
+                    Use um ambiente iluminado e mantenha o rosto centralizado.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const startCameraBtn = document.getElementById('startCameraBtn');
+        const captureBtn = document.getElementById('captureBtn');
+        const sendBtn = document.getElementById('sendBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileInput = document.getElementById('fileInput');
+        const statusDiv = document.getElementById('status');
+        const playIcon = document.getElementById('playIcon');
+        const ctx = canvas.getContext('2d');
+        let capturedBlob = null;
+
+        // Extrair token da URL (/faceid/TOKEN)
+        const pathParts = window.location.pathname.split('/');
+        const token = pathParts[pathParts.length - 1];
+
+        console.log('Token extraído:', token);
+
+        if (!token || token === 'faceid') {
+            showStatus('error', 'Token de verificação não encontrado!');
+            startCameraBtn.disabled = true;
+        }
+
+        // Iniciar câmera
+        startCameraBtn.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                });
+                video.srcObject = stream;
+                video.classList.remove('hidden');
+                playIcon.classList.add('hidden');
+
+                // Habilitar botão de captura
+                captureBtn.disabled = false;
+                captureBtn.classList.remove('bg-slate-700', 'text-slate-400', 'cursor-not-allowed');
+                captureBtn.classList.add('bg-slate-700', 'text-white', 'hover:bg-slate-600', 'cursor-pointer');
+
+                showStatus('info', '📹 Câmera ativada! Posicione seu rosto.');
+            } catch (error) {
+                console.error('Erro ao acessar câmera:', error);
+                showStatus('error', 'Erro ao acessar a câmera. Verifique as permissões.');
+            }
+        });
+
+        // Capturar foto
+        captureBtn.addEventListener('click', async () => {
+            if (captureBtn.disabled) return;
+
+            showStatus('info', '📸 Capturando...');
+
+            // Configurar canvas com as dimensões do vídeo
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Desenhar frame do vídeo no canvas (espelhado)
+            ctx.save();
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+            ctx.restore();
+
+            // Converter para blob
+            canvas.toBlob(async (blob) => {
+                capturedBlob = blob;
+                showStatus('success', 'Foto capturada! Clique em "Enviar verificação"');
+
+                // Mostrar botão de enviar
+                sendBtn.classList.remove('hidden');
+
+                // Parar câmera após captura
+                const stream = video.srcObject;
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                video.classList.add('hidden');
+                playIcon.classList.remove('hidden');
+            }, 'image/jpeg', 0.95);
+        });
+
+        // Enviar foto
+        sendBtn.addEventListener('click', async () => {
+            if (!capturedBlob) {
+                showStatus('error', 'Nenhuma foto capturada!');
+                return;
+            }
+            await sendPhoto(capturedBlob);
+        });
+
+        // Upload de arquivo
+        uploadBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                showStatus('info', '📤 Enviando foto da galeria...');
+                await sendPhoto(file);
+            }
+        });
+
+        // Enviar foto para o backend
+        async function sendPhoto(blob) {
+            const formData = new FormData();
+            formData.append('photo', blob, 'photo.jpg');
+            formData.append('token', token);
+
+            try {
+                showStatus('info', '🔄 Verificando sua identidade...');
+
+                const response = await fetch('/api/verification/verify-face', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showStatus('success', '✅ ' + data.message);
+
+                    // Redirecionar após 2 segundos
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    showStatus('error', '❌ ' + (data.message || 'Erro na verificação'));
+                }
+            } catch (error) {
+                console.error('Erro ao enviar foto:', error);
+                showStatus('error', '❌ Erro ao enviar foto. Tente novamente.');
+            }
+        }
+
+        // Mostrar status
+        function showStatus(type, message) {
+            const classes = {
+                success: 'bg-green-600 text-white',
+                error: 'bg-red-600 text-white',
+                info: 'bg-blue-600 text-white'
+            };
+
+            statusDiv.className = `mb-4 rounded-xl p-4 text-center font-semibold ${classes[type] || classes.info}`;
+            statusDiv.textContent = message;
+            statusDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+
+</html>

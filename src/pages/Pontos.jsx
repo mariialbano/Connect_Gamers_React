@@ -1,5 +1,4 @@
-import { Coins, Zap, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Pontos() {
@@ -22,13 +21,9 @@ export default function Pontos() {
                 {/* Header */}
                 <div className="text-center mb-8">
                     <div className="flex justify-center items-center gap-2 mb-3">
-                        <Coins className="w-8 h-8 text-pink-400" />
                         <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
                             Comprar <span className="text-pink-400">Pontos</span>
                         </h1>
-                    </div>
-                    <div className="flex justify-center mb-4">
-                        <Link to="/gamepoints" className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-full text-sm font-semibold">Solicitar Saque (DEMO)</Link>
                     </div>
                     <p className="text-gray-600 dark:text-gray-400">
                         Melhore sua experiência de gaming
@@ -46,7 +41,6 @@ export default function Pontos() {
                             </div>
                             <p className="text-gray-500 dark:text-gray-400 text-sm">≈ R$ {(saldo / 100).toFixed(2)}</p>
                         </div>
-                        <Zap className="w-8 h-8 text-yellow-500" />
                     </div>
                 </div>
 

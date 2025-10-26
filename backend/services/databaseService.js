@@ -166,18 +166,18 @@ class DatabaseService {
     static async createSquad(squadData) {
         const { nomeSquad, integrantes, jogo, eventoId, nivel } = squadData;
         const client = await pool.connect();
-        
+
         try {
             await client.query('BEGIN');
-            
+
             // Criar squad
             const squadResult = await client.query(
                 'INSERT INTO squads (id, nome_squad, jogo, evento_id, nivel, data_cadastro, created_at) VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING *',
                 [Date.now().toString(), nomeSquad, jogo, eventoId, nivel]
             );
-            
+
             const squad = squadResult.rows[0];
-            
+
             // Adicionar integrantes
             if (integrantes && integrantes.length > 0) {
                 for (const integrante of integrantes) {
@@ -190,7 +190,7 @@ class DatabaseService {
                     }
                 }
             }
-            
+
             // Criar chat de grupo se houver mais de 1 integrante
             if (integrantes && integrantes.length > 1) {
                 const groupChatId = Date.now().toString() + '-g';
@@ -198,7 +198,7 @@ class DatabaseService {
                     'INSERT INTO group_chats (id, squad_id, name, created_at) VALUES ($1, $2, $3, CURRENT_TIMESTAMP)',
                     [groupChatId, squad.id, nomeSquad]
                 );
-                
+
                 // Adicionar membros ao chat
                 for (const integrante of integrantes) {
                     const user = await client.query('SELECT id FROM usuarios WHERE usuario = $1', [integrante]);
@@ -210,10 +210,10 @@ class DatabaseService {
                     }
                 }
             }
-            
+
             await client.query('COMMIT');
             return squad;
-            
+
         } catch (error) {
             await client.query('ROLLBACK');
             throw error;
@@ -229,9 +229,9 @@ class DatabaseService {
 
         Object.entries(squadData).forEach(([key, value]) => {
             if (value !== undefined && key !== 'id') {
-                const dbKey = key === 'nomeSquad' ? 'nome_squad' : 
-                             key === 'eventoId' ? 'evento_id' : 
-                             key === 'dataCadastro' ? 'data_cadastro' : key;
+                const dbKey = key === 'nomeSquad' ? 'nome_squad' :
+                    key === 'eventoId' ? 'evento_id' :
+                        key === 'dataCadastro' ? 'data_cadastro' : key;
                 fields.push(`${dbKey} = $${paramCount}`);
                 values.push(value);
                 paramCount++;
@@ -298,7 +298,7 @@ class DatabaseService {
 
     static async createChannelMessage(channelName, messageData) {
         const { messageId, userId, username, text, role, avatar, reactions = {} } = messageData;
-        
+
         const client = await pool.connect();
         try {
             // Garantir que o canal existe
@@ -306,17 +306,17 @@ class DatabaseService {
                 'INSERT INTO chat_channels (channel_name, created_at) VALUES ($1, CURRENT_TIMESTAMP) ON CONFLICT (channel_name) DO NOTHING',
                 [channelName]
             );
-            
+
             // Obter ID do canal
             const channelResult = await client.query('SELECT id FROM chat_channels WHERE channel_name = $1', [channelName]);
             const channelId = channelResult.rows[0].id;
-            
+
             // Inserir mensagem
             const result = await client.query(
                 'INSERT INTO channel_messages (message_id, channel_id, user_id, username, text, role, avatar, reactions, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP) RETURNING *',
                 [messageId, channelId, userId, username, text, role, avatar, JSON.stringify(reactions)]
             );
-            
+
             return result.rows[0];
         } finally {
             client.release();
@@ -363,7 +363,7 @@ class DatabaseService {
             WHERE (pc.user_a = $1 AND pc.user_b = $2) OR (pc.user_a = $2 AND pc.user_b = $1)
             GROUP BY pc.id, pc.user_a, pc.user_b, pc.created_at
         `, [userA, userB]);
-        
+
         if (result.rows.length === 0) {
             // Criar novo chat privado
             const newChatResult = await pool.query(
@@ -372,13 +372,13 @@ class DatabaseService {
             );
             return { ...newChatResult.rows[0], messages: [] };
         }
-        
+
         return result.rows[0];
     }
 
     static async createPrivateMessage(userA, userB, messageData) {
         const { messageId, userId, username, text } = messageData;
-        
+
         const client = await pool.connect();
         try {
             // Garantir que o chat existe
@@ -386,7 +386,7 @@ class DatabaseService {
                 SELECT id FROM private_chats 
                 WHERE (user_a = $1 AND user_b = $2) OR (user_a = $2 AND user_b = $1)
             `, [userA, userB]);
-            
+
             let chatId;
             if (chatResult.rows.length === 0) {
                 const newChatResult = await client.query(
@@ -397,13 +397,13 @@ class DatabaseService {
             } else {
                 chatId = chatResult.rows[0].id;
             }
-            
+
             // Inserir mensagem
             const result = await client.query(
                 'INSERT INTO private_messages (message_id, chat_id, user_id, username, text, created_at) VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING *',
                 [messageId, chatId, userId, username, text]
             );
-            
+
             return result.rows[0];
         } finally {
             client.release();
@@ -442,7 +442,7 @@ class DatabaseService {
 
     static async createGroupMessage(groupId, messageData) {
         const { messageId, userId, username, text } = messageData;
-        
+
         const result = await pool.query(
             'INSERT INTO group_messages (message_id, group_id, user_id, username, text, created_at) VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING *',
             [messageId, groupId, userId, username, text]
@@ -488,12 +488,12 @@ class DatabaseService {
             'SELECT * FROM friend_requests WHERE receiver_id = $1 AND status = $2 ORDER BY created_at DESC',
             [userId, 'pendente']
         );
-        
+
         const outgoingResult = await pool.query(
             'SELECT * FROM friend_requests WHERE sender_id = $1 AND status = $2 ORDER BY created_at DESC',
             [userId, 'pendente']
         );
-        
+
         return {
             incoming: incomingResult.rows,
             outgoing: outgoingResult.rows
@@ -504,30 +504,30 @@ class DatabaseService {
         const client = await pool.connect();
         try {
             await client.query('BEGIN');
-            
+
             // Obter dados da solicitação
             const requestResult = await client.query('SELECT * FROM friend_requests WHERE id = $1', [requestId]);
             if (requestResult.rows.length === 0) {
                 throw new Error('Solicitação não encontrada');
             }
-            
+
             const request = requestResult.rows[0];
-            
+
             // Atualizar status da solicitação
             await client.query(
                 'UPDATE friend_requests SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
                 ['aceito', requestId]
             );
-            
+
             // Criar amizade
             await client.query(
                 'INSERT INTO friendships (id, user_id, friend_id, created_at) VALUES ($1, $2, $3, CURRENT_TIMESTAMP)',
                 [Date.now().toString(), request.sender_id, request.receiver_id]
             );
-            
+
             await client.query('COMMIT');
             return request;
-            
+
         } catch (error) {
             await client.query('ROLLBACK');
             throw error;
@@ -606,13 +606,13 @@ class DatabaseService {
 
     static async updateFeedbackSummary(summaryData) {
         const { total, categories, lastUpdate, last } = summaryData;
-        
+
         // Primeiro, tentar atualizar o registro existente
         const updateResult = await pool.query(
             'UPDATE feedback_summary SET total = $1, categories = $2, last_update = $3, last_feedbacks = $4, updated_at = CURRENT_TIMESTAMP RETURNING *',
             [total, JSON.stringify(categories), lastUpdate, JSON.stringify(last)]
         );
-        
+
         // Se não há registro para atualizar, criar um novo
         if (updateResult.rows.length === 0) {
             const insertResult = await pool.query(
@@ -621,7 +621,7 @@ class DatabaseService {
             );
             return insertResult.rows[0];
         }
-        
+
         return updateResult.rows[0];
     }
 }

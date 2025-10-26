@@ -106,7 +106,7 @@ export default function GamePoints() {
                   <div className="flex items-start">
                     <div className="text-pink-400 mr-3 mt-1">ℹ️</div>
                     <div className="text-sm text-pink-800">
-                      <strong>Importante:</strong> Esta é uma demonstração. Em um sistema real, essas informações seriam processadas com segurança e criptografia. O saque seria processado em até 24 horas úteis.
+                      <strong>Importante:</strong> Esta é uma demonstração. Em um sistema real, essas informações seriam processadas com segurança e criptografia. O saque seria processado em até 3 dias úteis.
                     </div>
                   </div>
                 </div>
