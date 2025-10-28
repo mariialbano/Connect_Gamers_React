@@ -48,8 +48,51 @@ npm start
 ```
 
 **4. Acesse a aplicação**
-- Frontend: [https://localhost:3000](https://localhost:3000) ou [https://192.168.0.141:3000](https://192.168.0.141:3000)
-- Backend: [https://localhost:5000](https://localhost:5000) ou [https://192.168.0.141:5000](https://192.168.0.141:5000)
+- Frontend: [https://localhost:3000](https://localhost:3000) ou [https://192.168.0.1:3000](https://192.168.0.1:3000)
+- Backend: [https://localhost:5000](https://localhost:5000) ou [https://192.168.0.1:5000](https://192.168.0.1:5000)
+
+---
+
+### 🔒 **Configuração HTTPS com Certificados SSL**
+
+O projeto utiliza HTTPS tanto no frontend quanto no backend para segurança. Para configurar os certificados SSL automaticamente:
+
+**1. Execute o script no Terminal**
+```bash
+.\setup-ssl.ps1
+```
+
+**O que o script faz automaticamente:**
+- ✅ Detecta o IP da sua rede local (ex: 192.168.0.1)
+- ✅ Verifica se `mkcert` está instalado (instala via winget se necessário)
+- ✅ Instala a CA (Certificate Authority) local do mkcert
+- ✅ Gera certificados SSL válidos para:
+  - `localhost`
+  - `127.0.0.1`
+  - Seu IP de rede (ex: 192.168.0.1)
+  - `::1` (IPv6)
+- ✅ Copia certificados para `backend/` e `public/`
+- ✅ Atualiza automaticamente os arquivos `.env` com:
+  - `REACT_APP_API_URL` (URL do backend com seu IP)
+  - `SERVER_IP` (IP para o backend carregar certificados)
+  - Caminhos dos certificados SSL
+- ✅ Configura HTTPS no frontend (porta 3000)
+- ✅ Configura HTTPS no backend (porta 5000)
+
+**2. Inicie o projeto**
+```bash
+npm run dev
+```
+
+**Resultado:**
+- 🔒 Frontend: `https://SEU_IP:3000` (ex: https://192.168.0.1:3000)
+- 🔒 Backend: `https://SEU_IP:5000` (ex: https://192.168.0.1:5000)
+- 📱 Acessível de celular na mesma rede (ideal para testar verificação facial)
+
+**Observações:**
+- Os certificados gerados são válidos apenas para desenvolvimento local
+- Seu navegador pode mostrar um aviso na primeira vez (é normal)
+- Para usar em outro dispositivo, execute `.\setup-ssl.ps1` novamente naquela máquina
 
 ---
 
@@ -170,8 +213,8 @@ npm run dev
 ```
 
 **7. Acesse a aplicação**
-- Frontend: [https://localhost:3000](https://localhost:3000) ou [https://192.168.0.141:3000](https://192.168.0.141:3000)
-- Backend: [https://localhost:5000](https://localhost:5000) ou [https://192.168.0.141:5000](https://192.168.0.141:5000)
+- Frontend: [https://localhost:3000](https://localhost:3000) ou [https://192.168.0.1:3000](https://192.168.0.1:3000)
+- Backend: [https://localhost:5000](https://localhost:5000) ou [https://192.168.0.1:5000](https://192.168.0.1:5000)
 
 ---
 

@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const usersRouter = require('./routes/users');
 const squadsRouter = require('./routes/squads');
 const gamesRouter = require('./routes/games');
@@ -53,6 +54,20 @@ function migrateRootLogs() {
 ensureLogsDir();
 migrateRootLogs();
 
+// Função para detectar IP da rede local
+function getLocalNetworkIP() {
+    const interfaces = os.networkInterfaces();
+    for (const name of Object.keys(interfaces)) {
+        for (const iface of interfaces[name]) {
+            // Pula endereços internos e não IPv4
+            if (iface.family === 'IPv4' && !iface.internal) {
+                return iface.address;
+            }
+        }
+    }
+    return 'localhost'; // Fallback se não encontrar IP de rede
+}
+
 try {
     const ensureFiles = ['login.log', 'ratelimit.log'];
     ensureFiles.forEach(f => {
@@ -76,12 +91,12 @@ const LOG_DEDUP_MS = Math.max(parseInt(process.env.LOG_DEDUP_MS || '0', 10) || 0
 const https = require('https');
 let sslKey, sslCert;
 try {
-    // Usar IP do .env ou fallback para IP hardcoded
-    const serverIP = process.env.SERVER_IP || '192.168.0.141';
+    // Usar IP do .env ou detectar automaticamente o IP da rede local
+    const serverIP = process.env.SERVER_IP || getLocalNetworkIP();
     sslKey = fs.readFileSync(path.join(__dirname, `${serverIP}+1-key.pem`));
     sslCert = fs.readFileSync(path.join(__dirname, `${serverIP}+1.pem`));
 } catch (e) {
-    console.error('Certificados SSL não encontrados. Execute: .\setup-ssl.ps1', e.message);
+    console.error('Certificados SSL não encontrados. Execute: .\\setup-ssl.ps1', e.message);
 }
 
 const limiter = rateLimit({
@@ -121,14 +136,14 @@ app.use(limiter);
 // Rota para baixar o certificado no iPhone
 app.get('/ca.crt', (req, res) => {
     try {
-        const serverIP = process.env.SERVER_IP || '192.168.0.141';
+        const serverIP = process.env.SERVER_IP || getLocalNetworkIP();
         const certPath = path.join(__dirname, `../public/${serverIP}+1.pem`);
         if (fs.existsSync(certPath)) {
             res.download(certPath, `${serverIP}.pem`);
         } else {
             res.status(404).send('Certificado não encontrado');
         }
-    } catch (error) {
+    } catch (error) {w
         console.error('Erro ao servir certificado:', error);
         res.status(500).send('Erro ao baixar certificado');
     }
