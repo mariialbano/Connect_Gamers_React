@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { API_BASE } from '../services/apiBase';
 import PrivateChat from '../components/PrivateChat';
 import StatusMenu from '../components/StatusMenu';
+import LayoutWrapper from '../components/LayoutWrapper';
+import { Card, Button, Badge } from '../components/ui';
 
 const STATUS = { 'Disponível': 'bg-green-500', 'Ausente': 'bg-yellow-500', 'Não perturbar': 'bg-red-600', 'Invisível': 'bg-gray-400' };
 
@@ -189,148 +191,171 @@ export default function Amigos() {
     const list = activeTab === 'online' ? onlineFriends : sorted;
 
     return (
-        <div className="flex h-[calc(100vh-6rem)] max-w-7xl mx-auto rounded-xl overflow-hidden shadow border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-            <aside className="w-72 flex flex-col border-r border-gray-200 dark:border-gray-800 bg-gray-100/70 dark:bg-gray-800/70">
-                <div className="px-4 py-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
-                    <h2 className="text-base md:text-lg font-semibold tracking-wide text-gray-700 dark:text-gray-200">CONVERSAS</h2>
+        <LayoutWrapper variant="friends" className="py-8">
+            <div className="max-w-7xl mx-auto px-4">
+                {/* Header Section */}
+                <div className="text-center mb-12">
+                    <Badge variant="primary" size="lg" className="mb-4">
+                        👥 Sistema de Amigos
+                    </Badge>
+                    <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+                        Conecte-se com <span className="bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">amigos</span>
+                    </h1>
+                    <p className="text-xl text-white/80 max-w-3xl mx-auto">
+                        Encontre novos gamers, mantenha contato e forme sua rede de amigos
+                    </p>
                 </div>
-                <div className="flex-1 overflow-y-auto custom-scrollbars-thin p-2 space-y-4 text-sm">
-                    <div>
-                        <p className="text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-2">Grupos</p>
-                        <div className="flex flex-col gap-2">
-                            {groupChats.map(g => (
-                                <button key={g.id} onClick={() => setOpenGroup(g)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-left hover:bg-white dark:hover:bg-gray-700/60 bg-gray-50/70 dark:bg-gray-700/40">
-                                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xs text-white font-semibold">{(g.name || '?').slice(0, 2).toUpperCase()}</div>
-                                    <div className="flex-1 min-w-0">
-                                        <span className="block truncate font-medium text-sm md:text-base">{g.name}</span>
-                                        {squadGames[g.squadId] && (
-                                            <span className="block text-[10px] text-gray-500 dark:text-gray-400 truncate">{squadGames[g.squadId]}</span>
-                                        )}
-                                    </div>
-                                    <span className="text-xs text-gray-500 dark:text-gray-400">{g.members.length}</span>
-                                </button>
-                            ))}
-                            {!groupChats.length && <div className="text-[11px] text-gray-500 dark:text-gray-300">Sem grupos</div>}
+
+                <Card variant="glass" className="h-[calc(100vh-20rem)] flex overflow-hidden">
+                    <aside className="w-72 flex flex-col border-r border-white/20 bg-white/5">
+                        <div className="px-4 py-3 flex items-center justify-between border-b border-white/20">
+                            <h2 className="text-base md:text-lg font-semibold tracking-wide text-white">CONVERSAS</h2>
                         </div>
-                    </div>
-                    <div>
-                        <p className="text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-2">Amigos</p>
-                        <div className="flex flex-col gap-2">
-                            {sorted.map(f => (
-                                <button key={f.id} onClick={() => setOpenFriend(f)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-left hover:bg-white dark:hover:bg-gray-700/60 bg-gray-50/70 dark:bg-gray-700/40">
-                                    <span className={`w-2 h-2 rounded-full ${STATUS[f.status] || STATUS['Invisível']}`}></span>
-                                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xs text-white font-semibold">
-                                        {(f.username || '?').charAt(0).toUpperCase()}
-                                    </div>
-                                    <span className="truncate font-medium text-sm md:text-base">{f.username}</span>
-                                </button>
-                            ))}
-                            {!sorted.length && <div className="text-[11px] text-gray-500 dark:text-gray-300">Sem amigos</div>}
-                        </div>
-                    </div>
-                </div>
-            </aside>
-            <main className="flex-1 flex flex-col">
-                <div className="flex items-center gap-4 px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/60">
-                    <h1 className="text-lg font-semibold">Amigos</h1>
-                    <StatusMenu userId={currentUser.id} onChange={() => { fetchOnline(); fetchFriends(); }} />
-                    <div className="flex-1" />
-                    <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-2">
-                            <Tab value="online" active={activeTab} setActive={setActiveTab}>Online</Tab>
-                            <Tab value="todos" active={activeTab} setActive={setActiveTab}>Todos</Tab>
-                        </div>
-                        <button onClick={() => setShowAdd(s => !s)} className="px-3 py-1.5 rounded-md bg-pink-800 hover:bg-pink-800 text-white text-xs font-medium">Adicionar amigo</button>
-                    </div>
-                </div>
-                <div className={`overflow-hidden transition-all duration-300 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 ${showAdd ? 'animate-slide-fade-in max-h-[600px]' : 'animate-slide-fade-out max-h-0'} flex flex-col gap-6 ${!showAdd ? 'pointer-events-none' : ''}`}>
-                    {renderAdd && (
-                        <div className="p-6 flex flex-col gap-6" aria-hidden={!showAdd}>
+                        <div className="flex-1 overflow-y-auto custom-scrollbars-thin p-2 space-y-4 text-sm">
                             <div>
-                                <h3 className="font-semibold mb-4">Pedidos de amizade</h3>
-                                <div className="grid md:grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                        <h4 className="font-semibold mb-2">Pedidos recebidos</h4>
-                                        <ul className="space-y-2">
-                                            {requests.incoming.map(fr => (
-                                                <li key={fr.id} className="flex items-center bg-gray-100 dark:bg-gray-700/60 px-3 py-2 rounded-md">
-                                                    <span className="flex-1 truncate text-sm">{userNames[fr.senderId] || fr.senderId}</span>
-                                                    <div className="flex gap-1 w-32 justify-end">
-                                                        <button onClick={() => actOnRequest(fr.id, 'accept')} className="text-[10px] px-2 py-1 rounded bg-green-700 text-white hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-400" aria-label="Aceitar pedido">Aceitar</button>
-                                                        <button onClick={() => actOnRequest(fr.id, 'decline')} className="text-[10px] px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">Recusar</button>
-                                                    </div>
-                                                </li>
-                                            ))}
-                                            {!requests.incoming.length && <li className="text-xs text-gray-500 dark:text-gray-300">Nenhum</li>}
-                                        </ul>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-semibold mb-2">Pedidos enviados</h4>
-                                        <ul className="space-y-2">
-                                            {requests.outgoing.map(fr => (
-                                                <li key={fr.id} className="flex items-center bg-gray-100 dark:bg-gray-700/60 px-3 py-2 rounded-md min-h-[42px] gap-2">
-                                                    <span className="flex-1 truncate text-sm">{userNames[fr.receiverId] || fr.receiverId}</span>
-                                                    <button onClick={() => cancelRequest(fr.id)} className="text-[10px] px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white">Cancelar</button>
-                                                </li>
-                                            ))}
-                                            {!requests.outgoing.length && <li className="text-xs text-gray-500 dark:text-gray-300">Nenhum</li>}
-                                        </ul>
-                                    </div>
+                                <p className="text-xs uppercase tracking-wider font-semibold text-white/60 mb-2">Grupos</p>
+                                <div className="flex flex-col gap-2">
+                                    {groupChats.map(g => (
+                                        <button key={g.id} onClick={() => setOpenGroup(g)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-left hover:bg-white/10 bg-white/5">
+                                            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xs text-white font-semibold">{(g.name || '?').slice(0, 2).toUpperCase()}</div>
+                                            <div className="flex-1 min-w-0">
+                                                <span className="block truncate font-medium text-sm md:text-base text-white">{g.name}</span>
+                                                {squadGames[g.squadId] && (
+                                                    <span className="block text-[10px] text-white/60 truncate">{squadGames[g.squadId]}</span>
+                                                )}
+                                            </div>
+                                            <span className="text-xs text-white/60">{g.members.length}</span>
+                                        </button>
+                                    ))}
+                                    {!groupChats.length && <div className="text-[11px] text-white/60">Sem grupos</div>}
                                 </div>
                             </div>
-                            <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                                <h4 className="font-semibold mb-3 text-sm">Adicionar novo amigo</h4>
-                                <div className="mb-3">
-                                    <label htmlFor="amigos-busca-usuario" className="sr-only">Buscar usuário</label>
-                                    <input id="amigos-busca-usuario" aria-label="Buscar usuário" value={search} onChange={e => { setSearch(e.target.value); setRequestInfo(null); }} placeholder="Buscar por Usuario" className="w-full px-3 py-2 rounded-md bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none text-sm" />
-                                </div>
-                                {requestInfo && (
-                                    <p className={`text-[11px] mb-2 ${requestInfo.startsWith('Falha') || requestInfo.startsWith('Erro') ? 'text-red-600 dark:text-red-400' : 'text-green-700 dark:text-green-400'}`}>{requestInfo}</p>
-                                )}
-                                {searchLoading && <p className="text-xs text-gray-500 mb-2">Buscando...</p>}
-                                {searchError && <p className="text-xs text-red-500 mb-2">{searchError}</p>}
-                                <ul className="space-y-1 max-h-40 overflow-y-auto text-sm">
-                                    {results.map(r => (
-                                        <li key={r.id} className="flex items-center justify-between px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-700/60">
-                                            <span>{r.username}</span>
-                                            <button onClick={() => sendRequest(r.id)} disabled={requestSending} className="text-xs px-3 py-1 rounded bg-pink-800 hover:bg-pink-800 disabled:opacity-50 disabled:cursor-not-allowed text-white">{requestSending ? '...' : 'Enviar'}</button>
-                                        </li>
+                            <div>
+                                <p className="text-xs uppercase tracking-wider font-semibold text-white/60 mb-2">Amigos</p>
+                                <div className="flex flex-col gap-2">
+                                    {sorted.map(f => (
+                                        <button key={f.id} onClick={() => setOpenFriend(f)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-left hover:bg-white/10 bg-white/5">
+                                            <span className={`w-2 h-2 rounded-full ${STATUS[f.status] || STATUS['Invisível']}`}></span>
+                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xs text-white font-semibold">
+                                                {(f.username || '?').charAt(0).toUpperCase()}
+                                            </div>
+                                            <span className="truncate font-medium text-sm md:text-base text-white">{f.username}</span>
+                                        </button>
                                     ))}
-                                    {search && !results.length && !searchLoading && !searchError && <li className="text-xs text-gray-500 dark:text-gray-300 px-1">Sem resultados</li>}
-                                </ul>
+                                    {!sorted.length && <div className="text-[11px] text-white/60">Sem amigos</div>}
+                                </div>
                             </div>
                         </div>
-                    )}
-                </div>
-                <div className="flex-1 overflow-y-auto custom-scrollbars-thin p-6">
-                    <h2 className="text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400 mb-4">{activeTab === 'todos' ? 'Todos os amigos' : `Online — ${list.length}`}</h2>
-                    {friendsError && <div className="text-xs text-red-500 mb-3">{friendsError}</div>}
-                    <ul className="space-y-3">
-                        {list.map(f => (
-                            <li key={f.id} className="flex items-center gap-5 bg-gray-50 dark:bg-gray-800/70 px-5 py-4 rounded-lg group relative">
-                                <div className="relative">
-                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white font-semibold text-base">
-                                        {(f.username || '?').charAt(0).toUpperCase()}
+                    </aside>
+                    <main className="flex-1 flex flex-col">
+                        <div className="flex items-center gap-4 px-6 py-4 border-b border-white/20 bg-white/10">
+                            <h1 className="text-lg font-semibold text-white">Amigos</h1>
+                            <StatusMenu userId={currentUser.id} onChange={() => { fetchOnline(); fetchFriends(); }} />
+                            <div className="flex-1" />
+                            <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2">
+                                    <Tab value="online" active={activeTab} setActive={setActiveTab}>Online</Tab>
+                                    <Tab value="todos" active={activeTab} setActive={setActiveTab}>Todos</Tab>
+                                </div>
+                                <Button 
+                                    onClick={() => setShowAdd(s => !s)} 
+                                    variant="primary" 
+                                    size="sm"
+                                >
+                                    Adicionar amigo
+                                </Button>
+                            </div>
+                        </div>
+                        <div className={`overflow-hidden transition-all duration-300 border-b border-white/20 bg-white/5 ${showAdd ? 'animate-slide-fade-in max-h-[600px]' : 'animate-slide-fade-out max-h-0'} flex flex-col gap-6 ${!showAdd ? 'pointer-events-none' : ''}`}>
+                            {renderAdd && (
+                                <div className="p-6 flex flex-col gap-6" aria-hidden={!showAdd}>
+                                    <div>
+                                        <h3 className="font-semibold mb-4 text-white">Pedidos de amizade</h3>
+                                        <div className="grid md:grid-cols-2 gap-4 text-sm">
+                                            <div>
+                                                <h4 className="font-semibold mb-2 text-white">Pedidos recebidos</h4>
+                                                <ul className="space-y-2">
+                                                    {requests.incoming.map(fr => (
+                                                        <li key={fr.id} className="flex items-center bg-white/10 px-3 py-2 rounded-md">
+                                                            <span className="flex-1 truncate text-sm text-white">{userNames[fr.senderId] || fr.senderId}</span>
+                                                            <div className="flex gap-1 w-32 justify-end">
+                                                                <button onClick={() => actOnRequest(fr.id, 'accept')} className="text-[10px] px-2 py-1 rounded bg-green-700 text-white hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-400" aria-label="Aceitar pedido">Aceitar</button>
+                                                                <button onClick={() => actOnRequest(fr.id, 'decline')} className="text-[10px] px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">Recusar</button>
+                                                            </div>
+                                                        </li>
+                                                    ))}
+                                                    {!requests.incoming.length && <li className="text-xs text-white/60">Nenhum</li>}
+                                                </ul>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-semibold mb-2 text-white">Pedidos enviados</h4>
+                                                <ul className="space-y-2">
+                                                    {requests.outgoing.map(fr => (
+                                                        <li key={fr.id} className="flex items-center bg-white/10 px-3 py-2 rounded-md min-h-[42px] gap-2">
+                                                            <span className="flex-1 truncate text-sm text-white">{userNames[fr.receiverId] || fr.receiverId}</span>
+                                                            <button onClick={() => cancelRequest(fr.id)} className="text-[10px] px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white">Cancelar</button>
+                                                        </li>
+                                                    ))}
+                                                    {!requests.outgoing.length && <li className="text-xs text-white/60">Nenhum</li>}
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <span className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-gray-900/70 dark:border-gray-900 ${STATUS[f.status] || STATUS['Invisível']}`}></span>
+                                    <div className="border-t border-white/20 pt-4">
+                                        <h4 className="font-semibold mb-3 text-sm text-white">Adicionar novo amigo</h4>
+                                        <div className="mb-3">
+                                            <label htmlFor="amigos-busca-usuario" className="sr-only">Buscar usuário</label>
+                                            <input id="amigos-busca-usuario" aria-label="Buscar usuário" value={search} onChange={e => { setSearch(e.target.value); setRequestInfo(null); }} placeholder="Buscar por Usuario" className="w-full px-3 py-2 rounded-md bg-white/10 border border-white/20 focus:outline-none text-sm text-white placeholder-white/60" />
+                                        </div>
+                                        {requestInfo && (
+                                            <p className={`text-[11px] mb-2 ${requestInfo.startsWith('Falha') || requestInfo.startsWith('Erro') ? 'text-red-400' : 'text-green-400'}`}>{requestInfo}</p>
+                                        )}
+                                        {searchLoading && <p className="text-xs text-white/60 mb-2">Buscando...</p>}
+                                        {searchError && <p className="text-xs text-red-400 mb-2">{searchError}</p>}
+                                        <ul className="space-y-1 max-h-40 overflow-y-auto text-sm">
+                                            {results.map(r => (
+                                                <li key={r.id} className="flex items-center justify-between px-3 py-2 rounded-md bg-white/10">
+                                                    <span className="text-white">{r.username}</span>
+                                                    <button onClick={() => sendRequest(r.id)} disabled={requestSending} className="text-xs px-3 py-1 rounded bg-pink-800 hover:bg-pink-800 disabled:opacity-50 disabled:cursor-not-allowed text-white">{requestSending ? '...' : 'Enviar'}</button>
+                                                </li>
+                                            ))}
+                                            {search && !results.length && !searchLoading && !searchError && <li className="text-xs text-white/60 px-1">Sem resultados</li>}
+                                        </ul>
+                                    </div>
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="font-medium text-base truncate">{f.username}</p>
-                                    <p className="text-xs mt-0.5 text-gray-500 dark:text-gray-400">{f.status === 'Disponível' ? 'Online' : f.status}</p>
-                                </div>
-                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition">
-                                    <button onClick={() => setOpenFriend(f)} className="text-xs md:text-sm px-3 py-1.5 rounded-md bg-pink-800 hover:bg-pink-800 text-white">Mensagem</button>
-                                    <FriendActions friend={f} currentUser={currentUser} onRemoved={() => { fetchFriends(); }} />
-                                </div>
-                            </li>
-                        ))}
-                        {!list.length && <li className="text-xs text-gray-500 dark:text-gray-300">Lista vazia</li>}
-                    </ul>
-                </div>
-            </main>
+                            )}
+                        </div>
+                        <div className="flex-1 overflow-y-auto custom-scrollbars-thin p-6">
+                            <h2 className="text-xs uppercase tracking-wider font-semibold text-white/60 mb-4">{activeTab === 'todos' ? 'Todos os amigos' : `Online — ${list.length}`}</h2>
+                            {friendsError && <div className="text-xs text-red-400 mb-3">{friendsError}</div>}
+                            <ul className="space-y-3">
+                                {list.map(f => (
+                                    <li key={f.id} className="flex items-center gap-5 bg-white/10 px-5 py-4 rounded-lg group relative">
+                                        <div className="relative">
+                                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white font-semibold text-base">
+                                                {(f.username || '?').charAt(0).toUpperCase()}
+                                            </div>
+                                            <span className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white/70 ${STATUS[f.status] || STATUS['Invisível']}`}></span>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-medium text-base truncate text-white">{f.username}</p>
+                                            <p className="text-xs mt-0.5 text-white/60">{f.status === 'Disponível' ? 'Online' : f.status}</p>
+                                        </div>
+                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition">
+                                            <Button onClick={() => setOpenFriend(f)} variant="primary" size="sm">Mensagem</Button>
+                                            <FriendActions friend={f} currentUser={currentUser} onRemoved={() => { fetchFriends(); }} />
+                                        </div>
+                                    </li>
+                                ))}
+                                {!list.length && <li className="text-xs text-white/60">Lista vazia</li>}
+                            </ul>
+                        </div>
+                    </main>
+                </Card>
+            </div>
             {openFriend && <PrivateChat currentUser={currentUser} friend={openFriend} onClose={() => setOpenFriend(null)} />}
             {openGroup && <GroupChatModal group={openGroup} currentUser={currentUser} onClose={() => setOpenGroup(null)} />}
-        </div>
+        </LayoutWrapper>
     );
 }
 

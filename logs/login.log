@@ -62,3 +62,8 @@
 {"time":"2025-10-21T13:58:30.635Z","ip":"::ffff:192.168.0.141","usuario":"Neemias","ok":false,"reason":"user_not_found"}
 {"time":"2025-10-21T13:58:35.295Z","ip":"::ffff:192.168.0.141","usuario":"Neemias","ok":false,"reason":"user_not_found"}
 {"time":"2025-10-21T13:58:51.600Z","ip":"::ffff:192.168.0.141","usuario":"SuperAdmin","userId":"superadmin","cargo":"admin","ok":true}
+{"time":"2025-10-26T17:42:37.660Z","ip":"172.18.0.1","usuario":"SuperAdmin","userId":"superadmin","cargo":"admin","ok":true}
+{"time":"2025-10-26T18:01:38.234Z","ip":"172.18.0.1","usuario":"SuperAdmin","userId":"superadmin","cargo":"admin","ok":true}
+{"time":"2025-10-26T18:33:43.262Z","ip":"172.18.0.1","usuario":"SuperAdmin","userId":"superadmin","cargo":"admin","ok":true}
+{"time":"2025-10-26T19:13:05.123Z","ip":"172.18.0.1","usuario":"mariialbano","ok":false,"reason":"wrong_password","userId":"1760805882350"}
+{"time":"2025-10-26T19:13:40.727Z","ip":"172.18.0.1","usuario":"mariialbano","userId":"1760805882350","cargo":"user","ok":true}

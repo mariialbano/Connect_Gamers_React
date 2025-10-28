@@ -27,7 +27,7 @@ export default function ChatWindow({ channel, messages, hideScrollbar, maxHeight
         className={scrollerClass}
         style={containerStyle}
       >
-        <ul className="space-y-4">
+        <ul className="space-y-2">
           {messages.map((msg, idx) => (
             <li
               key={msg.messageId || msg.id || idx}
