@@ -2,8 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { API_BASE } from '../services/apiBase';
 import SilentYouTube from "../components/SilentYouTube";
-import LayoutWrapper from "../components/LayoutWrapper";
-import { Card, Badge } from "../components/ui";
 import { BsFilterRight } from "react-icons/bs";
 const normalize = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
@@ -90,19 +88,7 @@ function Jogos() {
         return () => { aborted = true; };
     }, []);
     return (
-        <LayoutWrapper variant="games" className="pt-8 px-4">
-            {/* Header Section */}
-            <div className="text-center mb-12">
-                <Badge variant="primary" size="lg" className="mb-4">
-                    🎮 Catálogo de Jogos
-                </Badge>
-                <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-                    Descubra os <span className="bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">melhores jogos</span>
-                </h1>
-                <p className="text-xl text-white/80 max-w-3xl mx-auto">
-                    Explore nossa coleção completa de jogos e encontre sua próxima aventura épica
-                </p>
-            </div>
+        <section className="min-h-screen pt-8 px-4">
             <header>
                 <div className="mb-16 flex justify-center mx-auto">
                     <div ref={containerRef} className="relative w-full max-w-[1180px] lg:max-w-[1280px] rounded-2xl overflow-hidden shadow-xl" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} onMouseEnter={() => { isPausedRef.current = true; stopAutoplay(); }} onMouseLeave={() => { isPausedRef.current = false; startAutoplay(); }}>
@@ -143,102 +129,63 @@ function Jogos() {
                     </div>
                 </div>
             </header>
-            {/* Search and Filter Section */}
-            <Card variant="glass" className="p-6 mb-8 max-w-4xl mx-auto">
-                <div className="flex flex-col md:flex-row items-center gap-4">
+            <aside>
+                <div className="max-w-[1440px] px-4 mb-6 flex flex-col md:flex-row items-center gap-4 relative mx-[13%]">
                     <div className="w-full flex-1">
                         <label htmlFor="jogos-search" className="sr-only">Pesquisar jogos</label>
-                        <input 
-                            id="jogos-search" 
-                            aria-label="Pesquisar jogos" 
-                            type="text" 
-                            placeholder="Pesquisar por nome..." 
-                            value={search} 
-                            onChange={e => setSearch(e.target.value)} 
-                            className="w-full p-3 rounded-lg bg-white/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 border border-neutral-200 dark:border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent backdrop-blur-sm" 
-                        />
+                        <input id="jogos-search" aria-label="Pesquisar jogos" type="text" placeholder="Pesquisar por nome..." value={search} onChange={e => setSearch(e.target.value)} className="p-3 rounded-lg text-black bg-slate-200 border border-gray-300 flex-1 w-full" />
                     </div>
                     <div className="relative">
-                        <button 
-                            onClick={() => setDropdownOpen(!dropdownOpen)} 
-                            className="p-3 rounded-lg bg-white/80 dark:bg-neutral-800/80 hover:bg-white dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center gap-2 hover:scale-105 transition backdrop-blur-sm" 
-                            aria-label="Abrir filtro de categorias" 
-                            aria-haspopup="true" 
-                            aria-expanded={dropdownOpen}
-                        >
-                            <BsFilterRight size={20} className="text-neutral-700 dark:text-neutral-300" />
-                            <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Filtros</span>
+                        <button onClick={() => setDropdownOpen(!dropdownOpen)} className="p-1 rounded-lg  hover:bg-pink-600/30 border border-gray-300 dark:border-gray-600 flex items-center gap-2 hover:scale-105 transition" aria-label="Abrir filtro de categorias" aria-haspopup="true" aria-expanded={dropdownOpen}>
+                            <BsFilterRight size={41} />
                         </button>
                         {dropdownOpen && (
-                            <Card variant="elevated" className="absolute right-0 mt-2 w-48 p-4 z-50">
+                            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg p-2 z-50">
                                 <label htmlFor="categoria-search" className="sr-only">Pesquisar categorias</label>
-                                <input 
-                                    id="categoria-search" 
-                                    aria-label="Pesquisar categorias" 
-                                    type="text" 
-                                    placeholder="Pesquisar categorias..." 
-                                    value={categorySearch} 
-                                    onChange={e => setCategorySearch(e.target.value)} 
-                                    className="w-full p-2 mb-3 rounded-lg bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 border border-neutral-200 dark:border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent" 
-                                />
-                                <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
+                                <input id="categoria-search" aria-label="Pesquisar categorias" type="text" placeholder="Pesquisar categorias..." value={categorySearch} onChange={e => setCategorySearch(e.target.value)} className="w-full p-2 mb-2 rounded-lg text-black border border-gray-300 dark:border-gray-600 " />
+                                <div className="flex flex-col gap-1 max-h-48 overflow-y-auto">
                                     {filteredCategories.map(cat => (
                                         <label key={cat} className="flex items-center gap-2 cursor-pointer" onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); setSelectedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]); } }}>
-                                            <input 
-                                                aria-label={`Selecionar categoria ${cat}`} 
-                                                type="checkbox" 
-                                                checked={selectedCategories.includes(cat)} 
-                                                onChange={() => setSelectedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])} 
-                                                className="accent-primary-600 w-4 h-4 rounded-sm border border-primary-600 cursor-pointer" 
-                                                aria-checked={selectedCategories.includes(cat)} 
-                                            />
-                                            <span className="text-sm text-neutral-800 dark:text-neutral-200">{cat}</span>
+                                            <input aria-label={`Selecionar categoria ${cat}`} type="checkbox" checked={selectedCategories.includes(cat)} onChange={() => setSelectedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])} className="accent-pink-600 w-4 h-4 rounded-sm border border-pink-600 cursor-pointer" aria-checked={selectedCategories.includes(cat)} />
+                                            <span className="text-gray-800 dark:text-white">{cat}</span>
                                         </label>
                                     ))}
                                 </div>
-                            </Card>
+                            </div>
                         )}
                     </div>
                 </div>
-            </Card>
-            {/* Games Grid */}
-            <main className="max-w-7xl mx-auto px-4 mb-10">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                    {filteredGames.map(g => (
-                        <Card
-                            key={g.id}
-                            hover
-                            className="group cursor-pointer overflow-hidden"
-                            onClick={() => navigate(`/jogos/${g.id}`)}
-                            tabIndex={0}
-                            role="button"
-                            aria-label={`Abrir página do jogo ${g.name}`}
-                            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/jogos/${g.id}`); } }}
-                        >
-                            <div className="aspect-video overflow-hidden">
-                                <img 
-                                    src={srcSafe(g.image)} 
-                                    alt={`Capa do Jogo ${g.name}`} 
-                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" 
-                                />
-                            </div>
-                            <div className="p-4">
-                                <h3 className="text-lg font-bold mb-3 text-neutral-900 dark:text-neutral-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                                    {g.name}
-                                </h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {g.categories.map(cat => (
-                                        <Badge key={cat} variant="gaming" size="xs">
-                                            {cat}
-                                        </Badge>
-                                    ))}
+            </aside>
+            <main>
+                <div className="w-auto h-full px-4 mx-[13%]">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 justify-items-center gap-4">
+                        {filteredGames.map(g => (
+                            <div
+                                tabIndex={0}
+                                key={g.id}
+                                role="button"
+                                aria-label={`Abrir página do jogo ${g.name}`}
+                                onClick={() => navigate(`/jogos/${g.id}`)}
+                                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/jogos/${g.id}`); } }}
+                                className="game-card bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl cursor-pointer transition transform hover:scale-105 duration-300"
+                            >
+                                <div className="overflow-hidden rounded-t-2xl">
+                                    <img src={srcSafe(g.image)} alt={`Capa do Jogo ${g.name}`} className="w-full h-full object-cover" />
+                                </div>
+                                <div className="p-3">
+                                    <h3 className="text-md font-bold mb-2 text-gray-900 dark:text-white">{g.name}</h3>
+                                    <div className="flex flex-wrap gap-1">
+                                        {g.categories.map(cat => (
+                                            <span key={cat} className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white px-2 py-0.5 rounded-full text-xs">{cat}</span>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        </Card>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </main>
-        </LayoutWrapper>
+        </section>
     );
 }
 

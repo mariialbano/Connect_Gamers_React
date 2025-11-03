@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FaEye, FaEyeSlash, FaCheckCircle, FaExclamationTriangle, FaQrcode } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaQrcode, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { API_BASE } from '../services/apiBase';
 import { getItem, postItem } from '../services/api';
-import LayoutWrapper from '../components/LayoutWrapper';
-import { Card, Button, Badge } from '../components/ui';
 
 // Avatar
 function AvatarSection({ profileImage, siteAvatars, showAvatarList, onToggleList, onSelectAvatar }) {
@@ -53,7 +51,7 @@ function NameEditSection({ nomeUsuario, editandoNome, novoNome, setNovoNome, set
         <div className="flex flex-col items-center gap-2">
           <input
             type="text"
-            className="text-2xl font-bold rounded-lg px-3 py-1 text-neutral-900 dark:text-neutral-100 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="text-2xl font-bold rounded-lg px-3 py-1 text-black dark:text-gray-900"
             value={novoNome}
             onChange={e => setNovoNome(e.target.value)}
             maxLength={20}
@@ -64,18 +62,18 @@ function NameEditSection({ nomeUsuario, editandoNome, novoNome, setNovoNome, set
             }}
           />
           <div className="flex gap-2">
-            <button type="button" className="bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white px-4 py-1 rounded font-bold disabled:opacity-50" disabled={!novoNome.trim()} onClick={onSalvarNome}>Salvar</button>
-            <button type="button" className="bg-neutral-500 text-white px-4 py-1 rounded font-bold" onClick={() => setEditandoNome(false)}>Cancelar</button>
+            <button type="button" className="bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white px-4 py-1 rounded font-bold disabled:opacity-50" disabled={!novoNome.trim()} onClick={onSalvarNome}>Salvar</button>
+            <button type="button" className="bg-gray-500 text-white px-4 py-1 rounded font-bold" onClick={() => setEditandoNome(false)}>Cancelar</button>
           </div>
         </div>
       ) : (
         <div className="flex justify-center w-full relative">
           <div className="flex items-center justify-center mx-auto">
-            <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">Olá, {nomeUsuario}!</h1>
+            <h1 className="text-3xl font-bold text-black dark:text-gray-100">Olá, {nomeUsuario}!</h1>
             <button
               type="button"
               aria-label="Editar nome do usuário"
-              className="ml-2 mt-2 text-neutral-600 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400 p-2 text-2xl"
+              className="ml-2 mt-2 text-gray-600 hover:text-pink-600 dark:text-gray-400 dark:hover:text-pink-400 p-2 text-2xl"
               title="Editar nome"
               onClick={() => { setNovoNome(nomeUsuario === 'Nome do Usuário' ? '' : nomeUsuario); setEditandoNome(true); }}
             >
@@ -86,8 +84,8 @@ function NameEditSection({ nomeUsuario, editandoNome, novoNome, setNovoNome, set
           </div>
         </div>
       )}
-      <p className="mt-1 text-md text-neutral-700 dark:text-neutral-400">{localStorage.getItem('usuarioLogado')}</p>
-      <div className="inline-block text-sm md:text-base bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300 px-4 py-2 rounded-full font-semibold mt-4 tracking-wide">Ranking: Ouro</div>
+      <p className="mt-1 text-md text-gray-700 dark:text-gray-400">{localStorage.getItem('usuarioLogado')}</p>
+      <div className="inline-block text-sm md:text-base bg-pink-600/15 text-pink-800 dark:text-pink-300 px-4 py-2 rounded-full font-semibold mt-4 tracking-wide">Ranking: Ouro</div>
     </div>
   );
 }
@@ -154,31 +152,31 @@ function EventsSection({ usuarioLogado }) {
 
   return (
     <section className="mb-12">
-      <h2 className="text-2xl font-bold mb-6 pb-2 border-b-2 border-primary-600 dark:border-primary-400 flex justify-center items-center text-neutral-900 dark:text-neutral-100">
-        <i className="fas fa-calendar-alt mr-3 text-primary-600 dark:text-primary-400" /> Meus Eventos
+      <h2 className="text-2xl font-bold mb-6 pb-2 border-b-2 border-pink-800 flex justify-center items-center text-black dark:text-gray-100">
+        <i className="fas fa-calendar-alt mr-3 text-pink-800 dark:text-pink-400" /> Meus Eventos
       </h2>
-      {loading && <div className="text-center text-neutral-500 dark:text-neutral-400">Carregando eventos...</div>}
-      {erro && <div className="text-center text-red-500 dark:text-red-400">{erro}</div>}
-      {!loading && !erro && origemEventos === 'games-fallback' && <div className="text-center text-xs text-neutral-500 dark:text-neutral-400 mb-4">(Usando lista de eventos reconstruída a partir dos jogos)</div>}
-      {!loading && !erro && meusSquads.length === 0 && <div className="text-center text-neutral-500 dark:text-neutral-400">Você ainda não está inscrito em nenhum evento.</div>}
+      {loading && <div className="text-center text-gray-500">Carregando eventos...</div>}
+      {erro && <div className="text-center text-red-500">{erro}</div>}
+      {!loading && !erro && origemEventos === 'games-fallback' && <div className="text-center text-xs text-gray-500 mb-4">(Usando lista de eventos reconstruída a partir dos jogos)</div>}
+      {!loading && !erro && meusSquads.length === 0 && <div className="text-center text-gray-500">Você ainda não está inscrito em nenhum evento.</div>}
       <div className="grid gap-5 md:grid-cols-2">
         {meusSquads.map(squad => {
           const evento = todosEventos.find(ev => ev.id === squad.eventoId);
           return (
-            <div key={squad.id} className="p-5 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow hover:shadow-lg transition-shadow">
+            <div key={squad.id} className="p-5 rounded-xl bg-white dark:bg-gray-700 border border-pink-200 dark:border-gray-600 shadow hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{evento ? evento.nome : 'Evento não encontrado'}</h3>
-                <span className="text-xs bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 px-2 py-1 rounded-full font-semibold">{squad.jogo}</span>
+                <h3 className="text-lg font-bold text-black dark:text-white">{evento ? evento.nome : 'Evento não encontrado'}</h3>
+                <span className="text-xs bg-pink-500/20 text-pink-700 dark:text-pink-300 px-2 py-1 rounded-full font-semibold">{squad.jogo}</span>
               </div>
-              {evento && <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">{evento.dia} • {evento.horario}</p>}
-              <p className="text-sm font-semibold mb-1 text-neutral-800 dark:text-neutral-200">Squad: {squad.nomeSquad}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-2">Nível: {squad.nivel}</p>
+              {evento && <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{evento.dia} • {evento.horario}</p>}
+              <p className="text-sm font-semibold mb-1 text-gray-800 dark:text-gray-200">Squad: {squad.nomeSquad}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-300 mb-2">Nível: {squad.nivel}</p>
               <div className="flex flex-wrap gap-2 mt-2">
                 {squad.integrantes.slice(0, 8).map((usuarioRaw, idx) => {
                   const key = (usuarioRaw || '').toLowerCase().trim();
                   const display = mapUsuarios[key] || usuarioRaw || '—';
                   return (
-                    <span key={idx} className="text-xs bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 px-2 py-1 rounded-full" title={usuarioRaw}>{display}</span>
+                    <span key={idx} className="text-xs bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-2 py-1 rounded-full" title={usuarioRaw}>{display}</span>
                   );
                 })}
               </div>
@@ -427,20 +425,20 @@ function PasswordSection({ showPasswordSection, setShowPasswordSection, currentP
       <button
         type="button"
         onClick={() => setShowPasswordSection(!showPasswordSection)}
-        className="w-full flex items-center justify-between rounded-xl px-6 py-4 text-lg font-bold transition-all bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-700"
+        className="w-full flex items-center justify-between rounded-xl px-6 py-4 text-lg font-bold transition-all bg-white border border-pink-200 text-black hover:bg-pink-50 dark:bg-gray-700/60 dark:border-gray-600 dark:text-gray-100 dark:hover:bg-gray-700"
         aria-controls="password-section"
         aria-expanded={showPasswordSection}
       >
-        <span className="justify-center"><i className="fas fa-lock mr-3 text-primary-600 dark:text-primary-400" /> Alterar Senha</span>
+        <span className="justify-center"><i className="fas fa-lock mr-3 text-pink-800 dark:text-pink-400" /> Alterar Senha</span>
         <span className="ml-2">{showPasswordSection ? <i className="fas fa-chevron-up" /> : <i className="fas fa-chevron-down" />}</span>
       </button>
-      <div id="password-section" className={`overflow-hidden transition-all duration-300 p-0 rounded-xl shadow-lg mt-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 ${showPasswordSection ? 'animate-slide-fade-in max-h-[1000px]' : 'animate-slide-fade-out max-h-0'}`} aria-hidden={!showPasswordSection}>
+      <div id="password-section" className={`overflow-hidden transition-all duration-300 p-0 rounded-xl shadow-lg mt-2 bg-white border border-pink-200 dark:bg-gray-700/60 dark:border-gray-600 ${showPasswordSection ? 'animate-slide-fade-in max-h-[1000px]' : 'animate-slide-fade-out max-h-0'}`} aria-hidden={!showPasswordSection}>
         {showPasswordSection && (
           <form onSubmit={onSubmitPassword} className="p-8">
             <div className="mb-5">
-              <label className="block mb-3 font-semibold text-neutral-900 dark:text-neutral-100">Senha Atual</label>
+              <label className="block mb-3 font-semibold text-black dark:text-white">Senha Atual</label>
               <div className="relative">
-                <input type={mostrarAtual ? 'text' : 'password'} name="currentPassword" id="currentPassword" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="Digite sua senha atual" autoComplete="current-password" className="w-full p-3 pr-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400" />
+                <input type={mostrarAtual ? 'text' : 'password'} name="currentPassword" id="currentPassword" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="Digite sua senha atual" autoComplete="current-password" className="w-full p-3 pr-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgb(253,77,121)] bg-[#f3f4f6] border border-pink-300 text-black dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-white/65" />
                 <button
                   type="button"
                   onClick={() => setMostrarAtual(v => !v)}
@@ -452,9 +450,9 @@ function PasswordSection({ showPasswordSection, setShowPasswordSection, currentP
               </div>
             </div>
             <div className="mb-5">
-              <label className="block mb-3 font-semibold text-neutral-900 dark:text-neutral-100">Nova Senha</label>
+              <label className="block mb-3 font-semibold text-black dark:text-white">Nova Senha</label>
               <div className="relative">
-                <input type={mostrarNova ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full p-3 pr-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400" placeholder="Digite a nova senha" required pattern={passwordPattern} title={passwordTitle} />
+                <input type={mostrarNova ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full p-3 pr-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgb(253,77,121)] bg-[#f3f4f6] border border-pink-300 text-black dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-white/65" placeholder="Digite a nova senha" required pattern={passwordPattern} title={passwordTitle} />
                 <button
                   type="button"
                   onClick={() => setMostrarNova(v => !v)}
@@ -464,12 +462,12 @@ function PasswordSection({ showPasswordSection, setShowPasswordSection, currentP
                   {mostrarNova ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
-              <small className="text-neutral-600 dark:text-neutral-400">Use pelo menos 8 caracteres, misturando letras maiúsculas, minúsculas, números e símbolos</small>
+              <small className="text-gray-600 dark:text-gray-200">Use pelo menos 8 caracteres, misturando letras maiúsculas, minúsculas, números e símbolos</small>
             </div>
             <div className="mb-6">
-              <label className="block mb-3 font-semibold text-neutral-900 dark:text-neutral-100">Confirmar Nova Senha</label>
+              <label className="block mb-3 font-semibold text-black dark:text-white">Confirmar Nova Senha</label>
               <div className="relative">
-                <input type={mostrarConfirmacao ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="w-full p-3 pr-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400" placeholder="Confirme a nova senha" required pattern={passwordPattern} title={passwordTitle} />
+                <input type={mostrarConfirmacao ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="w-full p-3 pr-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgb(253,77,121)] bg-[#f3f4f6] border border-pink-300 text-black dark:bg-gray-600 dark:border-gray-500 dark:text-white  dark:placeholder-white/65" placeholder="Confirme a nova senha" required pattern={passwordPattern} title={passwordTitle} />
                 <button
                   type="button"
                   onClick={() => setMostrarConfirmacao(v => !v)}
@@ -480,7 +478,7 @@ function PasswordSection({ showPasswordSection, setShowPasswordSection, currentP
                 </button>
               </div>
             </div>
-            <button type="submit" className="w-full bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white py-3 px-4 rounded-lg font-bold transition-all shadow-soft hover:shadow-medium">Atualizar Senha</button>
+            <button type="submit" className="w-full bg-pink-800 hover:bg-pink-900 active:bg-pink-950 text-white py-3 px-4 rounded-lg font-bold transition-all shadow-md hover:shadow-lg">Atualizar Senha</button>
           </form>
         )}
       </div>
@@ -498,6 +496,7 @@ const Profile = () => {
   const [nomeUsuario, setNomeUsuario] = useState('Nome do Usuário');
   const [editandoNome, setEditandoNome] = useState(false);
   const [novoNome, setNovoNome] = useState('');
+  const [usuarioId, setUsuarioId] = useState('');
 
   const siteAvatars = [
     '/assets/avatars/india-avatar.png',
@@ -511,11 +510,56 @@ const Profile = () => {
     (async () => {
       try {
         const usuarioLogado = localStorage.getItem('usuarioLogado');
-        if (!usuarioLogado) return;
+        const usuarioIdLocal = localStorage.getItem('usuarioId');
+        console.log('Perfil: usuarioLogado(localStorage)=', usuarioLogado, 'usuarioId(localStorage)=', usuarioIdLocal);
+
+        if (!usuarioLogado) {
+          console.error('Nenhum usuário logado encontrado no localStorage');
+          return;
+        }
+
+        // 1) Preferir o ID do localStorage (definido no login)
+        if (usuarioIdLocal) {
+          setUsuarioId(usuarioIdLocal);
+          console.log('Perfil: usando usuarioId do localStorage:', usuarioIdLocal);
+          try {
+            const resp = await fetch(`${API_BASE}/api/usuarios/${usuarioIdLocal}`);
+            if (resp.ok) {
+              const u = await resp.json();
+              setNomeUsuario(u?.nome || usuarioLogado);
+            }
+          } catch {}
+          return;
+        }
+
+        // 2) Fallback: buscar na lista de usuários pelo username
+        console.log('Fazendo requisição para obter usuários (fallback)...');
         const usuarios = await getItem('usuarios');
-        const usuario = usuarios.find(u => u.usuario === usuarioLogado);
-        if (usuario) setNomeUsuario(usuario.nome || 'Nome do Usuário');
-      } catch (e) { console.error('Erro ao buscar dados do usuário', e); }
+        console.log('Usuarios obtidos da API:', usuarios);
+
+        if (!usuarios || !Array.isArray(usuarios)) {
+          console.error('Dados de usuários inválidos:', usuarios);
+          return;
+        }
+
+        const usuario = usuarios.find(u => u && u.usuario === usuarioLogado);
+        console.log('Usuario encontrado (fallback):', usuario);
+
+        if (usuario) {
+          setNomeUsuario(usuario.nome || 'Nome do Usuário');
+          if (usuario.id) {
+            setUsuarioId(usuario.id);
+            console.log('UsuarioId definido como (fallback):', usuario.id);
+          } else {
+            console.error('Usuario encontrado mas sem ID:', usuario);
+          }
+        } else {
+          console.error('Usuario não encontrado na lista de usuários');
+          console.log('Usuários disponíveis:', usuarios.map(u => u?.usuario));
+        }
+      } catch (e) {
+        console.error('Erro ao buscar dados do usuário:', e);
+      }
     })();
   }, []);
 
@@ -560,22 +604,8 @@ const Profile = () => {
   };
 
   return (
-    <LayoutWrapper variant="profile" className="py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        {/* Header Section */}
-        <div className="text-center mb-12">
-          <Badge variant="primary" size="lg" className="mb-4">
-            👤 Meu Perfil
-          </Badge>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-            Gerencie sua <span className="bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">conta</span>
-          </h1>
-          <p className="text-xl text-white/80 max-w-3xl mx-auto">
-            Personalize seu perfil, gerencie seus eventos e configure suas preferências
-          </p>
-        </div>
-
-        <Card variant="glass" className="p-8">
+    <div className="min-h-screen flex flex-col text-black dark:text-gray-200">
+      <div className="container mx-auto px-4 pt-24 pb-16 max-w-4xl bg-[#d9dbe2] dark:bg-gray-800 rounded-xl my-8 shadow-lg backdrop-blur-sm">
         <AvatarSection
           profileImage={profileImage}
           siteAvatars={siteAvatars}
@@ -592,7 +622,7 @@ const Profile = () => {
           onSalvarNome={handleSalvarNome}
         />
         <div className="max-w-2xl mx-auto">
-          <FacialVerificationSection usuarioId={localStorage.getItem('usuarioId')} />
+          <FacialVerificationSection usuarioId={usuarioId} />
           <EventsSection usuarioLogado={localStorage.getItem('usuarioLogado')} />
           <PasswordSection
             showPasswordSection={showPasswordSection}
@@ -606,9 +636,8 @@ const Profile = () => {
             onSubmitPassword={handlePasswordSubmit}
           />
         </div>
-        </Card>
       </div>
-    </LayoutWrapper>
+    </div>
   );
 };
 

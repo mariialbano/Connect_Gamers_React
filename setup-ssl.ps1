@@ -6,10 +6,17 @@ Write-Host ""
 
 # 1. Detectar IP da rede
 Write-Host "1. Detectando IP da rede..." -ForegroundColor Yellow
+
+# Priorizar 192.168.0.* ou interface principal (Ethernet/Wi-Fi sem número)
 $networkIP = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {
-    $_.IPAddress -notlike "127.*" -and 
-    $_.IPAddress -notlike "169.254.*" -and
-    $_.PrefixOrigin -eq "Dhcp" -or $_.PrefixOrigin -eq "Manual"
+    ($_.IPAddress -like "192.168.0.*") -or
+    ($_.InterfaceAlias -eq "Ethernet" -and $_.IPAddress -like "192.168.*") -or
+    ($_.InterfaceAlias -eq "Wi-Fi" -and $_.IPAddress -like "192.168.*")
+} | Sort-Object { 
+    if ($_.IPAddress -like "192.168.0.*") { 0 } 
+    elseif ($_.InterfaceAlias -eq "Ethernet") { 1 }
+    elseif ($_.InterfaceAlias -eq "Wi-Fi") { 2 }
+    else { 3 }
 } | Select-Object -First 1).IPAddress
 
 if (-not $networkIP) {
@@ -45,12 +52,16 @@ Write-Host ""
 # 4. Gerar certificados
 Write-Host "4. Gerando certificados SSL..." -ForegroundColor Yellow
 
-# Gerar certificados com nome baseado no IP (formato igual ao mkcert padrão)
+# Gerar certificados com nome baseado no IP
 $certPath = Join-Path $PSScriptRoot "backend"
 Set-Location $certPath
 
-# mkcert gera automaticamente com formato: IP+1.pem e IP+1-key.pem
+# mkcert gera automaticamente com formato: IP+3.pem (porque tem 3 domínios extras)
 mkcert $networkIP localhost 127.0.0.1 "::1"
+
+# Renomear para +1 que o código espera
+Move-Item "${networkIP}+3-key.pem" -Destination "${networkIP}+1-key.pem" -Force
+Move-Item "${networkIP}+3.pem" -Destination "${networkIP}+1.pem" -Force
 
 # Copiar para a pasta public
 Copy-Item "${networkIP}+1-key.pem" -Destination "..\public\${networkIP}+1-key.pem" -Force

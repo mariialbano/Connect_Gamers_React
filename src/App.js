@@ -17,7 +17,6 @@ import Pontos from './pages/Pontos';
 import GamePoints from './pages/GamePoints';
 import Resgates from './pages/Resgates';
 import { useTheme } from './theme/ThemeContext';
-import LayoutWrapper from './components/LayoutWrapper';
 
 function App() {
   const { theme } = useTheme();
@@ -57,34 +56,35 @@ function App() {
 
   return (
     <Router>
-      <div className="flex flex-col min-h-screen">
+      <div
+        className={
+          theme === "dark"
+            ? "min-h-screen bg-gray-700 text-white flex flex-col"
+            : "min-h-screen bg-white text-black flex flex-col"
+        }
+      >
         <Navbar />
-  
-        {/* Gradiente apenas dentro do main */}
-        <main className="flex-1">
-          <LayoutWrapper className="flex flex-col min-h-full pb-0">
-            <Routes>
-              <Route path="/" element={<Navigate to="/home" />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/inscreva-se" element={<RequireAuth><Cadastro /></RequireAuth>} />
-              <Route path="/cadastro" element={<RedirectCadastro />} />
-              <Route path="/faq" element={<RequireAuth><FAQ /></RequireAuth>} />
-              <Route path="/jogos" element={<Jogos />} />
-              <Route path="/jogos/:gameId" element={<JogoDetalhe />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/perfil" element={<RequireAuth><Perfil /></RequireAuth>} />
-              <Route path="/comunidade" element={<RequireAuth><Comunidade /></RequireAuth>} />
-              <Route path="/amigos" element={<RequireAuth><Amigos /></RequireAuth>} />
-              <Route path="/pontos" element={<RequireAuth><Pontos /></RequireAuth>} />
-              <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
-              <Route path="/esg" element={<ESG />} />
-              <Route path="/gamepoints" element={<RequireAuth><GamePoints /></RequireAuth>} />
-              <Route path="/resgates" element={<RequireAuth><Resgates /></RequireAuth>} />
-              <Route path="/verify/:token" element={<FacialVerification />} />
-            </Routes>
-          </LayoutWrapper>
+        <main className="flex-1 p-6">
+          <Routes>
+            <Route path="/" element={<Navigate to="/home" />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/inscreva-se" element={<RequireAuth><Cadastro /></RequireAuth>} />
+            <Route path="/cadastro" element={<RedirectCadastro />} />
+            <Route path="/faq" element={<RequireAuth><FAQ /></RequireAuth>} />
+            <Route path="/jogos" element={<Jogos />} />
+            <Route path="/jogos/:gameId" element={<JogoDetalhe />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/perfil" element={<RequireAuth><Perfil /></RequireAuth>} />
+            <Route path="/comunidade" element={<RequireAuth><Comunidade /></RequireAuth>} />
+            <Route path="/amigos" element={<RequireAuth><Amigos /></RequireAuth>} />
+            <Route path="/pontos" element={<RequireAuth><Pontos /></RequireAuth>} />
+            <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
+            <Route path="/esg" element={<ESG />} />
+            <Route path="/gamepoints" element={<RequireAuth><GamePoints /></RequireAuth>} />
+            <Route path="/resgates" element={<RequireAuth><Resgates /></RequireAuth>} />
+            <Route path="/verify/:token" element={<FacialVerification />} />
+          </Routes>
         </main>
-  
         <Footer />
       </div>
     </Router>

@@ -230,7 +230,7 @@ function start(port) {
             }
         });
     } else {
-        console.error('Certificados SSL não encontrados. Backend rodando apenas em HTTP NÃO é seguro para câmera no iOS/Safari.');
+        console.error('Certificados SSL não encontrados. Backend rodando apenas em HTTP NÃO é seguro.');
     }
 }
 

@@ -25,7 +25,7 @@ app.get('/ca.crt', (req, res) => {
   res.download(path.join(__dirname, `../public/${serverIP}+1.pem`));
 });
 
-app.get('*', (req, res) => {
+app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, '../build', 'index.html'));
 });
 
