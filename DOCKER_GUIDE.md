@@ -166,7 +166,7 @@ brew services stop postgresql
 ```yaml
 postgres:
   ports:
-    - "5433:5432"  # Muda a porta externa para 5433
+    - "5433:a5432"  # Muda a porta externa para 5433
 ```
 
 E atualizar o `.env`:

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const QRCode = require('qrcode');
 const pool = require('../config/database');
 const facePlusPlusService = require('../services/facePlusPlusService');
@@ -104,7 +104,7 @@ router.post('/generate-qr', async (req, res) => {
             token = existingTokenResult.rows[0].token;
         } else {
             // Criar novo token
-            token = uuidv4();
+            token = randomUUID();
             const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutos
 
             await pool.query(

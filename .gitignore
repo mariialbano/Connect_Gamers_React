@@ -23,6 +23,10 @@ backend/node_modules
 .env.production.local
 backend/.env
 
+# SSL certificates
+/ssl
+*.pem
+
 # logs
 *.log
 npm-debug.log*

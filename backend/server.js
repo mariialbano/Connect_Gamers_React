@@ -93,8 +93,8 @@ let sslKey, sslCert;
 try {
     // Usar IP do .env ou detectar automaticamente o IP da rede local
     const serverIP = process.env.SERVER_IP || getLocalNetworkIP();
-    sslKey = fs.readFileSync(path.join(__dirname, `${serverIP}+1-key.pem`));
-    sslCert = fs.readFileSync(path.join(__dirname, `${serverIP}+1.pem`));
+    sslKey = fs.readFileSync(path.join(__dirname, '..', 'ssl', `${serverIP}+1-key.pem`));
+    sslCert = fs.readFileSync(path.join(__dirname, '..', 'ssl', `${serverIP}+1.pem`));
 } catch (e) {
     console.error('Certificados SSL não encontrados. Execute: .\\setup-ssl.ps1', e.message);
 }

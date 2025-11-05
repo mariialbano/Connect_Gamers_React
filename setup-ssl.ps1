@@ -52,8 +52,14 @@ Write-Host ""
 # 4. Gerar certificados
 Write-Host "4. Gerando certificados SSL..." -ForegroundColor Yellow
 
+# Criar pasta ssl se não existir
+$certPath = Join-Path $PSScriptRoot "ssl"
+if (-not (Test-Path $certPath)) {
+    New-Item -ItemType Directory -Path $certPath -Force | Out-Null
+    Write-Host "   ✅ Pasta ssl/ criada" -ForegroundColor Green
+}
+
 # Gerar certificados com nome baseado no IP
-$certPath = Join-Path $PSScriptRoot "backend"
 Set-Location $certPath
 
 # mkcert gera automaticamente com formato: IP+3.pem (porque tem 3 domínios extras)
@@ -63,15 +69,9 @@ mkcert $networkIP localhost 127.0.0.1 "::1"
 Move-Item "${networkIP}+3-key.pem" -Destination "${networkIP}+1-key.pem" -Force
 Move-Item "${networkIP}+3.pem" -Destination "${networkIP}+1.pem" -Force
 
-# Copiar para a pasta public
-Copy-Item "${networkIP}+1-key.pem" -Destination "..\public\${networkIP}+1-key.pem" -Force
-Copy-Item "${networkIP}+1.pem" -Destination "..\public\${networkIP}+1.pem" -Force
-
 Write-Host "   ✅ Certificados gerados em:" -ForegroundColor Green
-Write-Host "      - backend/${networkIP}+1.pem" -ForegroundColor White
-Write-Host "      - backend/${networkIP}+1-key.pem" -ForegroundColor White
-Write-Host "      - public/${networkIP}+1.pem" -ForegroundColor White
-Write-Host "      - public/${networkIP}+1-key.pem" -ForegroundColor White
+Write-Host "      - ssl/${networkIP}+1.pem" -ForegroundColor White
+Write-Host "      - ssl/${networkIP}+1-key.pem" -ForegroundColor White
 Write-Host ""
 
 # 5. Atualizar .env na raiz
@@ -88,8 +88,8 @@ REACT_APP_API_URL=https://${networkIP}:5000
 
 # HTTPS Configuration
 HTTPS=true
-SSL_CRT_FILE=public/${networkIP}+1.pem
-SSL_KEY_FILE=public/${networkIP}+1-key.pem
+SSL_CRT_FILE=ssl/${networkIP}+1.pem
+SSL_KEY_FILE=ssl/${networkIP}+1-key.pem
 
 # Disable automatic browser opening
 BROWSER=none

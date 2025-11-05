@@ -11,7 +11,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: connectgamers
     ports:
-      - "5433:5432"
+      - "5432"
     volumes:
       # Persiste os dados do banco mesmo se o container for removido
       - postgres_data:/var/lib/postgresql/data
@@ -54,6 +54,8 @@ services:
       - /app/node_modules
       # Persiste os logs
       - ./logs:/app/../logs
+      # Monta certificados SSL
+      - ./ssl:/ssl
     networks:
       - connect_gamers_network
     command: sh -c "node scripts/initDatabase.js && node server.js"
