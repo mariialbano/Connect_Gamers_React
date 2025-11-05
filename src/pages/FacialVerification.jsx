@@ -332,15 +332,21 @@ const FacialVerification = () => {
       formData.append('photo', capturedImage, 'face-photo.jpg');
       formData.append('token', effectiveToken);
 
+      const url = buildApiUrl('/api/verification/face-verification');
       console.log('📤 Enviando verificação facial...');
+      console.log('📤 URL:', url);
+      console.log('📤 Token:', effectiveToken);
+      console.log('📤 Foto tamanho:', capturedImage?.size);
 
-      const response = await fetchWithTimeout(buildApiUrl('/api/verification/face-verification'), {
+      const response = await fetchWithTimeout(url, {
         method: 'POST',
         body: formData,
         credentials: 'include',
         mode: 'cors',
         cache: 'no-store',
       }, 20000);
+
+      console.log('📥 Resposta status:', response.status);
 
       let data = null;
       try {
@@ -365,8 +371,16 @@ const FacialVerification = () => {
         setCapturedImage(null);
       }
     } catch (error) {
-      console.error('❌ Erro:', error);
-      setError('Erro ao enviar imagem');
+      console.error('❌ Erro completo:', error);
+      console.error('❌ Erro tipo:', error.constructor.name);
+      console.error('❌ Erro mensagem:', error.message);
+      console.error('❌ Erro stack:', error.stack);
+      
+      // Mostrar erro detalhado
+      const errorMsg = `Erro: ${error.message}\nTipo: ${error.constructor.name}\nURL: ${buildApiUrl('/api/verification/face-verification')}`;
+      alert(errorMsg); // Temporário para debug
+      
+      setError(`Erro ao enviar foto: ${error.message}`);
       setStep('capture-photo');
       setCapturedImage(null);
     }

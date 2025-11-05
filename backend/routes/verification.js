@@ -113,9 +113,9 @@ router.post('/generate-qr', async (req, res) => {
             );
         }
 
-        // Gerar QR Code apontando para o backend na porta 5000 (faceid.html)
-        const origin = `${req.protocol}://${req.get('host')}`;
-        const verificationUrl = `${origin}/faceid/${token}`;
+        // Gerar QR Code apontando para o faceid.html no backend
+        const backendUrl = process.env.FRONTEND_URL || `${req.protocol}://${req.get('host')}`;
+        const verificationUrl = `${backendUrl}/faceid/${token}`;
         const qrCodeDataUrl = await QRCode.toDataURL(verificationUrl);
 
         res.json({
@@ -187,18 +187,26 @@ router.get('/verify-token/:token', async (req, res) => {
 // Rota para upload e verificação facial
 router.post('/face-verification', upload.single('photo'), async (req, res) => {
     try {
+        console.log('📸 [FACE-VERIFICATION] Requisição recebida');
+        console.log('📸 Body:', req.body);
+        console.log('📸 File:', req.file ? 'Presente' : 'Ausente');
+        
         await ensureFaceColumns();
 
         const { token } = req.body;
         const photoBuffer = req.file?.buffer;
 
         if (!token) {
+            console.error('❌ Token ausente');
             return res.status(400).json({ error: 'Token é obrigatório' });
         }
 
         if (!photoBuffer) {
+            console.error('❌ Foto ausente');
             return res.status(400).json({ error: 'Foto é obrigatória' });
         }
+
+        console.log('✅ Token e foto presentes');
 
         // Validar token
         const tokenResult = await pool.query(
@@ -250,8 +258,13 @@ router.post('/face-verification', upload.single('photo'), async (req, res) => {
                     });
                 }
             } catch (compareError) {
-                console.warn(`⚠️ Erro ao comparar com usuário ${verifiedUser.usuario}:`, compareError.message);
-                // Continua verificando outros usuários
+                console.error(`❌ Erro crítico ao comparar com usuário ${verifiedUser.usuario}:`, compareError.message);
+                // SEGURANÇA: Se houver erro na comparação, bloqueia por precaução
+                return res.status(500).json({
+                    error: 'Não foi possível verificar duplicatas',
+                    message: 'Erro ao processar verificação facial. Tente novamente em alguns instantes.',
+                    technical: compareError.message
+                });
             }
         }
 
@@ -290,7 +303,9 @@ router.post('/face-verification', upload.single('photo'), async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Erro na verificação facial:', error);
+        console.error('❌ [FACE-VERIFICATION] Erro completo:', error);
+        console.error('❌ Stack:', error.stack);
+        console.error('❌ Message:', error.message);
         
         // Erros específicos da API Face++
         if (error.message.includes('Face++')) {

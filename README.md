@@ -63,14 +63,14 @@ O projeto utiliza HTTPS tanto no frontend quanto no backend para segurança. Par
 ```
 
 **O que o script faz automaticamente:**
-- ✅ Detecta o IP da sua rede local (ex: 192.168.0.141)
+- ✅ Detecta o IP da sua rede local (ex: 192.168.0.1)
 - ✅ Verifica se `mkcert` está instalado (instala via winget se necessário)
 - ✅ Instala a CA (Certificate Authority) local do mkcert
 - ✅ Cria automaticamente a pasta `ssl/` para os certificados
 - ✅ Gera certificados SSL válidos para:
   - `localhost`
   - `127.0.0.1`
-  - Seu IP de rede (ex: 192.168.0.141)
+  - Seu IP de rede (ex: 192.168.0.1)
   - `::1` (IPv6)
 - ✅ Salva certificados em `ssl/` (ignorado pelo Git)
 - ✅ Atualiza automaticamente os arquivos `.env` com:
@@ -91,8 +91,8 @@ npm start
 ```
 
 **Resultado:**
-- 🔒 Frontend: `https://SEU_IP:3000` (ex: https://192.168.0.141:3000)
-- 🔒 Backend: `https://SEU_IP:5000` (ex: https://192.168.0.141:5000)
+- 🔒 Frontend: `https://SEU_IP:3000` (ex: https://192.168.0.1:3000)
+- 🔒 Backend: `https://SEU_IP:5000` (ex: https://192.168.0.1:5000)
 - 📱 Acessível de celular na mesma rede (ideal para testar verificação facial)
 
 **Observações:**
@@ -156,72 +156,6 @@ npm start
 **7. Acesse a aplicação**
 - Frontend: [http://localhost:3000](http://localhost:3000)
 - Backend: [http://localhost:5000](http://localhost:5000)
-
----
-
-### 💻 **OPÇÃO 3: Instalação Manual (sem Docker)**
-
-Se você não quiser usar Docker, siga estas instruções:
-
-#### **Pré-requisitos:**
-- [Node.js](https://nodejs.org/) instalado
-- [PostgreSQL](https://www.postgresql.org/download/) instalado e rodando
-
-#### **Passo a passo:**
-
-**1. Clone o repositório**
-```bash
-git clone https://github.com/mariialbano/Connect_Gamers_React.git
-cd Connect_Gamers_React
-```
-
-**2. Configure o PostgreSQL**
-- Certifique-se que o PostgreSQL está rodando na porta 5432
-- Crie o banco de dados:
-```sql
-CREATE DATABASE connect_gamers;
-```
-
-**3. Configure as variáveis de ambiente**
-```bash
-# Windows (PowerShell)
-Copy-Item backend\.env.example backend\.env
-
-# Linux/Mac
-cp backend/.env.example backend/.env
-```
-
-Edite o arquivo `backend/.env`:
-```env
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=connect_gamers
-DB_USER=postgres
-DB_PASSWORD=sua_senha_do_postgres
-OPENAI_API_KEY=sua_chave_aqui
-```
-
-**4. Instale as dependências**
-```bash
-# Frontend e Backend
-npm run install-all
-```
-
-**5. Inicialize o banco de dados**
-```bash
-cd backend
-node scripts/initDatabase.js
-cd ..
-```
-
-**6. Inicie o projeto**
-```bash
-npm run dev
-```
-
-**7. Acesse a aplicação**
-- Frontend: [https://localhost:3000](https://localhost:3000) ou [https://192.168.0.1:3000](https://192.168.0.1:3000)
-- Backend: [https://localhost:5000](https://localhost:5000) ou [https://192.168.0.1:5000](https://192.168.0.1:5000)
 
 ---
 
@@ -337,41 +271,81 @@ docker exec -it connect_gamers_db psql -U postgres -d connect_gamers
 
 ---
 
-## 🔐 Verificação Facial (Novo!)
+## 🔐 Verificação Facial
 
-O Connect Gamers agora suporta verificação de identidade via reconhecimento facial!
+O Connect Gamers possui sistema de verificação de identidade via reconhecimento facial usando **Face++ API**.
 
 ### **Como funciona:**
-1. **Cadastro normal** - usuário cria conta sem verificação
-2. **Perfil do usuário** - botão "Verifique sua conta" aparece
-3. **QR Code** - sistema gera QR code único que expira em 5 minutos
-4. **Celular** - usuário escaneia QR e tira foto do rosto
-5. **Azure Face API** - processa e verifica a identidade
-6. **Conta verificada** - usuário fica com selo de verificação
+1. **Cadastro normal** - Usuário cria conta sem verificação
+2. **Perfil do usuário** - Botão "Verifique sua conta" aparece
+3. **QR Code** - Sistema gera QR code único que expira em 5 minutos
+4. **Celular** - Usuário escaneia QR e abre página de verificação (`https://IP:5000/faceid/{token}`)
+5. **Captura de foto** - Tira foto do rosto pela câmera ou upload de arquivo
+6. **Face++ API** - Detecta o rosto e gera face_token biométrico único
+7. **Verificação de duplicatas** - Compara com todas as faces já cadastradas para evitar múltiplas contas
+8. **Conta verificada** - Usuário fica com selo de verificação e dados salvos no banco
 
 ### **Configuração necessária:**
-Para habilitar a verificação facial, você precisa configurar a Azure Face API:
 
-1. **Leia o guia completo:** [`FACIAL_VERIFICATION_SETUP.md`](FACIAL_VERIFICATION_SETUP.md)
-2. **Crie recurso Azure Face** (gratuito - 20.000 verificações/mês)
-3. **Configure no .env:**
+Para habilitar a verificação facial, você precisa configurar a Face++ API:
+
+1. **Crie conta gratuita:** [Face++ Console](https://console.faceplusplus.com/)
+   - Plano gratuito: 1.000 chamadas/mês
+   
+2. **Obtenha suas credenciais:**
+   - Acesse **API Management** no console
+   - Copie sua **API Key** e **API Secret**
+
+3. **Configure no `backend/.env`:**
    ```env
-   AZURE_FACE_ENDPOINT=https://your-resource.cognitiveservices.azure.com/
-   AZURE_FACE_SUBSCRIPTION_KEY=your_api_key_here
+   # Face++ API (Para verificação facial)
+   FACEPP_API_KEY=sua_api_key_aqui
+   FACEPP_API_SECRET=seu_api_secret_aqui
    ```
+
+4. **Reinicie o backend:**
+   ```bash
+   docker-compose restart backend
+   ```
+
+### **APIs utilizadas:**
+- **Detect API** - Detecta faces na imagem e gera face_token
+- **Compare API** - Compara duas faces e retorna confiança de similaridade
 
 ### **Recursos implementados:**
 - ✅ Geração de QR Code único por usuário
-- ✅ Página móvel responsiva para captura
-- ✅ Suporte à câmera ou upload de foto
-- ✅ Integração completa com Azure Face API
-- ✅ Validação de qualidade da imagem
-- ✅ Verificação de rosto único na foto
-- ✅ Comparação biométrica segura
-- ✅ Expiração automática de tokens
-- ✅ Status de verificação no perfil
+- ✅ Página HTML responsiva para captura móvel (`faceid.html`)
+- ✅ Suporte à câmera do dispositivo ou upload de foto
+- ✅ Integração com Face++ API (Detect + Compare)
+- ✅ Detecção automática de faces na imagem
+- ✅ **Prevenção de duplicatas** - Compara com todas as faces verificadas
+- ✅ **Bloqueio por segurança** - Se houver erro na comparação, bloqueia verificação
+- ✅ Armazenamento de face_token e foto no banco (PostgreSQL)
+- ✅ Expiração automática de tokens (5 minutos)
+- ✅ Status de verificação no perfil do usuário
+- ✅ Redirecionamento automático para frontend após sucesso
 
-**Opcional:** O projeto funciona normalmente mesmo sem configurar a verificação facial.
+### **Fluxo técnico:**
+```
+1. Frontend (porta 3000) → Gera QR Code via POST /api/verification/generate-qr
+2. QR Code aponta para → https://192.168.0.141:5000/faceid/{token}
+3. Usuário acessa faceid.html (backend porta 5000)
+4. Captura foto → POST /api/verification/face-verification
+5. Backend detecta face → Face++ Detect API
+6. Backend compara com usuários verificados → Face++ Compare API
+7. Se não houver duplicata → Salva e marca como verificado
+8. Redireciona para → https://192.168.0.141:3000/login
+```
+
+### **Segurança:**
+- ✅ Tokens únicos com expiração de 5 minutos
+- ✅ Cada face só pode ser usada uma vez (prevenção de duplicatas)
+- ✅ Comparação biométrica com threshold de confiança
+- ✅ Imagens armazenadas como BYTEA criptografado no PostgreSQL
+- ✅ Face_tokens armazenados para comparações futuras
+- ✅ Sistema bloqueia verificação em caso de erros na API
+
+**Nota:** O projeto funciona normalmente mesmo sem configurar a verificação facial. A funcionalidade é opcional.
 
 ---
 

@@ -227,7 +227,7 @@
             try {
                 showStatus('info', '🔄 Verificando sua identidade...');
 
-                const response = await fetch('/api/verification/verify-face', {
+                const response = await fetch('/api/verification/face-verification', {
                     method: 'POST',
                     body: formData
                 });
@@ -237,9 +237,11 @@
                 if (response.ok && data.success) {
                     showStatus('success', '✅ ' + data.message);
 
-                    // Redirecionar após 2 segundos
+                    // Redirecionar para o frontend após 2 segundos
+                    // Constrói URL do frontend trocando porta 5000 por 3000
                     setTimeout(() => {
-                        window.location.href = '/login';
+                        const frontendUrl = window.location.origin.replace(':5000', ':3000');
+                        window.location.href = `${frontendUrl}/login`;
                     }, 2000);
                 } else {
                     showStatus('error', '❌ ' + (data.message || 'Erro na verificação'));

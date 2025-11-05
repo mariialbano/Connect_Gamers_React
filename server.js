@@ -1,12 +1,30 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 require('dotenv').config();
 const app = express();
 
+// Função para detectar IP da rede local automaticamente
+function getLocalNetworkIP() {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      // Pular endereços internos e não IPv4
+      if (iface.family === 'IPv4' && !iface.internal) {
+        // Priorizar 192.168.0.* ou qualquer 192.168.*
+        if (iface.address.startsWith('192.168.0.') || iface.address.startsWith('192.168.')) {
+          return iface.address;
+        }
+      }
+    }
+  }
+  return 'localhost'; // Fallback
+}
+
 const serverIP = process.env.REACT_APP_API_URL ? 
   process.env.REACT_APP_API_URL.match(/https:\/\/([^:]+):/)?.[1] : 
-  '192.168.0.141';
+  getLocalNetworkIP();
 
 app.use(express.static(path.join(__dirname, '../build')));
 
@@ -22,7 +40,7 @@ app.get('/api/verify', (req, res) => {
 });
 
 app.get('/ca.crt', (req, res) => {
-  res.download(path.join(__dirname, `../public/${serverIP}+1.pem`));
+  res.download(path.join(__dirname, `../ssl/${serverIP}+1.pem`));
 });
 
 app.get('/*', (req, res) => {
